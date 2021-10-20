@@ -72,6 +72,7 @@ const deploy = async ({
 	useFork,
 	useOvm,
 	yes,
+	fromHardhat = true,
 } = {}) => {
 	ensureNetwork(network);
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network, useOvm });
@@ -150,7 +151,7 @@ const deploy = async ({
 	}
 
 	console.log(gray('Loading the compiled contracts locally...'));
-	const { earliestCompiledTimestamp, compiled } = loadCompiledFiles({ buildPath });
+	const { earliestCompiledTimestamp, compiled } = loadCompiledFiles({ buildPath, fromHardhat });
 
 	const {
 		providerUrl: envProviderUrl,
@@ -532,6 +533,7 @@ module.exports = {
 			)
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
+			.option('--from-hardhat', 'use compiled from hardhat.')
 			.action(async (...args) => {
 				try {
 					await deploy(...args);

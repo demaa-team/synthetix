@@ -18,11 +18,14 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'kovan', 'mainnet', 'goerli'];
+const networks = ['local', 'rinkeby', 'kovan', 'mainnet', 'goerli'];
 
 const chainIdMapping = Object.entries({
 	1: {
 		network: 'mainnet',
+	},
+	4: {
+		network: 'rinkeby',
 	},
 	5: {
 		network: 'goerli',
@@ -71,6 +74,7 @@ const constants = {
 	CONTRACTS_FOLDER: 'contracts',
 	MIGRATIONS_FOLDER: 'migrations',
 	COMPILED_FOLDER: 'compiled',
+	HARDHAT_COMPILED_FOLDER: 'artifacts',
 	FLATTENED_FOLDER: 'flattened',
 	AST_FOLDER: 'ast',
 

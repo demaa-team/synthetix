@@ -46,7 +46,6 @@ task('compile')
 		if (taskArguments.showsize || taskArguments.failOversize) {
 			const contractToObjectMap = collectContractBytesCodes();
 			const sizes = logContractSizes({ contractToObjectMap });
-
 			if (taskArguments.failOversize) {
 				const offenders = sizes.filter(entry => +entry.pcent.split('%')[0] > 100);
 				if (offenders.length > 0) {

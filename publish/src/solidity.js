@@ -4,8 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const solidifier = require('solidifier');
 const {
-	constants: { COMPILED_FOLDER },
+	constants: { COMPILED_FOLDER, HARDHAT_COMPILED_FOLDER, CONTRACTS_FOLDER },
 } = require('../..');
+const { red } = require('chalk');
 const { addSolidityHeader } = require('./solidity-header');
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
@@ -22,6 +23,7 @@ const findSolFiles = ({ sourcePath, ignore = [] }) => {
 			} else if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
 				doWork(fullPath, relativePath, fileList);
 			} else if (path.extname(file) === '.sol') {
+				console.debug(red(`find contract file ${fullPath}`));
 				fileList[relativePath] = {
 					textContents: fs.readFileSync(fullPath, 'utf8'),
 				};
@@ -102,33 +104,67 @@ module.exports = {
 		return { artifacts, errors, warnings };
 	},
 
-	loadCompiledFiles({ buildPath }) {
+	loadCompiledFiles({ buildPath, fromHardhat = true }) {
 		let earliestCompiledTimestamp = Infinity;
 
-		const compiledSourcePath = path.join(buildPath, COMPILED_FOLDER);
+		let compiledSourcePath = path.join(buildPath, COMPILED_FOLDER);
+		if (fromHardhat) {
+			compiledSourcePath = path.join(buildPath, HARDHAT_COMPILED_FOLDER, CONTRACTS_FOLDER);
+		}
 
 		if (!fs.existsSync(compiledSourcePath)) {
 			return { earliestCompiledTimestamp: 0 };
 		}
-		const compiled = fs
-			.readdirSync(compiledSourcePath)
-			.filter(name => /^.+\.json$/.test(name))
-			.reduce((memo, contractFilename) => {
-				const contract = contractFilename.replace(/\.json$/, '');
-				const sourceFile = path.join(compiledSourcePath, contractFilename);
-				earliestCompiledTimestamp = Math.min(
-					earliestCompiledTimestamp,
-					fs.statSync(sourceFile).mtimeMs
-				);
-				if (!fs.existsSync(sourceFile)) {
-					throw Error(
-						`Cannot find compiled contract code for: ${contract}. Did you run the "build" step first?`
+		let compiled;
+		if (fromHardhat) {
+			compiled = fs
+				.readdirSync(compiledSourcePath)
+				.filter(name => /^.+\.sol$/.test(name))
+				.reduce((memo, contractFilename) => {
+					const contract = contractFilename.replace(/\.sol$/, '');
+					const sourceFile = path.join(
+						compiledSourcePath,
+						contractFilename,
+						contractFilename.replace(/\.sol$/, '.json')
 					);
-				}
-				memo[contract] = JSON.parse(fs.readFileSync(sourceFile));
-				return memo;
-			}, {});
-
+					earliestCompiledTimestamp = Math.min(
+						earliestCompiledTimestamp,
+						fs.statSync(sourceFile).mtimeMs
+					);
+					if (!fs.existsSync(sourceFile)) {
+						throw Error(
+							`Cannot find compiled contract code for: ${contract}. Did you run the "build" step first?`
+						);
+					}
+					const compiledFile = JSON.parse(fs.readFileSync(sourceFile));
+					compiledFile.metadata = { compiler: { version: 'hard-hat' }, sources: [contract] };
+					compiledFile.evm = {
+						bytecode: { object: compiledFile.bytecode },
+						deployedBytecode: { object: compiledFile.deployedBytecode },
+					};
+					memo[contract] = compiledFile;
+					return memo;
+				}, {});
+		} else {
+			compiled = fs
+				.readdirSync(compiledSourcePath)
+				.filter(name => /^.+\.json$/.test(name))
+				.reduce((memo, contractFilename) => {
+					const contract = contractFilename.replace(/\.json$/, '');
+					const sourceFile = path.join(compiledSourcePath, contractFilename);
+					earliestCompiledTimestamp = Math.min(
+						earliestCompiledTimestamp,
+						fs.statSync(sourceFile).mtimeMs
+					);
+					if (!fs.existsSync(sourceFile)) {
+						throw Error(
+							`Cannot find compiled contract code for: ${contract}. Did you run the "build" step first?`
+						);
+					}
+					memo[contract] = JSON.parse(fs.readFileSync(sourceFile));
+					return memo;
+				}, {});
+		}
 		return { compiled, earliestCompiledTimestamp };
 	},
 };
