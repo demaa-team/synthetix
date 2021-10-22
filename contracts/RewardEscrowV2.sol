@@ -16,7 +16,7 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
-    bytes32 private constant CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM = "SynthetixBridgeToOptimism";
+    // bytes32 private constant CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM = "SynthetixBridgeToOptimism";
     bytes32 private constant CONTRACT_REWARD_ESCROW = "RewardEscrow";
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
 
@@ -28,15 +28,15 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
 
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
         bytes32[] memory existingAddresses = BaseRewardEscrowV2.resolverAddressesRequired();
-        bytes32[] memory newAddresses = new bytes32[](3);
-        newAddresses[0] = CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM;
-        newAddresses[1] = CONTRACT_REWARD_ESCROW;
-        newAddresses[2] = CONTRACT_SYSTEMSTATUS;
+        bytes32[] memory newAddresses = new bytes32[](2);
+        newAddresses[0] = CONTRACT_REWARD_ESCROW;
+        newAddresses[1] = CONTRACT_SYSTEMSTATUS;
         return combineArrays(existingAddresses, newAddresses);
     }
 
     function synthetixBridgeToOptimism() internal view returns (address) {
-        return requireAndGetAddress(CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM);
+        return address(0);
+        // return requireAndGetAddress(CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM);
     }
 
     function oldRewardEscrow() internal view returns (IRewardEscrow) {

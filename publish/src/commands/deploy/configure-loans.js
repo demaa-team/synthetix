@@ -14,7 +14,6 @@ module.exports = async ({
 
 	const {
 		SystemSettings,
-		CollateralErc20,
 		CollateralEth,
 		CollateralShort,
 		CollateralManager,
@@ -37,8 +36,8 @@ module.exports = async ({
 
 	if (CollateralShort && CollateralManager) {
 		let CollateralsArg = [CollateralShort].map(addressOf);
-		if (CollateralEth && CollateralErc20) {
-			CollateralsArg = [CollateralEth, CollateralErc20, CollateralShort].map(addressOf);
+		if (CollateralEth) {
+			CollateralsArg = [CollateralEth, CollateralShort].map(addressOf);
 		}
 		await runStep({
 			contract: 'CollateralManager',
@@ -89,47 +88,6 @@ module.exports = async ({
 			write: 'setIssueFeeRate',
 			writeArg: [(await getDeployParameter('COLLATERAL_ETH'))['ISSUE_FEE_RATE']],
 			comment: 'Ensure the CollateralEth contract has its issue fee rate set',
-		});
-	}
-
-	if (CollateralErc20 && CollateralManager) {
-		await runStep({
-			contract: 'CollateralErc20',
-			target: CollateralErc20,
-			read: 'manager',
-			expected: input => input === addressOf(CollateralManager),
-			write: 'setManager',
-			writeArg: addressOf(CollateralManager),
-			comment: 'Ensure the CollateralErc20 contract is connected to the CollateralManager',
-		});
-
-		const CollateralErc20Synths = (await getDeployParameter('COLLATERAL_RENBTC'))['SYNTHS']; // COLLATERAL_RENBTC synths - ['sUSD', 'sBTC']
-		await runStep({
-			contract: 'CollateralErc20',
-			gasLimit: 1e6,
-			target: CollateralErc20,
-			read: 'areSynthsAndCurrenciesSet',
-			readArg: [
-				CollateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
-				CollateralErc20Synths.map(toBytes32),
-			],
-			expected: input => input,
-			write: 'addSynths',
-			writeArg: [
-				CollateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
-				CollateralErc20Synths.map(toBytes32),
-			],
-			comment: 'Ensure the CollateralErc20 contract has all associated synths added',
-		});
-
-		await runStep({
-			contract: 'CollateralErc20',
-			target: CollateralErc20,
-			read: 'issueFeeRate',
-			expected: input => input !== '0', // only change if zero
-			write: 'setIssueFeeRate',
-			writeArg: [(await getDeployParameter('COLLATERAL_RENBTC'))['ISSUE_FEE_RATE']],
-			comment: 'Ensure the CollateralErc20 contract has its issue fee rate set',
 		});
 	}
 

@@ -50,7 +50,7 @@ const DEFAULTS = {
 };
 
 const deploy = async ({
-	addNewSynths,
+	addNewSynths = true,
 	buildPath = DEFAULTS.buildPath,
 	concurrency,
 	deploymentPath,

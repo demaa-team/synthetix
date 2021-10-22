@@ -139,6 +139,9 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 };
 
 const getExplorerLinkPrefix = ({ network, useOvm }) => {
+	if (network === 'mumbai') {
+		return 'https://mumbai.polygonscan.com';
+	}
 	return `https://${network !== 'mainnet' ? network + (useOvm ? '-' : '.') : ''}${
 		useOvm ? 'explorer.optimism' : 'etherscan'
 	}.io`;
@@ -165,9 +168,12 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 	const privateKey =
 		network === 'mainnet' ? process.env.DEPLOY_PRIVATE_KEY : process.env.TESTNET_DEPLOY_PRIVATE_KEY;
 
-	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
+	let etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
 		useOvm ? '-optimistic' : ''
 	}.etherscan.io/api`;
+	if (network === 'mumbai') {
+		etherscanUrl = 'https://api-testnet.polygonscan.com/api';
+	}
 
 	const explorerLinkPrefix = getExplorerLinkPrefix({ network, useOvm });
 

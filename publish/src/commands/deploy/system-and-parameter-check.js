@@ -52,6 +52,8 @@ module.exports = async ({
 	let systemSuspendedReason;
 
 	try {
+		freshDeploy = true;
+		// throw Error('TODO:need check all bellow things');
 		const oldSynthetix = deployer.getExistingContract({ contract: 'Synthetix' });
 		currentSynthetixSupply = await oldSynthetix.totalSupply();
 
@@ -83,7 +85,7 @@ module.exports = async ({
 		} else {
 			console.error(
 				red(
-					'Cannot connect to existing Synthetix contract. Please double check the deploymentPath is correct for the network allocated'
+					`${err}=> Cannot connect to existing Synthetix contract. Please double check the deploymentPath is correct for the network allocated`
 				)
 			);
 			throw Error('Cannot deploy. Halted.');

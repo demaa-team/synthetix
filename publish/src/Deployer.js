@@ -5,6 +5,7 @@ const ethers = require('ethers');
 const { gray, green, yellow } = require('chalk');
 const fs = require('fs');
 const { stringify, getExplorerLinkPrefix, assignGasOptions } = require('./util');
+const path = require('path');
 const { getVersions, getUsers } = require('../..');
 
 class Deployer {
@@ -145,7 +146,7 @@ class Deployer {
 		return params;
 	}
 
-	async _deploy({ name, source, args = [], deps = [], force = false, dryRun = this.dryRun }) {
+	async _deploy({ name, source, args = [], deps = [], force = true, dryRun = this.dryRun }) {
 		if (!this.config[name] && !force) {
 			console.log(yellow(`Skipping ${name} as it is NOT in contract flags file for deployment.`));
 			return;
@@ -204,10 +205,14 @@ class Deployer {
 			// Any contract after SafeDecimalMath can automatically get linked.
 			// Doing this with bytecode that doesn't require the library is a no-op.
 			let bytecode = compiled.evm.bytecode.object;
+
+			// TODO:temporay fix
 			['SafeDecimalMath', 'Math'].forEach(contractName => {
 				if (this.deployedContracts[contractName]) {
+					const fullSource = path.join('contracts', contractName);
+					console.log(fullSource);
 					bytecode = linker.linkBytecode(bytecode, {
-						[source + '.sol']: {
+						[fullSource + '.sol']: {
 							[contractName]: this.deployedContracts[contractName].address,
 						},
 					});
@@ -277,7 +282,6 @@ class Deployer {
 						);
 					}
 				}
-
 				const factory = new ethers.ContractFactory(compiled.abi, bytecode, this.signer);
 
 				const overrides = await this.sendOverrides();
@@ -393,7 +397,7 @@ class Deployer {
 		source = name,
 		args = [],
 		deps = [],
-		force = false,
+		force = true,
 		dryRun = this.dryRun,
 	}) {
 		const forbiddenAddress = (this.deployedContracts['AddressResolver'] || {}).address;

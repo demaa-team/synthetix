@@ -30,6 +30,9 @@ module.exports = async ({
 }) => {
 	console.log(gray(`\n------ IMPORT FEE PERIODS ------\n`));
 
+	// TODO: removed after test
+	freshDeploy = true;
+
 	const { FeePool } = deployer.deployedContracts;
 	// fresh deploys or no new fee pool mean this should be skipped
 	if (freshDeploy) {

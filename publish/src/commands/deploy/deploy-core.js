@@ -224,6 +224,7 @@ module.exports = async ({
 		});
 	}
 
+	/*
 	await deployer.deployContract({
 		name: 'SynthetixBridgeToBase',
 		deps: ['AddressResolver'],
@@ -241,7 +242,7 @@ module.exports = async ({
 		deps: ['AddressResolver'],
 		args: [account],
 	});
-
+*/
 	await deployer.deployContract({
 		name: 'SynthRedeemer',
 		deps: ['AddressResolver'],

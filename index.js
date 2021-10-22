@@ -8,6 +8,8 @@ const data = {
 	kovan: require('./publish/deployed/kovan'),
 	mainnet: require('./publish/deployed/mainnet'),
 	goerli: require('./publish/deployed/goerli'),
+	rinkeby: require('./publish/deployed/rinkeby'),
+	mumbai: require('./publish/deployed/mumbai'),
 	'goerli-ovm': require('./publish/deployed/goerli-ovm'),
 	'kovan-ovm': require('./publish/deployed/kovan-ovm'),
 	'mainnet-ovm': require('./publish/deployed/mainnet-ovm'),
@@ -18,7 +20,7 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'rinkeby', 'kovan', 'mainnet', 'goerli'];
+const networks = ['local', 'rinkeby', 'mumbai', 'kovan', 'mainnet', 'goerli'];
 
 const chainIdMapping = Object.entries({
 	1: {
@@ -38,7 +40,6 @@ const chainIdMapping = Object.entries({
 		network: 'mainnet',
 		fork: true,
 	},
-
 	// OVM networks: see https://github.com/ethereum-optimism/regenesis/
 	10: {
 		network: 'mainnet',
@@ -47,6 +48,11 @@ const chainIdMapping = Object.entries({
 	69: {
 		network: 'kovan',
 		useOvm: true,
+	},
+	// polygon-mumbai test networks: see https://mumbai.polygonscan.com/
+	80001: {
+		network: 'mumbai',
+		fork: false,
 	},
 	'-1': {
 		// no chain ID for this currently
@@ -151,6 +157,7 @@ const defaults = {
 	WETH_ERC20_ADDRESSES: {
 		mainnet: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
 		kovan: '0xd0A1E359811322d97991E03f863a0C30C2cF029C',
+		mumbai: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
 		goerli: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 		'mainnet-ovm': '0x4200000000000000000000000000000000000006',
 		'kovan-ovm': '0x4200000000000000000000000000000000000006',
@@ -182,7 +189,7 @@ const defaults = {
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
 	},
 	COLLATERAL_SHORT: {
-		SYNTHS: ['sBTC', 'sETH'],
+		SYNTHS: ['sETH'],
 		MIN_CRATIO: w3utils.toWei('1.2'),
 		MIN_COLLATERAL: w3utils.toWei('1000'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.005'),
@@ -496,6 +503,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			owner: '0xDe910777C787903F78C89e7a0bf7F4C435cBB1Fe',
 		}),
 		rinkeby: Object.assign({}, base),
+		mumbai: Object.assign({}, base),
 		ropsten: Object.assign({}, base),
 		goerli: Object.assign({}, base),
 		'goerli-ovm': Object.assign({}, base),

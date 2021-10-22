@@ -9,28 +9,22 @@
 		"deploy": false
 	},
 	"CollateralManager": {
-		"deploy": true
+		"deploy": false
 	},
 	"CollateralManagerState": {
-		"deploy": true
+		"deploy": false
 	},
 	"CollateralEth": {
-		"deploy": true
-	},
-	"CollateralErc20": {
-		"deploy": true
+		"deploy": false
 	},
 	"CollateralShort": {
-		"deploy": true
-	},
-	"CollateralStateErc20": {
-		"deploy": true
+		"deploy": false
 	},
 	"CollateralStateEth": {
-		"deploy": true
+		"deploy": false
 	},
 	"CollateralStateShort": {
-		"deploy": true
+		"deploy": false
 	},
 	"ReadProxyAddressResolver": {
 		"deploy": false
@@ -131,15 +125,6 @@
 	"VirtualSynthMastercopy": {
 		"deploy": false
 	},
-	"SynthetixBridgeToBase": {
-		"deploy": false
-	},
-	"SynthetixBridgeToOptimism": {
-		"deploy": false
-	},
-	"SynthetixBridgeEscrow": {
-		"deploy": false
-	},
 	"SynthRedeemer": {
 		"deploy": false
 	},
@@ -155,40 +140,31 @@
 	"SynthsUSD": {
 		"deploy": false
 	},
-	"TokenStatesEUR": {
+	"TokenStatesETH": {
 		"deploy": false
 	},
-	"ProxysEUR": {
+	"ProxysETH": {
 		"deploy": false
 	},
-	"SynthsEUR": {
+	"SynthsETH": {
 		"deploy": false
 	},
-	"TokenStatesBTC": {
+	"EtherWrapper": {
 		"deploy": false
 	},
-	"ProxysBTC": {
+	"NativeEtherWrapper": {
 		"deploy": false
 	},
-	"SynthsBTC": {
+	"CollateralUtil": {
 		"deploy": false
 	},
-	"TokenStatesBNB": {
+	"TokenStateiETH": {
 		"deploy": false
 	},
-	"ProxysBNB": {
+	"ProxyiETH": {
 		"deploy": false
 	},
-	"SynthsBNB": {
-		"deploy": false
-	},
-	"TokenStatesCEX": {
-		"deploy": false
-	},
-	"ProxysCEX": {
-		"deploy": false
-	},
-	"SynthsCEX": {
+	"SynthiETH": {
 		"deploy": false
 	}
 }

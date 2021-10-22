@@ -36,6 +36,39 @@ const findSolFiles = ({ sourcePath, ignore = [] }) => {
 	return fileList;
 };
 
+const findHarhatCompiledFiles = ({ sourcePath, ignore = [/test/, /interface/] }) => {
+	const compiledFiles = {};
+	let earliestCompiledTimestamp = Infinity;
+
+	function doWork(cd, curRelativePath = '') {
+		const files = fs.readdirSync(cd);
+		const dirBaseName = path.basename(cd, '.sol');
+		for (const file of files) {
+			const fullPath = path.join(cd, file);
+			const relativePath = path.join(curRelativePath, file);
+			const baseName = path.basename(file, '.json');
+			if (ignore.filter(regex => regex.test(relativePath)).length > 0) {
+				continue;
+			} else if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
+				doWork(fullPath, relativePath, compiledFiles);
+			} else if (dirBaseName === baseName) {
+				earliestCompiledTimestamp = Math.min(
+					earliestCompiledTimestamp,
+					fs.statSync(fullPath).mtimeMs
+				);
+
+				compiledFiles[baseName] = {
+					textContents: fs.readFileSync(fullPath, 'utf8'),
+				};
+			}
+		}
+	}
+
+	doWork(sourcePath);
+
+	return { compiledFiles, earliestCompiledTimestamp };
+};
+
 module.exports = {
 	findSolFiles,
 
@@ -115,36 +148,20 @@ module.exports = {
 		if (!fs.existsSync(compiledSourcePath)) {
 			return { earliestCompiledTimestamp: 0 };
 		}
-		let compiled;
+		let compiled = {};
 		if (fromHardhat) {
-			compiled = fs
-				.readdirSync(compiledSourcePath)
-				.filter(name => /^.+\.sol$/.test(name))
-				.reduce((memo, contractFilename) => {
-					const contract = contractFilename.replace(/\.sol$/, '');
-					const sourceFile = path.join(
-						compiledSourcePath,
-						contractFilename,
-						contractFilename.replace(/\.sol$/, '.json')
-					);
-					earliestCompiledTimestamp = Math.min(
-						earliestCompiledTimestamp,
-						fs.statSync(sourceFile).mtimeMs
-					);
-					if (!fs.existsSync(sourceFile)) {
-						throw Error(
-							`Cannot find compiled contract code for: ${contract}. Did you run the "build" step first?`
-						);
-					}
-					const compiledFile = JSON.parse(fs.readFileSync(sourceFile));
-					compiledFile.metadata = { compiler: { version: 'hard-hat' }, sources: [contract] };
-					compiledFile.evm = {
-						bytecode: { object: compiledFile.bytecode },
-						deployedBytecode: { object: compiledFile.deployedBytecode },
-					};
-					memo[contract] = compiledFile;
-					return memo;
-				}, {});
+			const ret = findHarhatCompiledFiles({ sourcePath: compiledSourcePath });
+			const compiledRes = ret.compiledFiles;
+			earliestCompiledTimestamp = ret.earliestCompiledTimestamp;
+			for (const contract of Object.keys(compiledRes)) {
+				const compiledFile = JSON.parse(compiledRes[contract].textContents);
+				compiledFile.metadata = { compiler: { version: 'hard-hat' }, sources: [contract] };
+				compiledFile.evm = {
+					bytecode: { object: compiledFile.bytecode },
+					deployedBytecode: { object: compiledFile.deployedBytecode },
+				};
+				compiled[contract] = compiledFile;
+			}
 		} else {
 			compiled = fs
 				.readdirSync(compiledSourcePath)

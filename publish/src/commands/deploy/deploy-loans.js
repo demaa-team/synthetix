@@ -91,37 +91,6 @@ module.exports = async ({ account, addressOf, deployer, getDeployParameter, netw
 		],
 	});
 
-	let RENBTC_ADDRESS = (await getDeployParameter('RENBTC_ERC20_ADDRESSES'))[network];
-	if (!RENBTC_ADDRESS) {
-		if (network !== 'local') {
-			throw new Error('renBTC address is not known');
-		}
-
-		// On local, deploy a mock renBTC token to use as the underlying in CollateralErc20
-		const renBTC = await deployer.deployContract({
-			name: 'MockToken',
-			args: ['renBTC', 'renBTC', 8],
-		});
-
-		// this could be undefined in an env where MockToken is not listed in the config flags
-		RENBTC_ADDRESS = renBTC ? renBTC.address : undefined;
-	}
-
-	await deployer.deployContract({
-		name: 'CollateralErc20',
-		source: 'CollateralErc20',
-		args: [
-			account,
-			addressOf(collateralManager),
-			addressOf(ReadProxyAddressResolver),
-			toBytes32('sBTC'),
-			(await getDeployParameter('COLLATERAL_RENBTC'))['MIN_CRATIO'],
-			(await getDeployParameter('COLLATERAL_RENBTC'))['MIN_COLLATERAL'],
-			RENBTC_ADDRESS, // if undefined then this will error as expected.
-			8,
-		],
-	});
-
 	await deployer.deployContract({
 		name: 'CollateralShort',
 		args: [
