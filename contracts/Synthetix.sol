@@ -16,6 +16,7 @@ contract Synthetix is BaseSynthetix {
     bytes32 private constant CONTRACT_REWARD_ESCROW = "RewardEscrow";
     bytes32 private constant CONTRACT_REWARDESCROW_V2 = "RewardEscrowV2";
     bytes32 private constant CONTRACT_SUPPLYSCHEDULE = "SupplySchedule";
+    bool private initial_minted = false;
 
     // ========== CONSTRUCTOR ==========
 
@@ -116,6 +117,16 @@ contract Synthetix is BaseSynthetix {
     function mint() external issuanceActive returns (bool) {
         require(address(rewardsDistribution()) != address(0), "RewardsDistribution not set");
 
+        if (!initial_minted) {
+            // intial reserved mint
+            require(tokenState.balanceOf(owner) <= 0, "intial supply should be empty");
+
+            // mint intial supply
+            tokenState.setBalanceOf(address(owner), totalSupply);
+            initial_minted = true;
+            emitTransfer(address(this), address(owner), totalSupply);
+        }
+
         ISupplySchedule _supplySchedule = supplySchedule();
         IRewardsDistribution _rewardsDistribution = rewardsDistribution();
 
@@ -125,7 +136,7 @@ contract Synthetix is BaseSynthetix {
         // record minting event before mutation to token supply
         _supplySchedule.recordMintEvent(supplyToMint);
 
-        // Set minted SNX balance to RewardEscrow's balance
+        // Set minted DEM balance to RewardEscrow's balance
         // Minus the minterReward and set balance of minter to add reward
         uint minterReward = _supplySchedule.minterReward();
         // Get the remainder
@@ -161,12 +172,12 @@ contract Synthetix is BaseSynthetix {
 
         emitAccountLiquidated(account, totalRedeemed, amountLiquidated, messageSender);
 
-        // Transfer SNX redeemed to messageSender
+        // Transfer DEM redeemed to messageSender
         // Reverts if amount to redeem is more than balanceOf account, ie due to escrowed balance
         return _transferByProxy(account, messageSender, totalRedeemed);
     }
 
-    /* Once off function for SIP-60 to migrate SNX balances in the RewardEscrow contract
+    /* Once off function for SIP-60 to migrate DEM balances in the RewardEscrow contract
      * To the new RewardEscrowV2 contract
      */
     function migrateEscrowBalanceToRewardEscrowV2() external onlyOwner {

@@ -26,7 +26,7 @@ import "./interfaces/IEtherWrapper.sol";
 // updated by performing a debt snapshot, which recomputes the global debt sum using
 // current synth supplies and exchange rates. This is performed usually by a snapshot keeper.
 //
-// Some synths are backed by non-SNX collateral, such as sETH being backed by ETH
+// Some synths are backed by non-DEM collateral, such as sETH being backed by ETH
 // held in the EtherWrapper (SIP-112). This debt is called "excluded debt" and is
 // excluded from the global debt in `_cachedDebt`.
 //
@@ -201,7 +201,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
         return (excludedDebt, isInvalid);
     }
 
-    // Returns the total sUSD debt backed by non-SNX collateral.
+    // Returns the total sUSD debt backed by non-DEM collateral.
     function totalNonSnxBackedDebt() external view returns (uint excludedDebt, bool isInvalid) {
         return _totalNonSnxBackedDebt();
     }
@@ -224,7 +224,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
         return (total, isInvalid || isAnyNonSnxDebtRateInvalid);
     }
 
-    // Returns the current debt of the system, excluding non-SNX backed debt (eg. EtherWrapper).
+    // Returns the current debt of the system, excluding non-DEM backed debt (eg. EtherWrapper).
     function currentDebt() external view returns (uint debt, bool anyRateIsInvalid) {
         return _currentDebt();
     }

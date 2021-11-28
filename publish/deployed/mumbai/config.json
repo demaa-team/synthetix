@@ -21,10 +21,10 @@
 		"deploy": false
 	},
 	"CollateralStateEth": {
-		"deploy": false
+		"deploy": true
 	},
 	"CollateralStateShort": {
-		"deploy": false
+		"deploy": true
 	},
 	"ReadProxyAddressResolver": {
 		"deploy": false
@@ -140,6 +140,9 @@
 	"SynthsUSD": {
 		"deploy": false
 	},
+	"SynthsCN2111": {
+		"deploy": false
+	},
 	"TokenStatesETH": {
 		"deploy": false
 	},
@@ -165,6 +168,12 @@
 		"deploy": false
 	},
 	"SynthiETH": {
+		"deploy": false
+	},
+	"TokenStatesCN2111": {
+		"deploy": false
+	},
+	"ProxysCN2111": {
 		"deploy": false
 	}
 }

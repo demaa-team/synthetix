@@ -201,7 +201,7 @@ module.exports = async ({
 			expected: input => input !== '0', // only change if zero
 			write: 'setMinimumStakeTime',
 			writeArg: await getDeployParameter('MINIMUM_STAKE_TIME'),
-			comment: 'Set the minimum amount of time SNX can be issued before any is burned (SIP-40)',
+			comment: 'Set the minimum amount of time DEM can be issued before any is burned (SIP-40)',
 		});
 
 		await runStep({
@@ -233,7 +233,7 @@ module.exports = async ({
 			expected: input => input !== '0', // only change if zero
 			write: 'setCrossDomainMessageGasLimit',
 			writeArg: [1, await getDeployParameter('CROSS_DOMAIN_ESCROW_GAS_LIMIT')],
-			comment: 'Set the gas limit for migrating escrowed SNX to L2',
+			comment: 'Set the gas limit for migrating escrowed DEM to L2',
 		});
 
 		await runStep({

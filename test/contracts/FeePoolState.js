@@ -364,13 +364,13 @@ contract('FeePoolState', async accounts => {
 	// 	const timestamp = await currentTime();
 
 	// 	await exchangeRates.updateRates(
-	// 		[sAUD, sEUR, SNX],
+	// 		[sAUD, sEUR, DEM],
 	// 		['0.5', '1.25', '0.1'].map(toUnit),
 	// 		timestamp,
 	// 		{ from: oracle }
 	// 	);
 
-	// 	// Give some SNX to account1
+	// 	// Give some DEM to account1
 	// 	await synthetix.transfer(account1, toUnit('10000'), { from: owner });
 
 	// 	// Determine maximum amount that can be issued.
@@ -401,13 +401,13 @@ contract('FeePoolState', async accounts => {
 	// 	const timestamp = await currentTime();
 
 	// 	await exchangeRates.updateRates(
-	// 		[sAUD, sEUR, SNX],
+	// 		[sAUD, sEUR, DEM],
 	// 		['0.5', '1.25', '0.1'].map(toUnit),
 	// 		timestamp,
 	// 		{ from: oracle }
 	// 	);
 
-	// 	// Give some SNX to account1
+	// 	// Give some DEM to account1
 	// 	await synthetix.transfer(account1, toUnit('20000'), { from: owner });
 
 	// 	// Issue

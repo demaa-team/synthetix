@@ -331,7 +331,7 @@ const actions = {
 		} else {
 			currencyKeys = [
 				...(await Issuer.availableCurrencyKeys()),
-				ethers.utils.formatBytes32String('SNX'),
+				ethers.utils.formatBytes32String('DEM'),
 			];
 		}
 

@@ -57,13 +57,13 @@
 		"deploy": false
 	},
 	"Synthetix": {
-		"deploy": false
+		"deploy": true
 	},
 	"SynthetixEscrow": {
-		"deploy": false
+		"deploy": true
 	},
 	"SynthetixState": {
-		"deploy": false
+		"deploy": true
 	},
 	"SystemStatus": {
 		"deploy": false

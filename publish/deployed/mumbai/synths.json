@@ -10,6 +10,11 @@
 		"subclass": "MultiCollateralSynth"
 	},
 	{
+		"name": "sCN2111",
+		"asset": "CN2111",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
 		"name": "iETH",
 		"asset": "ETH",
 		"subclass": "PurgeableSynth",

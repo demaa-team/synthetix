@@ -68,7 +68,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
     bytes32 internal constant sUSD = "sUSD";
     bytes32 internal constant sETH = "sETH";
-    bytes32 internal constant SNX = "SNX";
+    bytes32 internal constant DEM = "DEM";
 
     // Flexible storage names
 
@@ -170,14 +170,14 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         }
 
         if (withSNX) {
-            currencyKeys[availableSynths.length] = SNX;
+            currencyKeys[availableSynths.length] = DEM;
         }
 
         return currencyKeys;
     }
 
     // Returns the total value of the debt pool in currency specified by `currencyKey`.
-    // To return only the SNX-backed debt, set `excludeCollateral` to true.
+    // To return only the DEM-backed debt, set `excludeCollateral` to true.
     function _totalIssuedSynths(bytes32 currencyKey, bool excludeCollateral)
         internal
         view
@@ -222,7 +222,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         // If it's zero, they haven't issued, and they have no debt.
         // Note: it's more gas intensive to put this check here rather than before _totalIssuedSynths
-        // if they have 0 SNX, but it's a necessary trade-off
+        // if they have 0 DEM, but it's a necessary trade-off
         if (initialDebtOwnership == 0) return (0, totalSystemValue, anyRateIsInvalid);
 
         // Figure out the global debt percentage delta from when they entered the system.
@@ -281,8 +281,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     }
 
     function _maxIssuableSynths(address _issuer) internal view returns (uint, bool) {
-        // What is the value of their SNX balance in sUSD
-        (uint snxRate, bool isInvalid) = exchangeRates().rateAndInvalid(SNX);
+        // What is the value of their DEM balance in sUSD
+        (uint snxRate, bool isInvalid) = exchangeRates().rateAndInvalid(DEM);
         uint destinationValue = _snxToUSD(_collateral(_issuer), snxRate);
 
         // They're allowed to issue up to issuanceRatio of that value
@@ -292,9 +292,9 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     function _collateralisationRatio(address _issuer) internal view returns (uint, bool) {
         uint totalOwnedSynthetix = _collateral(_issuer);
 
-        (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, SNX);
+        (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_issuer, DEM);
 
-        // it's more gas intensive to put this check here if they have 0 SNX, but it complies with the interface
+        // it's more gas intensive to put this check here if they have 0 DEM, but it complies with the interface
         if (totalOwnedSynthetix == 0) return (0, anyRateIsInvalid);
 
         return (debtBalance.divideDecimalRound(totalOwnedSynthetix), anyRateIsInvalid);
@@ -392,19 +392,19 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         view
         returns (uint transferable, bool anyRateIsInvalid)
     {
-        // How many SNX do they have, excluding escrow?
+        // How many DEM do they have, excluding escrow?
         // Note: We're excluding escrow here because we're interested in their transferable amount
-        // and escrowed SNX are not transferable.
+        // and escrowed DEM are not transferable.
 
         // How many of those will be locked by the amount they've issued?
-        // Assuming issuance ratio is 20%, then issuing 20 SNX of value would require
-        // 100 SNX to be locked in their wallet to maintain their collateralisation ratio
+        // Assuming issuance ratio is 20%, then issuing 20 DEM of value would require
+        // 100 DEM to be locked in their wallet to maintain their collateralisation ratio
         // The locked synthetix value can exceed their balance.
         uint debtBalance;
-        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, SNX);
+        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, DEM);
         uint lockedSynthetixValue = debtBalance.divideDecimalRound(getIssuanceRatio());
 
-        // If we exceed the balance, no SNX are transferable, otherwise the difference is.
+        // If we exceed the balance, no DEM are transferable, otherwise the difference is.
         if (lockedSynthetixValue >= balance) {
             transferable = 0;
         } else {
@@ -592,7 +592,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         // What is their debt in sUSD?
         (uint debtBalance, uint totalDebtIssued, bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(account, sUSD);
-        (uint snxRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(SNX);
+        (uint snxRate, bool snxRateInvalid) = exchangeRates().rateAndInvalid(DEM);
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
 
         uint collateralForAccount = _collateral(account);
@@ -608,7 +608,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         // Add penalty
         totalRedeemed = snxRedeemed.multiplyDecimal(SafeDecimalMath.unit().add(liquidationPenalty));
 
-        // if total SNX to redeem is greater than account's collateral
+        // if total DEM to redeem is greater than account's collateral
         // account is under collateralised, liquidate all collateral and reduce sUSD to burn
         if (totalRedeemed > collateralForAccount) {
             // set totalRedeemed to all transferable collateral
@@ -634,7 +634,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     /* ========== INTERNAL FUNCTIONS ========== */
 
     function _requireRatesNotInvalid(bool anyRateIsInvalid) internal pure {
-        require(!anyRateIsInvalid, "A synth or SNX rate is invalid");
+        require(!anyRateIsInvalid, "A synth or DEM rate is invalid");
     }
 
     function _requireCanIssueOnBehalf(address issueForAddress, address from) internal view {
@@ -671,7 +671,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         // Account for the issued debt in the cache
         debtCache().updateCachedsUSDDebt(SafeCast.toInt256(amount));
 
-        // Store their locked SNX amount to determine their fee % for the period
+        // Store their locked DEM amount to determine their fee % for the period
         _appendAccountIssuanceRecord(from);
     }
 

@@ -20,8 +20,8 @@ function itCanStake({ ctx }) {
 			user = ctx.users.someUser;
 		});
 
-		before('ensure the user has enough SNX', async () => {
-			await ensureBalance({ ctx, symbol: 'SNX', user, balance: SNXAmount });
+		before('ensure the user has enough DEM', async () => {
+			await ensureBalance({ ctx, symbol: 'DEM', user, balance: SNXAmount });
 		});
 
 		describe('when the user issues sUSD', () => {

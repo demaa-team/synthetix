@@ -17,7 +17,7 @@ describe('depositTo() integration tests (L1, L2)', () => {
 
 	let depositReceipt;
 
-	describe('when the owner deposits SNX for a user', () => {
+	describe('when the owner deposits DEM for a user', () => {
 		before('target contracts and users', () => {
 			({ Synthetix, SynthetixBridgeToOptimism, SynthetixBridgeEscrow } = ctx.l1.contracts);
 

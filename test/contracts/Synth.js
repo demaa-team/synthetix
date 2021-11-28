@@ -23,7 +23,7 @@ const {
 } = require('../..');
 
 contract('Synth', async accounts => {
-	const [sUSD, SNX, sEUR] = ['sUSD', 'SNX', 'sEUR'].map(toBytes32);
+	const [sUSD, DEM, sEUR] = ['sUSD', 'DEM', 'sEUR'].map(toBytes32);
 
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -80,7 +80,7 @@ contract('Synth', async accounts => {
 		const timestamp = await currentTime();
 
 		// Send a price update to guarantee we're not stale.
-		await exchangeRates.updateRates([SNX], ['0.1'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([DEM], ['0.1'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 		await debtCache.takeDebtSnapshot();

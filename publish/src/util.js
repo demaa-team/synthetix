@@ -105,12 +105,12 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 		fs.writeFileSync(deploymentFile, stringify({ targets: {}, sources: {} }));
 	}
 	const deployment = JSON.parse(fs.readFileSync(deploymentFile));
-
+	/*
 	if (freshDeploy) {
 		deployment.targets = {};
 		deployment.sources = {};
 	}
-
+*/
 	const ownerActionsFile = path.join(deploymentPath, OWNER_ACTIONS_FILENAME);
 	if (!fs.existsSync(ownerActionsFile)) {
 		fs.writeFileSync(ownerActionsFile, stringify({}));

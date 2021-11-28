@@ -21,7 +21,7 @@ contract ExchangeRates is Owned, MixinSystemSettings, IExchangeRates {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // Exchange rates and update times stored by currency code, e.g. 'SNX', or 'sUSD'
+    // Exchange rates and update times stored by currency code, e.g. 'DEM', or 'sUSD'
     mapping(bytes32 => mapping(uint => RateAndUpdatedTime)) private _rates;
 
     // The address of the oracle which pushes rate updates to this contract

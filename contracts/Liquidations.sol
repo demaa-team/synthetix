@@ -163,7 +163,7 @@ contract Liquidations is Owned, MixinSystemSettings, ILiquidations {
 
     // totalIssuedSynths checks synths for staleness
     // check snx rate is not stale
-    function flagAccountForLiquidation(address account) external rateNotInvalid("SNX") {
+    function flagAccountForLiquidation(address account) external rateNotInvalid("DEM") {
         systemStatus().requireSystemActive();
 
         require(getLiquidationRatio() > 0, "Liquidation ratio not set");
@@ -198,8 +198,8 @@ contract Liquidations is Owned, MixinSystemSettings, ILiquidations {
 
     // Public function to allow an account to remove from liquidations
     // Checks collateral ratio is fixed - below target issuance ratio
-    // Check SNX rate is not stale
-    function checkAndRemoveAccountInLiquidation(address account) external rateNotInvalid("SNX") {
+    // Check DEM rate is not stale
+    function checkAndRemoveAccountInLiquidation(address account) external rateNotInvalid("DEM") {
         systemStatus().requireSystemActive();
 
         LiquidationEntry memory liquidation = _getLiquidationEntryForAccount(account);

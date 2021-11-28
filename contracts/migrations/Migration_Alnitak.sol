@@ -183,9 +183,9 @@ contract Migration_Alnitak is BaseMigration {
         addressresolver_rebuildCaches_destinations_4_0[17] = MixinResolver(0xaa03aB31b55DceEeF845C8d17890CC61cD98eD04);
         addressresolver_rebuildCaches_destinations_4_0[18] = MixinResolver(0x1F2c3a1046c32729862fcB038369696e3273a516);
         addressresolver_i.rebuildCaches(addressresolver_rebuildCaches_destinations_4_0);
-        // Ensure the SNX proxy has the correct Synthetix target set;
+        // Ensure the DEM proxy has the correct Synthetix target set;
         proxyerc20_i.setTarget(Proxyable(new_Synthetix_contract));
-        // Ensure the legacy SNX proxy has the correct Synthetix target set;
+        // Ensure the legacy DEM proxy has the correct Synthetix target set;
         proxysynthetix_i.setTarget(Proxyable(new_Synthetix_contract));
         // Ensure the Exchanger contract can write to its State;
         exchangestate_i.setAssociatedContract(new_Exchanger_contract);

@@ -1,5 +1,5 @@
 {
-	"v3.0.1-polygon": {
+	"v1.0.1-mumbai": {
 		"tag": "v1.0.0-mumbai",
 		"fulltag": "v1.0.0-mumbai",
 		"network": "mumbai",
@@ -9,226 +9,518 @@
 		"contracts": {
 			"SafeDecimalMath": {
 				"address": "0x985E37Bbb2DF2d440211ed456e2D9D2027220f17",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"Math": {
 				"address": "0xa7508d2655eAc8BccC530F1Ce675283A206D33D0",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"AddressResolver": {
 				"address": "0x7C382f72F44D62F79214C9E09A42718Fb1f97B0e",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ReadProxyAddressResolver": {
 				"address": "0xe25D03eD428adC27D5662aB5edFAd3633f137FeF",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"FlexibleStorage": {
 				"address": "0xE3Ae53491f8EA7Fc68D08D918962fAd0966f4ADb",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SystemSettings": {
 				"address": "0xddD285DD240627B5F24668C9790f8070d327c3BA",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SystemStatus": {
 				"address": "0xf24f91E508aD4473BB440B3421cAf986791dcC8b",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ExchangeRates": {
 				"address": "0x65e7Ea11281D625ea84131e401038994625DE5f2",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"RewardEscrow": {
 				"address": "0x6a068aAfAD5095aEafC96F79d164867A29932A03",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"RewardEscrowV2": {
 				"address": "0x17C643c38E191C5513dd29C88C3B040B94aF497C",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthetixEscrow": {
 				"address": "0x44b7f2efFa8208ffAE6613C810B1f8F89aDbC102",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthetixState": {
 				"address": "0xEE28885F7Ac70860979E5611E2c53EcC943dE929",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxyFeePool": {
 				"address": "0x3A410Cd4BCbe20F238cc813f37b4Ed2718C9555a",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"DelegateApprovalsEternalStorage": {
 				"address": "0xb82D592BD7fDb82C276697052B2e2303d238d3cB",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"DelegateApprovals": {
 				"address": "0x995cDEE47712968cA11e4E317e25CE624911eeAD",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"Liquidations": {
 				"address": "0xe8E280e6865B5E649992A3F65200A1411fa48cfD",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"EternalStorageLiquidations": {
 				"address": "0xA43eDb97B25B3b515EB2Dbc514bbA30D880CB8a5",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"FeePoolEternalStorage": {
 				"address": "0xdC5928A4cA50b2Dbb6D4eb9FEdbed0b65Dd191b5",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"FeePool": {
 				"address": "0xaC37b8d532121B26Bb918083934dcE9Beec4Be19",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"FeePoolState": {
 				"address": "0xad1b98caCCA50bC546dfD487a81A1F4e8fdaF7f9",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"RewardsDistribution": {
 				"address": "0x4568e88420c27379EF52206de889e0CdFC04F078",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxyERC20": {
 				"address": "0xC2d36D18693bfD31f70f0349047A593f66794dbd",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"TokenStateSynthetix": {
 				"address": "0xA8384b0a26a3B1FBE099846a74e7d13Fd73d56b6",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"Synthetix": {
 				"address": "0xC48549A19315C0A467106D8ED136f92b11F0B9dA",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxySynthetix": {
 				"address": "0x84907C765d9Dc1bAC8116940A49dB671A34137F3",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"DebtCache": {
 				"address": "0x7501BdA70Dfc0c8a6036417332c427A2Ab44e002",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"Exchanger": {
 				"address": "0x4e869B28CA9cF47713c9B3BBbb8026F0019F2310",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"VirtualSynthMastercopy": {
 				"address": "0x9fF75a22E0CAf77fa3F891fCDC6C42f5b3602BA9",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ExchangeState": {
 				"address": "0x75B8cb9681113Cd10dC795158F325aaeF9E357Eb",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"Issuer": {
 				"address": "0x080510e3728D1dB1e29FA1E5E975386Ca265302D",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"TradingRewards": {
 				"address": "0x3708678111BE8645312042DE8a1D7230dB675629",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SupplySchedule": {
 				"address": "0x2a7c3D5863156202d0B5d694b704E6924466C634",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"EscrowChecker": {
 				"address": "0x025af8FF737a492c3E43f6bb313E932B18E4579B",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthRedeemer": {
 				"address": "0xe81c9D9AFe0D57756E39827821C2e6723079529C",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"TokenStatesUSD": {
 				"address": "0x1a43B048897Cd379C039e44a0A2CaFc6B8b969FD",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxysUSD": {
 				"address": "0x5370AAE98D9acBa994736B37990939e654Fb8619",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxyERC20sUSD": {
 				"address": "0xBF501D175B7EAdDA86cc10a2d5874b834A8369E2",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthsUSD": {
 				"address": "0xE37AFC3ECf17957A06A3AD5004eA8A493A6F4611",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"TokenStatesETH": {
 				"address": "0xAfc8FA9E49Ce81d75De21E63f2006dA02ef3dD92",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxysETH": {
 				"address": "0xF8e95016CBa6D93C84f0863ab4A3EDf8544aB5A5",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthsETH": {
 				"address": "0x38Db02405fE6ABC6E2E70d3A291d88eeF575DA60",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"Depot": {
 				"address": "0xD2DA221496b6DaE55dA9Fa2908AcFd69b46C6b4C",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"EtherWrapper": {
 				"address": "0x795b8a8170626DBeEa434bB1229B88d73E5c1936",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"NativeEtherWrapper": {
 				"address": "0x13DDB693A47E3c85F402A14c154AA33e76D045F7",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"CollateralUtil": {
 				"address": "0x1BC1804f94021c68D57158a4E2e440E1478535d8",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"CollateralManagerState": {
 				"address": "0xf55d5b66326a6a74f1CF4A37B6Ab573439cc4A89",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"CollateralManager": {
 				"address": "0x265eCBc5Ad29C9787e4B58b8E7803BEBc2b975a7",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"CollateralStateEth": {
 				"address": "0x3e61DFE06E533e7279a0AFc0f6522519516c109E",
-				"status": "current"
+				"status": "deleted"
 			},
 			"CollateralEth": {
 				"address": "0x8C4E396d487c89aCB53b35232515e313A85E828f",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"CollateralStateShort": {
 				"address": "0xb8f0a1eF42920A6BE4C72651775efAA4Ec2BEcb4",
-				"status": "current"
+				"status": "deleted"
 			},
 			"CollateralShort": {
 				"address": "0x36880653944805a9caB68877285351e5400d909C",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthUtil": {
 				"address": "0x6382F7BA69328DDA6953B3d5dBd8379bdb94A144",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"DappMaintenance": {
 				"address": "0x32f6246aD2326033fC6D785Cf82c654F4Bd78822",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"TokenStateiETH": {
 				"address": "0x7183Fd37C194c4Ae0B76c8B8672BF99F9fDb9d83",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"ProxyiETH": {
 				"address": "0x7A99d8ABd7fcA3eB929b33172b7f508c12304cae",
-				"status": "current"
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
 			},
 			"SynthiETH": {
 				"address": "0x9De36677C67A12d352798Eeb94d3dA08B69B870b",
+				"status": "replaced",
+				"replaced_in": "v1.1.0-mumbai"
+			}
+		}
+	},
+	"v1.1.0-mumbai": {
+		"tag": "v1.1.0-mumbai",
+		"fulltag": "v1.1.0-mumbai",
+		"network": "mumbai",
+		"date": "2021-10-22T20:22:47+08:00",
+		"block": "21887195",
+		"commit": "ee24001252e5297053c766ea25b83df9876847b3",
+		"contracts": {
+			"SafeDecimalMath": {
+				"address": "0xC0B5bDEf6a36c35E7FCf433A97e9613E82Ac73CE",
+				"status": "current"
+			},
+			"Math": {
+				"address": "0xD97Bb0d0247aD2D2964Dc79291c28cd4eD34C5ee",
+				"status": "current"
+			},
+			"AddressResolver": {
+				"address": "0x39B1518c5E1A2f4e89Bd7a815fA2bf6576D6F92e",
+				"status": "current"
+			},
+			"ReadProxyAddressResolver": {
+				"address": "0x9b7aFcC5cC71B68a71c2D1848E3D87406bF46998",
+				"status": "current"
+			},
+			"FlexibleStorage": {
+				"address": "0x269c40c76ae269B286efC450c789E037Aac6E335",
+				"status": "current"
+			},
+			"SystemSettings": {
+				"address": "0x41F81cC086bcCa7e31090C9d0aFd8FdC7862fa20",
+				"status": "current"
+			},
+			"SystemStatus": {
+				"address": "0xa35f3397E92A048B828B99e9A6eC31ADaC7204A7",
+				"status": "current"
+			},
+			"ExchangeRates": {
+				"address": "0x0018b7C98EC1F74246bB24D378fBfDE53CbE1Ae6",
+				"status": "current"
+			},
+			"RewardEscrow": {
+				"address": "0x8dAaBb2Ac0EE666a46c6834498560de7f865408a",
+				"status": "current"
+			},
+			"RewardEscrowV2": {
+				"address": "0xAE7D7178221928fCf30d995A29b3D3eA3F57580f",
+				"status": "current"
+			},
+			"SynthetixEscrow": {
+				"address": "0x37BDBB84688BD4Ba2403622675a852941312A248",
+				"status": "current"
+			},
+			"SynthetixState": {
+				"address": "0x62324800BA62922e3f8919C01Ee4b49377528fA4",
+				"status": "current"
+			},
+			"ProxyFeePool": {
+				"address": "0x1A164EB91Cef2aBFbC5376AD3b48985bA7a348b7",
+				"status": "current"
+			},
+			"DelegateApprovalsEternalStorage": {
+				"address": "0x30ab9B3A773530d420D9909e1F10A771df899202",
+				"status": "current"
+			},
+			"DelegateApprovals": {
+				"address": "0x29E1082240CF7dAD2F94a8788e884bdD6881a88f",
+				"status": "current"
+			},
+			"Liquidations": {
+				"address": "0xe5A2A944e26E12aB236Cc9611Ca13bF0fdCeD7Eb",
+				"status": "current"
+			},
+			"EternalStorageLiquidations": {
+				"address": "0xc1E082ba30262754FD62BCA6445E7C86AAFAfB5E",
+				"status": "current"
+			},
+			"FeePoolEternalStorage": {
+				"address": "0x1bb0BF0F525161695FA73622EB6c23201ED6A623",
+				"status": "current"
+			},
+			"FeePool": {
+				"address": "0x2744cc221F330b20e885105F6D271DAfC4471f11",
+				"status": "current"
+			},
+			"FeePoolState": {
+				"address": "0xe4Ac9aF50b684585C9b92139acc1577448b171c1",
+				"status": "current"
+			},
+			"RewardsDistribution": {
+				"address": "0xAFF72Ca2B1bB439e34227Ae96F8c5eF7a4cd9322",
+				"status": "current"
+			},
+			"ProxyERC20": {
+				"address": "0xe2f45DF412e4dE94FB9faFaAC35DBE88d23d338A",
+				"status": "current"
+			},
+			"TokenStateSynthetix": {
+				"address": "0x87C8479Dd700C7e43154DC286D463C9aD03B274D",
+				"status": "current"
+			},
+			"Synthetix": {
+				"address": "0x110c4a6c84d4adC7D4538d56835b671DdeF7C4Ea",
+				"status": "current"
+			},
+			"ProxySynthetix": {
+				"address": "0x78664AfF781bD6C2Ef3c8B1D0C1a718b6949365C",
+				"status": "current"
+			},
+			"DebtCache": {
+				"address": "0xa17C57c03D344da54CAeC5588bC7A2f497cC5EDb",
+				"status": "current"
+			},
+			"Exchanger": {
+				"address": "0x5B57bCA2A8A54DF4E2c9ad8DB591f2254f77C5C3",
+				"status": "current"
+			},
+			"VirtualSynthMastercopy": {
+				"address": "0x3277b45ab90b8a6898Dc378C9e4e6a39Ddc704dB",
+				"status": "current"
+			},
+			"ExchangeState": {
+				"address": "0x1202573Df4D8594e7e018E2a92811be7644C8840",
+				"status": "current"
+			},
+			"Issuer": {
+				"address": "0x115c80DC65Ec136850282d18a0aB69D3F3A49006",
+				"status": "current"
+			},
+			"TradingRewards": {
+				"address": "0x4E63Ca4660f566b958e735a241ad8fEa95F75021",
+				"status": "current"
+			},
+			"SupplySchedule": {
+				"address": "0xD1dDD27E6bAD4F730DBA32e25fd45E639E2F9000",
+				"status": "current"
+			},
+			"EscrowChecker": {
+				"address": "0x4bDFb3415B5a0586b63aB8973aa56A12d503A25f",
+				"status": "current"
+			},
+			"SynthRedeemer": {
+				"address": "0x0995846daF9f06e168B736FE840CECbaB3634bF8",
+				"status": "current"
+			},
+			"TokenStatesUSD": {
+				"address": "0x816d99f265Bb32238E5B8dcDe00dF40788AFBC6F",
+				"status": "current"
+			},
+			"ProxysUSD": {
+				"address": "0xb87834516FFd2506e4026D5193Ca2A8B3f93e0E5",
+				"status": "current"
+			},
+			"ProxyERC20sUSD": {
+				"address": "0x29c160e8F9E35Fd529a75e9e57247bAaAA5381C9",
+				"status": "current"
+			},
+			"SynthsUSD": {
+				"address": "0x786632c8c3B7137D0Dbec3eE46B4ccbC94324209",
+				"status": "current"
+			},
+			"TokenStatesETH": {
+				"address": "0x6cF22d460907b66faD7F48d2F91e635f35E36BEB",
+				"status": "current"
+			},
+			"ProxysETH": {
+				"address": "0xBEfe49142927ce502920b948d819C388909E9800",
+				"status": "current"
+			},
+			"SynthsETH": {
+				"address": "0x0a2f3423035278380759DD6563d8b18A98b34e7d",
+				"status": "current"
+			},
+			"TokenStatesCN2111": {
+				"address": "0xf029778Ce106B48dE93df1EEa67aC0FEAcBC717b",
+				"status": "current"
+			},
+			"ProxysCN2111": {
+				"address": "0x3d93De48F132ac039D08C771a376DACF81a3fc5C",
+				"status": "current"
+			},
+			"SynthsCN2111": {
+				"address": "0x9d3E819B237226d8D96d4a54303e29e7DDf5f56b",
+				"status": "current"
+			},
+			"TokenStateiETH": {
+				"address": "0x0C87E601eCe3c1D61f62C82e077F052E2a2e6F8e",
+				"status": "current"
+			},
+			"ProxyiETH": {
+				"address": "0xD27aBC98cC667813432869a3ab2D13556c207dB1",
+				"status": "current"
+			},
+			"SynthiETH": {
+				"address": "0x5535b6f57237Fd401A07aAebcd4A6fA8aF307D0F",
+				"status": "current"
+			},
+			"Depot": {
+				"address": "0x3A4e3b5859Cc5Ed8134AbdB865C33038C57e4c42",
+				"status": "current"
+			},
+			"EtherWrapper": {
+				"address": "0xE6cFADB4e59857E78bab6DbA520AfaA67969eBEC",
+				"status": "current"
+			},
+			"NativeEtherWrapper": {
+				"address": "0x49B2A59cd5c46d949de2Aac35c79Ee1305141128",
+				"status": "current"
+			},
+			"CollateralUtil": {
+				"address": "0xaD29d112801CCEbefB766723d546C34A1380e8D6",
+				"status": "current"
+			},
+			"CollateralManagerState": {
+				"address": "0x41491f4d92F7546D3Dc3771EF43156497Ef16a74",
+				"status": "current"
+			},
+			"CollateralManager": {
+				"address": "0x0bafCCD2686fA8FDa6De8eeFFff0883FB29Ed646",
+				"status": "current"
+			},
+			"CollateralEth": {
+				"address": "0xEB1a60519d61cdd36db7bcd10c6BF7c0c79Da089",
+				"status": "current"
+			},
+			"CollateralShort": {
+				"address": "0xFf55116a21Ee7B33495aC844be828fE0ECEaDcBD",
+				"status": "current"
+			},
+			"SynthUtil": {
+				"address": "0x4295350DAF8De2DaEFdc1926E2331dbAd11a943b",
+				"status": "current"
+			},
+			"DappMaintenance": {
+				"address": "0x00D0667b94530808d82EC258Bad51F630ccCF5Ed",
 				"status": "current"
 			}
 		}

@@ -28,7 +28,7 @@ contract('Depot', async accounts => {
 
 	const [, owner, oracle, fundsWallet, address1, address2, address3] = accounts;
 
-	const [SNX, ETH] = ['SNX', 'ETH'].map(toBytes32);
+	const [DEM, ETH] = ['DEM', 'ETH'].map(toBytes32);
 
 	const approveAndDepositSynths = async (synthsToDeposit, depositor) => {
 		// Approve Transaction
@@ -81,7 +81,7 @@ contract('Depot', async accounts => {
 		snxRate = toUnit('0.1');
 		ethRate = toUnit('172');
 
-		await exchangeRates.updateRates([SNX, ETH], [snxRate, ethRate], timestamp, {
+		await exchangeRates.updateRates([DEM, ETH], [snxRate, ethRate], timestamp, {
 			from: oracle,
 		});
 	});
@@ -779,7 +779,7 @@ contract('Depot', async accounts => {
 				});
 				it('when the purchaser supplies a rate and the rate is changed in by the oracle', async () => {
 					const timestamp = await currentTime();
-					await exchangeRates.updateRates([SNX, ETH], ['0.1', '134'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([DEM, ETH], ['0.1', '134'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await assert.revert(
@@ -799,7 +799,7 @@ contract('Depot', async accounts => {
 			beforeEach(async () => {
 				const purchaseValueDollars = multiplyDecimal(ethToSend, ethRate);
 				snxToPurchase = divideDecimal(purchaseValueDollars, snxRate);
-				// Send some SNX to the Depot contract
+				// Send some DEM to the Depot contract
 				await synthetix.transfer(depot.address, toUnit('1000000'), {
 					from: owner,
 				});
@@ -813,7 +813,7 @@ contract('Depot', async accounts => {
 					assert.eventEqual(exchangeEvent, 'Exchange', {
 						fromCurrency: 'ETH',
 						fromAmount: ethToSend,
-						toCurrency: 'SNX',
+						toCurrency: 'DEM',
 						toAmount: snxToPurchase,
 					});
 				});
@@ -831,7 +831,7 @@ contract('Depot', async accounts => {
 				});
 				it('when the purchaser supplies a rate and the rate is changed in by the oracle', async () => {
 					const timestamp = await currentTime();
-					await exchangeRates.updateRates([SNX, ETH], ['0.1', '134'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([DEM, ETH], ['0.1', '134'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await assert.revert(
@@ -856,7 +856,7 @@ contract('Depot', async accounts => {
 				await synth.transfer(purchaser, purchaserSynthAmount, {
 					from: owner,
 				});
-				// Send some SNX to the Token Depot contract
+				// Send some DEM to the Token Depot contract
 				await synthetix.transfer(depot.address, depotSNXAmount, {
 					from: owner,
 				});
@@ -877,7 +877,7 @@ contract('Depot', async accounts => {
 					assert.eventEqual(exchangeEvent, 'Exchange', {
 						fromCurrency: 'sUSD',
 						fromAmount: synthsToSend,
-						toCurrency: 'SNX',
+						toCurrency: 'DEM',
 						toAmount: snxToPurchase,
 					});
 				});
@@ -895,7 +895,7 @@ contract('Depot', async accounts => {
 				});
 				it('when the purchaser supplies a rate and the rate is changed in by the oracle', async () => {
 					const timestamp = await currentTime();
-					await exchangeRates.updateRates([SNX], ['0.05'].map(toUnit), timestamp, {
+					await exchangeRates.updateRates([DEM], ['0.05'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await assert.revert(
@@ -1106,11 +1106,11 @@ contract('Depot', async accounts => {
 		});
 	});
 
-	describe('Ensure user can exchange ETH for SNX', async () => {
+	describe('Ensure user can exchange ETH for DEM', async () => {
 		const purchaser = address1;
 
 		beforeEach(async () => {
-			// Send some SNX to the Depot contract
+			// Send some DEM to the Depot contract
 			await synthetix.transfer(depot.address, toUnit('1000000'), {
 				from: owner,
 			});
@@ -1143,11 +1143,11 @@ contract('Depot', async accounts => {
 			});
 		});
 
-		it('ensure user get the correct amount of SNX after sending ETH', async () => {
+		it('ensure user get the correct amount of DEM after sending ETH', async () => {
 			const ethToSend = toUnit('10');
 
 			const purchaserSNXStartBalance = await synthetix.balanceOf(purchaser);
-			// Purchaser should not have SNX yet
+			// Purchaser should not have DEM yet
 			assert.equal(purchaserSNXStartBalance, 0);
 
 			// Purchaser sends ETH
@@ -1161,7 +1161,7 @@ contract('Depot', async accounts => {
 
 			const purchaserSNXEndBalance = await synthetix.balanceOf(purchaser);
 
-			// Purchaser SNX balance should be equal to the purchase value we calculated above
+			// Purchaser DEM balance should be equal to the purchase value we calculated above
 			assert.bnEqual(purchaserSNXEndBalance, purchaseValueInSynthetix);
 		});
 	});
@@ -1177,7 +1177,7 @@ contract('Depot', async accounts => {
 			await synth.transfer(purchaser, purchaserSynthAmount, {
 				from: owner,
 			});
-			// We need to send some SNX to the Token Depot contract
+			// We need to send some DEM to the Token Depot contract
 			await synthetix.transfer(depot.address, depotSNXAmount, {
 				from: owner,
 			});
@@ -1215,9 +1215,9 @@ contract('Depot', async accounts => {
 			});
 		});
 
-		it('ensure user gets the correct amount of SNX after sending 10 sUSD', async () => {
+		it('ensure user gets the correct amount of DEM after sending 10 sUSD', async () => {
 			const purchaserSNXStartBalance = await synthetix.balanceOf(purchaser);
-			// Purchaser should not have SNX yet
+			// Purchaser should not have DEM yet
 			assert.equal(purchaserSNXStartBalance, 0);
 
 			// Purchaser sends sUSD
@@ -1229,7 +1229,7 @@ contract('Depot', async accounts => {
 
 			const purchaserSNXEndBalance = await synthetix.balanceOf(purchaser);
 
-			// Purchaser SNX balance should be equal to the purchase value we calculated above
+			// Purchaser DEM balance should be equal to the purchase value we calculated above
 			assert.bnEqual(purchaserSNXEndBalance, purchaseValueInSynthetix);
 
 			// assert the exchange event
@@ -1238,7 +1238,7 @@ contract('Depot', async accounts => {
 			assert.eventEqual(exchangeEvent, 'Exchange', {
 				fromCurrency: 'sUSD',
 				fromAmount: synthsToSend,
-				toCurrency: 'SNX',
+				toCurrency: 'DEM',
 				toAmount: purchaseValueInSynthetix,
 			});
 		});
@@ -1248,7 +1248,7 @@ contract('Depot', async accounts => {
 		const snxAmount = toUnit('1000000');
 
 		beforeEach(async () => {
-			// Send some SNX to the Depot contract
+			// Send some DEM to the Depot contract
 			await synthetix.transfer(depot.address, snxAmount, {
 				from: owner,
 			});

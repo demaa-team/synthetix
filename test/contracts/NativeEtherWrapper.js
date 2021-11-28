@@ -19,7 +19,7 @@ const { toBytes32 } = require('../..');
 const { toBN } = require('web3-utils');
 
 contract('NativeEtherWrapper', async accounts => {
-	const synths = ['sUSD', 'sETH', 'ETH', 'SNX'];
+	const synths = ['sUSD', 'sETH', 'ETH', 'DEM'];
 	const [sETH, ETH] = ['sETH', 'ETH'].map(toBytes32);
 
 	const [, owner, oracle, , account1] = accounts;

@@ -14,7 +14,7 @@ contract SystemSettings is Owned, MixinSystemSettings, ISystemSettings {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // No more synths may be issued than the value of SNX backing them.
+    // No more synths may be issued than the value of DEM backing them.
     uint public constant MAX_ISSUANCE_RATIO = 1e18;
 
     // The fee period must be between 1 day and 60 days.

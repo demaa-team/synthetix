@@ -68,7 +68,7 @@ async function _getAvailableCurrencyKeys({ ctx }) {
 
 	return availableCurrencyKeys
 		.filter(key => key !== toBytes32('sUSD'))
-		.concat(['SNX', 'ETH'].map(toBytes32));
+		.concat(['DEM', 'ETH'].map(toBytes32));
 }
 
 async function _getCurrentRates({ ctx, currencyKeys }) {

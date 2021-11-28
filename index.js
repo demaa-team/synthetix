@@ -169,8 +169,8 @@ const defaults = {
 	CROSS_DOMAIN_WITHDRAWAL_GAS_LIMIT: `${3e6}`,
 
 	COLLATERAL_MANAGER: {
-		SYNTHS: ['sUSD', 'sBTC', 'sETH'],
-		SHORTS: ['sBTC', 'sETH'],
+		SYNTHS: ['sUSD', 'sETH'],
+		SHORTS: ['sETH'],
 		MAX_DEBT: w3utils.toWei('75000000'), // 75 million sUSD
 		MAX_SKEW_RATE: w3utils.toWei('0.2'),
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
@@ -578,18 +578,17 @@ const getSuspensionReasons = ({ code = undefined } = {}) => {
 const getTokens = ({ network = 'mainnet', path, fs, useOvm = false } = {}) => {
 	const synths = getSynths({ network, useOvm, path, fs });
 	const targets = getTarget({ network, useOvm, path, fs });
-	const feeds = getFeeds({ network, useOvm, path, fs });
 
 	return [
 		Object.assign(
 			{
-				symbol: 'SNX',
-				asset: 'SNX',
-				name: 'Synthetix',
+				symbol: 'DEM',
+				asset: 'DEM',
+				name: 'Demaa',
 				address: targets.ProxyERC20.address,
 				decimals: 18,
 			},
-			feeds['SNX'].feed ? { feed: feeds['SNX'].feed } : {}
+			{}
 		),
 	].concat(
 		synths

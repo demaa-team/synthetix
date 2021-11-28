@@ -52,14 +52,13 @@ module.exports = async ({
 	let systemSuspendedReason;
 
 	try {
-		freshDeploy = true;
 		// throw Error('TODO:need check all bellow things');
 		const oldSynthetix = deployer.getExistingContract({ contract: 'Synthetix' });
 		currentSynthetixSupply = await oldSynthetix.totalSupply();
 
 		// inflationSupplyToDate = total supply - 100m
 		const inflationSupplyToDate = parseUnits(currentSynthetixSupply.toString(), 'wei').sub(
-			parseUnits((100e6).toString(), 'wei')
+			parseUnits((100e6).toString(), 'ether')
 		);
 
 		// current weekly inflation 75m / 52

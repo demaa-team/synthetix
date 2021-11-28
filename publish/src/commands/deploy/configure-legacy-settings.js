@@ -129,7 +129,7 @@ module.exports = async ({
 			expected: input => input === addressOf(Synthetix),
 			write: 'setTarget',
 			writeArg: addressOf(Synthetix),
-			comment: 'Ensure the SNX proxy has the correct Synthetix target set',
+			comment: 'Ensure the DEM proxy has the correct Synthetix target set',
 		});
 		await runStep({
 			contract: 'Synthetix',
@@ -150,7 +150,7 @@ module.exports = async ({
 			expected: input => input === addressOf(Synthetix),
 			write: 'setTarget',
 			writeArg: addressOf(Synthetix),
-			comment: 'Ensure the legacy SNX proxy has the correct Synthetix target set',
+			comment: 'Ensure the legacy DEM proxy has the correct Synthetix target set',
 		});
 	}
 
@@ -255,7 +255,7 @@ module.exports = async ({
 			expected: input => input === addressOf(ProxyERC20),
 			write: 'setSynthetixProxy',
 			writeArg: addressOf(ProxyERC20),
-			comment: 'Ensure the SupplySchedule is connected to the SNX proxy for reading',
+			comment: 'Ensure the SupplySchedule is connected to the DEM proxy for reading',
 		});
 	}
 

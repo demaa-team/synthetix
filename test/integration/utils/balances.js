@@ -23,7 +23,7 @@ async function _readBalance({ ctx, symbol, user }) {
 }
 
 async function _getAmount({ ctx, symbol, user, amount }) {
-	if (symbol === 'SNX') {
+	if (symbol === 'DEM') {
 		await _getSNX({ ctx, user, amount });
 	} else if (symbol === 'WETH') {
 		await _getWETH({ ctx, user, amount });
@@ -93,7 +93,7 @@ async function _getSNX({ ctx, user, amount }) {
 
 async function _getSNXForOwner({ ctx, amount }) {
 	if (!ctx.useOvm) {
-		throw new Error('There is no more SNX!');
+		throw new Error('There is no more DEM!');
 	} else {
 		if (ctx.l1) {
 			await _getSNXForOwnerOnL2ByDepositing({ ctx: ctx.l1, amount });
@@ -139,7 +139,7 @@ async function _getsUSD({ ctx, user, amount }) {
 	let tx;
 
 	const requiredSNX = await _getSNXAmountRequiredForsUSDAmount({ ctx, amount });
-	await ensureBalance({ ctx, symbol: 'SNX', user, balance: requiredSNX });
+	await ensureBalance({ ctx, symbol: 'DEM', user, balance: requiredSNX });
 
 	Synthetix = Synthetix.connect(ctx.users.owner);
 	tx = await Synthetix.issueSynths(amount);
@@ -159,14 +159,14 @@ async function _getSNXAmountRequiredForsUSDAmount({ ctx, amount }) {
 	const [expectedAmount, ,] = await Exchanger.getAmountsForExchange(
 		collateral,
 		toBytes32('sUSD'),
-		toBytes32('SNX')
+		toBytes32('DEM')
 	);
 
 	return expectedAmount;
 }
 
 function _getTokenFromSymbol({ ctx, symbol }) {
-	if (symbol === 'SNX') {
+	if (symbol === 'DEM') {
 		return ctx.contracts.Synthetix;
 	} else if (symbol === 'WETH') {
 		return ctx.contracts.WETH;

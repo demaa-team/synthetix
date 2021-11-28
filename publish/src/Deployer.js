@@ -210,7 +210,6 @@ class Deployer {
 			['SafeDecimalMath', 'Math'].forEach(contractName => {
 				if (this.deployedContracts[contractName]) {
 					const fullSource = path.join('contracts', contractName);
-					console.log(fullSource);
 					bytecode = linker.linkBytecode(bytecode, {
 						[fullSource + '.sol']: {
 							[contractName]: this.deployedContracts[contractName].address,

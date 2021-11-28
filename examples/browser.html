@@ -16,17 +16,17 @@
     <script type="text/javascript" src="../browser.js"></script>
     <script>
       const network = "mainnet";
-      const sources = synthetix.getSource({network});
+      const sources = synthetix.getSource({ network });
       console.log("sources", sources);
-      const targets = synthetix.getTarget({network});
+      const targets = synthetix.getTarget({ network });
       console.log("targets", targets);
-      const synths = synthetix.getSynths({network});
+      const synths = synthetix.getSynths({ network });
       console.log("synths", synths);
-      const users = synthetix.getUsers({network});
+      const users = synthetix.getUsers({ network });
       console.log("users", users);
       console.log(
         "synthetix.toBytes32 correct?",
-        synthetix.toBytes32("SNX") ===
+        synthetix.toBytes32("DEM") ===
           "0x534e580000000000000000000000000000000000000000000000000000000000"
       );
       const sETHContract = new ethers.Contract(

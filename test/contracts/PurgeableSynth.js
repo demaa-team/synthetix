@@ -25,7 +25,7 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [sUSD, SNX, sAUD, iETH] = ['sUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
+	const [sUSD, DEM, sAUD, iETH] = ['sUSD', 'DEM', 'sAUD', 'iETH'].map(toBytes32);
 	const synthKeys = [sUSD, sAUD, iETH];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -156,7 +156,7 @@ contract('PurgeableSynth', accounts => {
 		describe("when there's a price for the purgeable synth", () => {
 			beforeEach(async () => {
 				await exchangeRates.updateRates(
-					[sAUD, SNX, iETH],
+					[sAUD, DEM, iETH],
 					['0.5', '1', '170'].map(toUnit),
 					timestamp,
 					{

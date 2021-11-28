@@ -32,11 +32,11 @@ const bnCloseVariance = '30';
 const MockAggregator = artifacts.require('MockAggregatorV2V3');
 
 contract('Exchanger (spec tests)', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sBTC, iBTC, sETH, iETH] = [
+	const [sUSD, sAUD, sEUR, DEM, sBTC, iBTC, sETH, iETH] = [
 		'sUSD',
 		'sAUD',
 		'sEUR',
-		'SNX',
+		'DEM',
 		'sBTC',
 		'iBTC',
 		'sETH',
@@ -2289,7 +2289,7 @@ contract('Exchanger (spec tests)', async accounts => {
 								}
 							);
 						});
-						describe('when a user holds holds 100,000 SNX', () => {
+						describe('when a user holds holds 100,000 DEM', () => {
 							beforeEach(async () => {
 								await synthetix.transfer(account1, toUnit(1e5), {
 									from: owner,
@@ -2303,7 +2303,7 @@ contract('Exchanger (spec tests)', async accounts => {
 										from: oracle,
 									});
 								});
-								describe('when the user tries to mint 1% of their SNX value', () => {
+								describe('when the user tries to mint 1% of their DEM value', () => {
 									const amountIssued = toUnit(1e3);
 									beforeEach(async () => {
 										// Issue
@@ -3881,7 +3881,7 @@ contract('Exchanger (spec tests)', async accounts => {
 		beforeEach(async () => {
 			timestamp = await currentTime();
 			await exchangeRates.updateRates(
-				[sAUD, sEUR, SNX, sETH, sBTC, iBTC],
+				[sAUD, sEUR, DEM, sETH, sBTC, iBTC],
 				['0.5', '2', '1', '100', '5000', '5000'].map(toUnit),
 				timestamp,
 				{
@@ -3982,7 +3982,7 @@ contract('Exchanger (spec tests)', async accounts => {
 		beforeEach(async () => {
 			timestamp = await currentTime();
 			await exchangeRates.updateRates(
-				[sAUD, sEUR, SNX, sETH, sBTC, iBTC],
+				[sAUD, sEUR, DEM, sETH, sBTC, iBTC],
 				['0.5', '2', '1', '100', '5000', '5000'].map(toUnit),
 				timestamp,
 				{

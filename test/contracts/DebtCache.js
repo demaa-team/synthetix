@@ -24,16 +24,16 @@ const {
 } = require('../..');
 
 contract('DebtCache', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sETH, ETH, iETH] = [
+	const [sUSD, sAUD, sEUR, DEM, sETH, ETH, iETH] = [
 		'sUSD',
 		'sAUD',
 		'sEUR',
-		'SNX',
+		'DEM',
 		'sETH',
 		'ETH',
 		'iETH',
 	].map(toBytes32);
-	const synthKeys = [sUSD, sAUD, sEUR, sETH, SNX];
+	const synthKeys = [sUSD, sAUD, sEUR, sETH, DEM];
 
 	const [deployerAccount, owner, oracle, account1, account2] = accounts;
 
@@ -261,7 +261,7 @@ contract('DebtCache', async accounts => {
 		timestamp = await currentTime();
 
 		await exchangeRates.updateRates(
-			[sAUD, sEUR, SNX, sETH, ETH, iETH],
+			[sAUD, sEUR, DEM, sETH, ETH, iETH],
 			['0.5', '1.25', '10', '200', '200', '200'].map(toUnit),
 			timestamp,
 			{ from: oracle }
@@ -472,7 +472,7 @@ contract('DebtCache', async accounts => {
 
 				// Revalidate the cache once rates are no longer stale
 				await exchangeRates.updateRates(
-					[sAUD, sEUR, SNX, sETH, ETH, iETH],
+					[sAUD, sEUR, DEM, sETH, ETH, iETH],
 					['0.5', '2', '100', '200', '200', '200'].map(toUnit),
 					await currentTime(),
 					{ from: oracle }
@@ -493,7 +493,7 @@ contract('DebtCache', async accounts => {
 
 				// ensure no actual rates are stale.
 				await exchangeRates.updateRates(
-					[sAUD, sEUR, sETH, SNX],
+					[sAUD, sEUR, sETH, DEM],
 					['0.5', '2', '100', '1'].map(toUnit),
 					await currentTime(),
 					{ from: oracle }
@@ -561,7 +561,7 @@ contract('DebtCache', async accounts => {
 				await fastForward(snapshotStaleTime + 10);
 				// ensure no actual rates are stale.
 				await exchangeRates.updateRates(
-					[sAUD, sEUR, sETH, SNX],
+					[sAUD, sEUR, sETH, DEM],
 					['0.5', '2', '100', '1'].map(toUnit),
 					await currentTime(),
 					{ from: oracle }
@@ -569,20 +569,20 @@ contract('DebtCache', async accounts => {
 
 				await assert.revert(
 					synthetix.issueSynths(toUnit('10'), { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A synth or DEM rate is invalid'
 				);
 
 				await assert.revert(
 					synthetix.burnSynths(toUnit('1'), { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A synth or DEM rate is invalid'
 				);
 
-				await assert.revert(feePool.claimFees(), 'A synth or SNX rate is invalid');
+				await assert.revert(feePool.claimFees(), 'A synth or DEM rate is invalid');
 
-				// Can't transfer SNX if issued debt
+				// Can't transfer DEM if issued debt
 				await assert.revert(
 					synthetix.transfer(owner, toUnit('1'), { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A synth or DEM rate is invalid'
 				);
 
 				// But can transfer if not
@@ -671,8 +671,8 @@ contract('DebtCache', async accounts => {
 				assert.eventEqual(tx.logs[0], 'DebtCacheUpdated', [toUnit(600)]);
 			});
 
-			it('reverts when attempting to synchronise non-existent synths or SNX', async () => {
-				await assert.revert(debtCache.updateCachedSynthDebts([SNX]));
+			it('reverts when attempting to synchronise non-existent synths or DEM', async () => {
+				await assert.revert(debtCache.updateCachedSynthDebts([DEM]));
 				const fakeSynth = toBytes32('FAKE');
 				await assert.revert(debtCache.updateCachedSynthDebts([fakeSynth]));
 				await assert.revert(debtCache.updateCachedSynthDebts([sUSD, fakeSynth]));
@@ -1279,7 +1279,7 @@ contract('DebtCache', async accounts => {
 				});
 			});
 
-			it('increases non-SNX debt', async () => {
+			it('increases non-DEM debt', async () => {
 				assert.bnEqual(
 					totalNonSnxBackedDebt.add(multiplyDecimalRound(oneETH, rate)),
 					await getTotalNonSnxBackedDebt()
@@ -1296,7 +1296,7 @@ contract('DebtCache', async accounts => {
 					tx = await synthetix.exchange(sETH, '5', sAUD, { from: account1 });
 				});
 
-				it('non-SNX debt is unchanged', async () => {
+				it('non-DEM debt is unchanged', async () => {
 					assert.bnEqual(
 						totalNonSnxBackedDebt.add(multiplyDecimalRound(oneETH, rate)),
 						await getTotalNonSnxBackedDebt()
@@ -1362,7 +1362,7 @@ contract('DebtCache', async accounts => {
 				await short.open(amount, oneETH, sETH, { from: account1 });
 			});
 
-			it('increases non-SNX debt', async () => {
+			it('increases non-DEM debt', async () => {
 				assert.bnEqual(totalNonSnxBackedDebt.add(rate), await getTotalNonSnxBackedDebt());
 			});
 			it('is excluded from currentDebt', async () => {

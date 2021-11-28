@@ -206,9 +206,9 @@ contract Migration_Mirfak is BaseMigration {
         feepooleternalstorage_i.setAssociatedContract(new_FeePool_contract);
         // Ensure the FeePool contract can write to its State;
         feepoolstate_i.setFeePool(IFeePool(new_FeePool_contract));
-        // Ensure the SNX proxy has the correct Synthetix target set;
+        // Ensure the DEM proxy has the correct Synthetix target set;
         proxyerc20_i.setTarget(Proxyable(new_Synthetix_contract));
-        // Ensure the legacy SNX proxy has the correct Synthetix target set;
+        // Ensure the legacy DEM proxy has the correct Synthetix target set;
         proxysynthetix_i.setTarget(Proxyable(new_Synthetix_contract));
         // Ensure the Exchanger contract can write to its State;
         exchangestate_i.setAssociatedContract(new_Exchanger_contract);

@@ -5,8 +5,14 @@
 		"sign": "$",
 		"description": "US Dollars"
 	},
-	"SNX": {
-		"asset": "SNX",
+	"CN2111": {
+		"asset": "CN2111",
+		"category": "equities",
+		"sign": "",
+		"description": "CN2111 weekly contract"
+	},
+	"DEM": {
+		"asset": "DEM",
 		"category": "crypto",
 		"sign": "",
 		"description": "Synthetix Network Token"
