@@ -23,7 +23,7 @@ const {
 const CONTRACT_OVERRIDES = require('../contract-overrides');
 const { optimizerRuns } = require('./build').DEFAULTS;
 
-const verify = async ({ buildPath, deploymentPath, network, useOvm, skipVerify = true }) => {
+const verify = async ({ buildPath, deploymentPath, network, useOvm, skipVerify = false }) => {
 	// Note: require this here as silent error is detected on require that impacts pretty-error
 	const solc = require('solc');
 
@@ -52,7 +52,7 @@ const verify = async ({ buildPath, deploymentPath, network, useOvm, skipVerify =
 	}
 
 	const { etherscanUrl, explorerLinkPrefix } = loadConnections({ network, useOvm });
-	console.log(gray(`Starting ${network.toUpperCase()} contract verification on Etherscan...`));
+	console.log(gray(`Starting ${network.toUpperCase()} contract verification on polygon...`));
 
 	const tableData = [];
 
@@ -106,10 +106,6 @@ const verify = async ({ buildPath, deploymentPath, network, useOvm, skipVerify =
 			deployment.targets[name].timestamp = new Date(result.data.result[0].timeStamp * 1000);
 
 			fs.writeFileSync(deploymentFile, stringify(deployment));
-
-			if (skipVerify) {
-				continue;
-			}
 
 			// Grab the last 150 characters of the compiled bytecode
 			const compiledBytecode = deployment.sources[source].bytecode.slice(-150);

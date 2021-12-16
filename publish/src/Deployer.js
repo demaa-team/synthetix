@@ -32,6 +32,7 @@ class Deployer {
 		useOvm,
 		ignoreSafetyChecks,
 		nonceManager,
+		fromHardhat,
 	}) {
 		this.compiled = compiled;
 		this.config = config;
@@ -67,6 +68,9 @@ class Deployer {
 
 		// Keep track of newly deployed contracts
 		this.newContractsDeployed = [];
+
+		// set compiled source
+		this.fromHardhat = fromHardhat;
 	}
 
 	async evaluateNextDeployedContractAddress() {
@@ -205,18 +209,28 @@ class Deployer {
 			// Any contract after SafeDecimalMath can automatically get linked.
 			// Doing this with bytecode that doesn't require the library is a no-op.
 			let bytecode = compiled.evm.bytecode.object;
-
-			// TODO:temporay fix
-			['SafeDecimalMath', 'Math'].forEach(contractName => {
-				if (this.deployedContracts[contractName]) {
-					const fullSource = path.join('contracts', contractName);
-					bytecode = linker.linkBytecode(bytecode, {
-						[fullSource + '.sol']: {
-							[contractName]: this.deployedContracts[contractName].address,
-						},
-					});
-				}
-			});
+			if (this.fromHardhat) {
+				['SafeDecimalMath', 'Math'].forEach(contractName => {
+					if (this.deployedContracts[contractName]) {
+						const fullSource = path.join('contract', source);
+						bytecode = linker.linkBytecode(bytecode, {
+							[fullSource + '.sol']: {
+								[contractName]: this.deployedContracts[contractName].address,
+							},
+						});
+					}
+				});
+			} else {
+				['SafeDecimalMath', 'Math'].forEach(contractName => {
+					if (this.deployedContracts[contractName]) {
+						bytecode = linker.linkBytecode(bytecode, {
+							[source + '.sol']: {
+								[contractName]: this.deployedContracts[contractName].address,
+							},
+						});
+					}
+				});
+			}
 
 			compiled.evm.bytecode.linkedObject = bytecode;
 			console.log(

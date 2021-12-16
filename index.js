@@ -200,6 +200,9 @@ const defaults = {
 	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.02'), // 200 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0.0005'), // 5 bps
+	OTC_USDT_ADDRESS: {
+		mumbai: '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65',
+	},
 };
 
 /**

@@ -138,7 +138,6 @@ const setupContract = async ({
 			return cache[name][fncName](...args.concat({ from: user }));
 		}
 	};
-
 	const defaultArgs = {
 		GenericMock: [],
 		TradingRewards: [owner, owner, tryGetAddressOf('AddressResolver')],
@@ -157,6 +156,7 @@ const setupContract = async ({
 		Proxy: [owner],
 		ProxyERC20: [owner],
 		Depot: [owner, fundsWallet, tryGetAddressOf('AddressResolver')],
+		OTC: [tryGetAddressOf('ERC20USDT'), owner, tryGetAddressOf('AddressResolver')],
 		SynthUtil: [tryGetAddressOf('AddressResolver')],
 		DappMaintenance: [owner],
 		DebtCache: [owner, tryGetAddressOf('AddressResolver')],
@@ -261,6 +261,9 @@ const setupContract = async ({
 
 	let instance;
 	try {
+		if (contract === 'OTC') {
+			log(`args: ${args.length > 0 ? args : defaultArgs[contract]} artific: ${source} ${contract}`);
+		}
 		instance = await create({
 			constructorArgs: args.length > 0 ? args : defaultArgs[contract],
 		});
@@ -641,6 +644,7 @@ const setupAllContracts = async ({
 			mocks: ['Synthetix', 'FeePool', 'RewardEscrow', 'RewardEscrowV2', 'ProxyFeePool'],
 		},
 		{ contract: 'Depot', deps: ['AddressResolver', 'SystemStatus'] },
+		{ contract: 'OTC', deps: ['AddressResolver', 'SystemStatus'] },
 		{ contract: 'SynthUtil', deps: ['AddressResolver'] },
 		{ contract: 'DappMaintenance' },
 		{ contract: 'WETH' },
@@ -901,6 +905,7 @@ const setupAllContracts = async ({
 		if (contract === 'MintableSynthetix' || contract === 'BaseSynthetix') {
 			contractRegistered = 'Synthetix';
 		}
+
 		returnObj[contractRegistered + forContractName] = await setupContract({
 			accounts,
 			contract,

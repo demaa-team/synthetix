@@ -72,8 +72,9 @@ const deploy = async ({
 	useFork,
 	useOvm,
 	yes,
-	fromHardhat = true,
+	fromHardhat = false,
 } = {}) => {
+	console.log(`from hardhat ${fromHardhat}`);
 	ensureNetwork(network);
 	deploymentPath = deploymentPath || getDeploymentPathForNetwork({ network, useOvm });
 	ensureDeploymentPath(deploymentPath);
@@ -195,6 +196,7 @@ const deploy = async ({
 		useFork,
 		ignoreSafetyChecks,
 		nonceManager: manageNonces ? nonceManager : undefined,
+		fromHardhat,
 	});
 
 	const { account, signer } = deployer;
@@ -533,7 +535,7 @@ module.exports = {
 			)
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
-			.option('--from-hardhat', 'use compiled from hardhat.')
+			.option('-f, --from-hardhat', 'use compiled from hardhat.')
 			.action(async (...args) => {
 				try {
 					await deploy(...args);

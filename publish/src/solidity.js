@@ -137,7 +137,7 @@ module.exports = {
 		return { artifacts, errors, warnings };
 	},
 
-	loadCompiledFiles({ buildPath, fromHardhat = true }) {
+	loadCompiledFiles({ buildPath, fromHardhat }) {
 		let earliestCompiledTimestamp = Infinity;
 
 		let compiledSourcePath = path.join(buildPath, COMPILED_FOLDER);
