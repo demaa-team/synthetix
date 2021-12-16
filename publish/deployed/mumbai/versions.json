@@ -524,5 +524,19 @@
 				"status": "current"
 			}
 		}
+	},
+	"v1.3.0-polygon": {
+		"tag": "v1.3.0-polygon",
+		"fulltag": "v1.3.0-polygon",
+		"network": "mumbai",
+		"date": "2021-12-16T05:46:20+00:00",
+		"commit": "dd90ef1118aa407395d7ec78a0e318ae7c0c107f",
+		"contracts": {
+			"OTC": {
+				"address": "0x431cB0f765a422dA32107171D460128456a7Ab2c",
+				"status": "current",
+				"keccak256": "0x09ba8bfce76e3b39c0d283e6a726a2288dd3c3fc6744747ba8d7358d03ab1768"
+			}
+		}
 	}
 }

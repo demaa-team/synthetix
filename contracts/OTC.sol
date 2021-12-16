@@ -255,8 +255,24 @@ contract OTC is MixinResolver, IOTC, Owned {
         _updateOrder(msg.sender, price, orders[msg.sender].leftAmount);
     }
 
-    function updateAmount(uint256 amount) public {
-        _updateOrder(msg.sender, orders[msg.sender].price, amount);
+    function increaseAmount(uint256 amount) public {
+        require(amount > 0, "Increase amount should gt than 0!");
+        require(hasOrder(msg.sender), "Order dose not exists!");
+
+        erc20().transferFrom(msg.sender, address(this), amount);
+
+        _updateOrder(msg.sender, orders[msg.sender].price, orders[msg.sender].leftAmount.add(amount));
+    }
+
+    function decreaseAmount(uint256 amount) public {
+        require(amount > 0, "Decrease amount should gt than 0!");
+        require(hasOrder(msg.sender), "Order dose not exists!");
+        require(orders[msg.sender].leftAmount >= amount, "Leftamount is insufficient!");
+
+        // send back assets to user
+        erc20().transfer(address(this), amount);
+
+        _updateOrder(msg.sender, orders[msg.sender].price, orders[msg.sender].leftAmount.sub(amount));
     }
 
     function hasDeal(uint256 dealID) public view returns (bool) {

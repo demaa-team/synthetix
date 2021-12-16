@@ -30,7 +30,9 @@ interface IOTC {
 
     function updatePrice(uint256 price) external;
 
-    function updateAmount(uint256 amount) external;
+    function increaseAmount(uint256 amount) external;
+
+    function decreaseAmount(uint256 amount) external;
 
     //Deal
     function makeDeal(address maker, uint256 amount) external returns (uint256);

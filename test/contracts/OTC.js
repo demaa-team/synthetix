@@ -109,7 +109,7 @@ contract('OTC', async accounts => {
 				console.log(`balanceof: ${await usdt.balanceOf(owner)}`);
 				console.log(`totalSupply: ${await usdt.totalSupply()}`);
 
-				await usdt.transfer(address1, toUnit('100'), { from: owner });
+				await usdt.transfer(address1, toUnit('1000'), { from: owner });
 				console.log(`usdt balanceof address1: ${await usdt.balanceOf(address1)}`);
 				await usdt.approve(otc.address, toUnit('100'), { from: address1 });
 				tx = await otc.openOrder(0, toUnit('6.33'), toUnit('100'), { from: address1 });
@@ -121,6 +121,26 @@ contract('OTC', async accounts => {
 					amount: toUnit('100'),
 				});
 				assert.bnEqual(await otc.orderCount(), 1);
+
+				// cant decrease amount
+				await assert.revert(
+					otc.decreaseAmount(toUnit('0'), { from: address1 }),
+					'Decrease amount should gt than 0!'
+				);
+				await assert.revert(
+					otc.decreaseAmount(toUnit('101'), { from: address1 }),
+					'Leftamount is insufficient!'
+				);
+				await assert.revert(otc.decreaseAmount(toUnit('50')), 'Order dose not exists!');
+				await otc.decreaseAmount(toUnit('50'), { from: address1 });
+				let o = await otc.orders(address1);
+				console.log(`left amount: ${o.leftAmount}`);
+				assert.bnEqual(o.leftAmount, toUnit('50'));
+				await usdt.approve(otc.address, toUnit('50'), { from: address1 });
+				await otc.increaseAmount(toUnit('50'), { from: address1 });
+				o = await otc.orders(address1);
+				console.log(`left amount: ${o.leftAmount}`);
+				assert.bnEqual(o.leftAmount, toUnit('100'));
 
 				await assert.equal(await otc.hasOrder(address1), true);
 
