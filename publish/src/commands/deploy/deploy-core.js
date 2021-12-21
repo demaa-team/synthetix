@@ -4,7 +4,6 @@ const { gray } = require('chalk');
 
 const {
 	constants: { ZERO_ADDRESS },
-	defaults,
 } = require('../../../..');
 
 module.exports = async ({
@@ -251,10 +250,9 @@ module.exports = async ({
 	});
 
 	// deploy otc module
-	console.log(`deploy otc with usdt address ${defaults.OTC_USDT_ADDRESS.mumbai}`);
 	await deployer.deployContract({
 		name: 'OTC',
 		deps: ['AddressResolver'],
-		args: [defaults.OTC_USDT_ADDRESS.mumbai, account, addressOf(readProxyForResolver)],
+		args: [account, addressOf(readProxyForResolver)],
 	});
 };

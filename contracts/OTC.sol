@@ -28,26 +28,38 @@ contract OTC is MixinResolver, IOTC, Owned {
     }
 
     struct Order {
+        // exange coin
+        bytes32 coinCode;
+        // trade partener code
+        bytes32 currencyCode;
         // uinique order id
         uint256 orderID;
         // Price of order
         uint256 price;
         // Left usdt amount not been selled
         uint256 leftAmount;
+        // locked amount
+        uint256 lockedAmount;
         // timestapm when order created
         uint256 cTime;
         uint256 uTime;
-        // trade partener code
-        CurrencyCode code;
     }
 
     struct Deal {
+        // underlying asset key
+        bytes32 coinCode;
+        // trade partener code
+        bytes32 currencyCode;
+        // order id
+        uint256 orderID;
         // a increasement number for 0
         uint256 dealID;
         // deal price
         uint256 price;
         // deal amount
         uint256 amount;
+        // locked amount
+        uint256 lockedAmount;
         // collateral for make this deal
         uint256 collateral;
         // time when deal created or updated
@@ -58,18 +70,17 @@ contract OTC is MixinResolver, IOTC, Owned {
         address taker;
         // deal state
         DealState dealState;
-        // trade partener code
-        CurrencyCode code;
     }
 
-    // erc20 contract address
-    address private _erc20;
     // profile table
     mapping(address => Profile) public profiles;
     // order table
     mapping(address => Order) public orders;
     // deal table
     mapping(uint256 => Deal) public deals;
+    // underlying assetst for otc supported
+    mapping(bytes32 => IERC20) public underlyingAssets;
+    uint256 public underlyingAssetsCount;
     // count users
     uint256 public userCount;
     // an incresement number used for generating order id
@@ -79,7 +90,8 @@ contract OTC is MixinResolver, IOTC, Owned {
     // collater forzen period before taker redeem collateral
     uint256 public dealFrozenPeriod = 3 days;
     // collateral ration 200%
-    uint256 public collateralRatio = 500000000000000000;
+    uint256 public takerCRatio = 200000000000000000;
+    uint256 public makerCRatio = 100000000000000000;
     uint256 public minTradeAmount = 50 * 1e18;
 
     bytes32 private constant DEM = "DEM";
@@ -87,13 +99,7 @@ contract OTC is MixinResolver, IOTC, Owned {
     bytes32 private constant CONTRACT_SYNTHETIX = "Synthetix";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
 
-    constructor(
-        address _asset,
-        address _owner,
-        address _resolver
-    ) public Owned(_owner) MixinResolver(_resolver) {
-        _erc20 = _asset;
-    }
+    constructor(address _owner, address _resolver) public Owned(_owner) MixinResolver(_resolver) {}
 
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
         addresses = new bytes32[](2);
@@ -113,29 +119,34 @@ contract OTC is MixinResolver, IOTC, Owned {
         return IExchangeRates(requireAndGetAddress(CONTRACT_EXRATES));
     }
 
-    function erc20() public view returns (IERC20) {
-        require(_erc20 != address(0), "invalid erc20 address");
-        return IERC20(_erc20);
+    function erc20(bytes32 coinCode) public view returns (IERC20) {
+        return underlyingAssets[coinCode];
     }
 
-    function getCollateralRatio() public view returns (uint256) {
-        return collateralRatio;
+    function addAsset(bytes32[] memory coinCodes, IERC20[] memory contracts) public onlyOwner {
+        require(coinCodes.length == contracts.length, "Should have the same length!");
+        for (uint256 i = 0; i < coinCodes.length; i++) {
+            require(contracts[i] != IERC20(address(0)), "Invalid contract address!");
+            underlyingAssets[coinCodes[i]] = contracts[i];
+        }
+        underlyingAssetsCount = coinCodes.length;
     }
 
-    function setCollateralRatio(uint256 cRatio) public onlyOwner {
-        collateralRatio = cRatio;
+    function removeAsset(bytes32 coinCode) public onlyOwner {
+        delete underlyingAssets[coinCode];
+        underlyingAssetsCount--;
     }
 
-    function getMinTradeAmount() public view returns (uint256) {
-        return minTradeAmount;
+    function setTakerCRatio(uint256 cRatio) public onlyOwner {
+        takerCRatio = cRatio;
+    }
+
+    function setMakerCRatio(uint256 cRatio) public onlyOwner {
+        makerCRatio = cRatio;
     }
 
     function setMinTradeAmount(uint256 minAmount) public onlyOwner {
         minTradeAmount = minAmount;
-    }
-
-    function getDealFrozenPeriod() public view returns (uint256) {
-        return dealFrozenPeriod;
     }
 
     function setDealFrozenPeriod(uint256 period) public onlyOwner {
@@ -185,47 +196,84 @@ contract OTC is MixinResolver, IOTC, Owned {
         return userCount;
     }
 
-    function migrate(address newOTC) public onlyOwner {
+    function migrate(bytes32[] memory assetKeys, address newOTC) public onlyOwner {
         // Transfer erc20 asset to new otc
-        erc20().transfer(newOTC, erc20().balanceOf(address(this)));
+        for (uint256 i = 0; i < assetKeys.length; i++) {
+            IERC20 asset = erc20(assetKeys[i]);
+            if (address(asset) == address(0)) {
+                revert("Unsuported underlying asset!");
+            }
+
+            asset.transfer(newOTC, asset.balanceOf(address(this)));
+        }
 
         // Transfer dem to new otc
         synthetixERC20().transfer(newOTC, synthetixERC20().balanceOf(address(this)));
     }
 
+    function maxExchangeableAsset(address maker) public view returns (uint256) {
+        require(hasOrder(maker), "Oder dose not exist!");
+        return exchangeableAsset(orders[maker].leftAmount, makerCRatio);
+    }
+
+    function exchangeableAsset(uint256 amount, uint256 ratio) public pure returns (uint256) {
+        // exchangeable = amount /(1 + ratio)
+        return amount.divideDecimalRound(SafeDecimalMath.unit().add(ratio));
+    }
+
+    function lockedAsset(uint256 amount, uint256 ratio) public pure returns (uint256) {
+        // locked = amount * ratio
+        return amount.multiplyDecimalRound(ratio);
+    }
+
     // Order
     function openOrder(
-        CurrencyCode code,
+        bytes32 coinCode,
+        bytes32 currencyCode,
         uint256 price,
         uint256 amount
     ) public {
         require(hasProfile(msg.sender), "Profile dose not exist!");
+        require(!hasOrder(msg.sender), "Order has exist!");
+
+        IERC20 asset = erc20(coinCode);
+        if (address(asset) == address(0)) {
+            revert("Unsuported underlying asset!");
+        }
 
         // delegate token to this
-        erc20().transferFrom(msg.sender, address(this), amount);
+        asset.transferFrom(msg.sender, address(this), amount);
 
         // create order
         orders[msg.sender] = Order({
+            coinCode: coinCode,
+            currencyCode: currencyCode,
             orderID: orderCount,
-            code: code,
             price: price,
             leftAmount: amount,
+            lockedAmount: uint256(0),
             cTime: block.timestamp,
             uTime: block.timestamp
         });
 
-        emit OpenOrder(msg.sender, orderCount, code, price, amount);
+        emit OpenOrder(msg.sender, orderCount);
 
         orderCount++;
     }
 
     function closeOrder() public {
         require(hasProfile(msg.sender), "Profile dose not exist!");
+        require(hasOrder(msg.sender), "Order dose not exist!");
+
+        // check if has pending deal
+        Order storage order = orders[msg.sender];
+        require(order.lockedAmount == uint256(0), "Has pending deals!");
+
+        // refund maker with left asset
+        erc20(order.coinCode).transfer(msg.sender, order.leftAmount);
 
         uint256 orderID = orders[msg.sender].orderID;
-
         delete orders[msg.sender];
-
         emit CloseOrder(msg.sender, orderID);
     }
 
@@ -234,45 +282,50 @@ contract OTC is MixinResolver, IOTC, Owned {
     }
 
     function updateOrder(uint256 price, uint256 amount) public {
-        _updateOrder(msg.sender, price, amount);
+        require(hasOrder(msg.sender), "Order dose not exists!");
+
+        orders[msg.sender].price = price;
+        orders[msg.sender].leftAmount = amount;
+
+        _updateOrder(msg.sender);
     }
 
-    function _updateOrder(
-        address user,
-        uint256 price,
-        uint256 amount
-    ) internal {
-        require(hasOrder(user), "Order dose not exists!");
-
-        orders[user].price = price;
-        orders[user].leftAmount = amount;
+    function _updateOrder(address user) internal {
         orders[user].uTime = block.timestamp;
-
-        emit UpdateOrder(user, orders[user].orderID, price, amount);
+        emit UpdateOrder(user, orders[user].orderID);
     }
 
     function updatePrice(uint256 price) public {
-        _updateOrder(msg.sender, price, orders[msg.sender].leftAmount);
+        require(hasOrder(msg.sender), "Order dose not exists!");
+
+        orders[msg.sender].price = price;
+
+        _updateOrder(msg.sender);
     }
 
     function increaseAmount(uint256 amount) public {
         require(amount > 0, "Increase amount should gt than 0!");
         require(hasOrder(msg.sender), "Order dose not exists!");
 
-        erc20().transferFrom(msg.sender, address(this), amount);
+        Order storage order = orders[msg.sender];
+        order.leftAmount = order.leftAmount.add(amount);
 
-        _updateOrder(msg.sender, orders[msg.sender].price, orders[msg.sender].leftAmount.add(amount));
+        _updateOrder(msg.sender);
+
+        erc20(order.coinCode).transferFrom(msg.sender, address(this), amount);
     }
 
     function decreaseAmount(uint256 amount) public {
         require(amount > 0, "Decrease amount should gt than 0!");
         require(hasOrder(msg.sender), "Order dose not exists!");
-        require(orders[msg.sender].leftAmount >= amount, "Leftamount is insufficient!");
+
+        Order storage order = orders[msg.sender];
+        require(order.leftAmount >= amount, "Leftamount is insufficient!");
+        order.leftAmount = order.leftAmount.sub(amount);
+        _updateOrder(msg.sender);
 
         // send back assets to user
-        erc20().transfer(address(this), amount);
-
-        _updateOrder(msg.sender, orders[msg.sender].price, orders[msg.sender].leftAmount.sub(amount));
+        erc20(order.coinCode).transfer(msg.sender, amount);
     }
 
     function hasDeal(uint256 dealID) public view returns (bool) {
@@ -281,29 +334,43 @@ contract OTC is MixinResolver, IOTC, Owned {
 
     //Deal
     function makeDeal(address maker, uint256 amount) public returns (uint256) {
-        require(msg.sender != maker, "Can not trade with self");
+        // check traders
+        require(msg.sender != maker, "Can not trade with self!");
 
-        // 1. check requirment
-        require(hasOrder(maker), "Maker has no active order!");
-        Order storage order = orders[maker];
-        require(order.leftAmount >= amount, "Amount exceed order left amount!");
+        // check min deal amount
         require(amount >= minTradeAmount, "Trade amount less than min!");
 
-        // 2. caculate required collateral amount
+        // check order
+        require(hasOrder(maker), "Maker has no active order!");
+
+        // check exchange able set
+        Order storage order = orders[maker];
+        uint256 maxExangeableAsset = exchangeableAsset(order.leftAmount, makerCRatio);
+        require(maxExangeableAsset >= amount, "Amount exceed order max excangeable!");
+        uint256 lockedAmount = lockedAsset(amount, makerCRatio);
+        order.leftAmount = order.leftAmount.sub(amount.add(lockedAmount));
+        order.lockedAmount = order.lockedAmount.add(lockedAmount);
+
+        _updateOrder(maker);
+
+        // caculate required collateral amount
         // TODO: replace sUSD with target asset
         uint256 collateral = exchangeRates().effectiveValue(sUSD, amount, DEM);
-        collateral = collateral.divideDecimalRound(getCollateralRatio());
+        collateral = lockedAsset(collateral, takerCRatio);
 
-        // 2. delegate collateral to frozen
+        // delegate collateral to frozen
         synthetixERC20().transferFrom(msg.sender, address(this), collateral);
 
         // 4. make deal
         Deal memory deal =
             Deal({
+                coinCode: order.coinCode,
+                currencyCode: order.currencyCode,
+                orderID: order.orderID,
                 dealID: dealCount,
-                code: order.code,
                 price: order.price,
                 amount: amount,
+                lockedAmount: lockedAmount,
                 collateral: collateral,
                 cTime: block.timestamp,
                 uTime: block.timestamp,
@@ -318,9 +385,6 @@ contract OTC is MixinResolver, IOTC, Owned {
 
         emit UpdateDeal(deal.maker, deal.taker, deal.dealID, deal.dealState);
 
-        // update left amount of order
-        _updateOrder(maker, order.price, order.leftAmount.sub(amount));
-
         return deal.dealID;
     }
 
@@ -329,7 +393,7 @@ contract OTC is MixinResolver, IOTC, Owned {
     }
 
     function maxTradeAmount(address taker) public view returns (uint256) {
-        uint256 collateral = synthetix().transferableSynthetix(taker).multiplyDecimalRound(getCollateralRatio());
+        uint256 collateral = synthetix().transferableSynthetix(taker).divideDecimalRound(takerCRatio);
         return exchangeRates().effectiveValue(DEM, collateral, sUSD);
     }
 
@@ -340,16 +404,19 @@ contract OTC is MixinResolver, IOTC, Owned {
         require(msg.sender == deal.taker, "Only taker can cancel deal!");
         require(deal.dealState == DealState.Confirming, "Deal state should be confirming!");
 
-        // transfer erc20 token back to maker
-        erc20().transfer(deal.maker, deal.amount);
-
-        // transfer DEM back to taker
-        synthetixERC20().transfer(deal.taker, deal.collateral);
+        // refund maker and taker
+        Order storage order = orders[deal.maker];
+        order.leftAmount = order.leftAmount.add(deal.amount).add(deal.lockedAmount);
+        order.lockedAmount = order.lockedAmount.sub(deal.lockedAmount);
+        _updateOrder(deal.maker);
 
         deal.dealState = DealState.Cancelled;
         deal.uTime = block.timestamp;
 
         emit UpdateDeal(deal.maker, deal.taker, deal.dealID, deal.dealState);
+
+        // transfer DEM back to taker
+        synthetixERC20().transfer(deal.taker, deal.collateral);
     }
 
     function confirmDeal(uint256 dealID) public returns (bool) {
@@ -358,14 +425,20 @@ contract OTC is MixinResolver, IOTC, Owned {
         require(deal.dealState == DealState.Confirming, "Deal should be confirming!");
         require(msg.sender == deal.maker, "Only maker can confirm deal!");
 
-        // transfer erc20 token to taker
-        erc20().transfer(deal.taker, deal.amount);
+        // unlocker maker and transfer asset to taker
+        Order storage order = orders[deal.maker];
+        order.leftAmount = order.leftAmount.add(deal.lockedAmount);
+        order.lockedAmount = order.lockedAmount.sub(deal.lockedAmount);
+        _updateOrder(deal.maker);
 
         // mark deal confirmed
         deal.dealState = DealState.Confirmed;
         deal.uTime = block.timestamp;
 
         emit UpdateDeal(deal.maker, deal.taker, deal.dealID, deal.dealState);
+
+        // transfer erc20 token to taker
+        erc20(deal.coinCode).transfer(deal.taker, deal.amount);
 
         // TODO: distribute trade reward
     }
@@ -386,6 +459,6 @@ contract OTC is MixinResolver, IOTC, Owned {
         require(hasDeal(dealID), "Deal dose not exist!");
         require(deal.dealState == DealState.Confirmed, "Deal not confirmed!");
 
-        return (deal.uTime + dealFrozenPeriod <= block.timestamp ? 0 : block.timestamp - deal.uTime);
+        return (deal.uTime + dealFrozenPeriod <= block.timestamp ? 0 : (deal.uTime + dealFrozenPeriod - block.timestamp));
     }
 }

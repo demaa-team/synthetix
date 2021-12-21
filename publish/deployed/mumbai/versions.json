@@ -534,8 +534,24 @@
 		"contracts": {
 			"OTC": {
 				"address": "0x431cB0f765a422dA32107171D460128456a7Ab2c",
+				"status": "replaced",
+				"keccak256": "0x09ba8bfce76e3b39c0d283e6a726a2288dd3c3fc6744747ba8d7358d03ab1768",
+				"replaced_in": "v1.4.0-polygon"
+			}
+		}
+	},
+	"v1.4.0-polygon": {
+		"tag": "v1.4.0-polygon",
+		"fulltag": "v1.4.0-polygon",
+		"network": "mumbai",
+		"date": "2021-12-21T06:41:06+00:00",
+		"block": "22930944",
+		"commit": "ab7b49e35f0cb813768abaeacdea5750797f6434",
+		"contracts": {
+			"OTC": {
+				"address": "0xBcCc2ceE2C44792cD83ADd7Ab2Ed81258432F4D0",
 				"status": "current",
-				"keccak256": "0x09ba8bfce76e3b39c0d283e6a726a2288dd3c3fc6744747ba8d7358d03ab1768"
+				"keccak256": "0x7c98b4ea7605528c3eeecdc2d2c86965c8ded2ca64018b4abc31a6815c78f665"
 			}
 		}
 	}

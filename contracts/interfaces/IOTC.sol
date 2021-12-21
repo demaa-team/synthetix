@@ -1,8 +1,9 @@
 pragma solidity ^0.5.16;
 
+import "./IERC20.sol";
+
 interface IOTC {
     enum DealState {Confirming, Cancelled, Confirmed}
-    enum CurrencyCode {CNY, USD}
 
     //Personal profile
     function registerProfile(string calldata ipfsHash) external;
@@ -17,7 +18,8 @@ interface IOTC {
 
     //Order
     function openOrder(
-        CurrencyCode code,
+        bytes32 coinCode,
+        bytes32 currencyCode,
         uint256 price,
         uint256 amount
     ) external;
@@ -47,15 +49,18 @@ interface IOTC {
 
     function hasDeal(uint256 dealID) external view returns (bool);
 
-    function migrate(address newOTC) external;
+    function migrate(bytes32[] calldata coinCodes, address newOTC) external;
+
+    function addAsset(bytes32[] calldata coinCodes, IERC20[] calldata contracts) external;
+
+    function removeAsset(bytes32 assetKey) external;
 
     event RegisterProfile(address indexed from, string ipfsHash);
     event UpdateProfile(address indexed from, string ipfsHash);
     event DestroyProfile(address indexed from);
 
-    event OpenOrder(address indexed from, uint256 orderID, CurrencyCode code, uint256 price, uint256 amount);
+    event OpenOrder(address indexed from, uint256 orderID);
     event CloseOrder(address indexed from, uint256 orderID);
-    event UpdateOrder(address indexed from, uint256 orderID, uint256 price, uint256 amount);
-
+    event UpdateOrder(address indexed from, uint256 orderID);
     event UpdateDeal(address indexed maker, address indexed taker, uint256 dealID, DealState dealState);
 }

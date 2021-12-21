@@ -22,6 +22,12 @@ const releases = require('./publish/releases.json');
 
 const networks = ['local', 'rinkeby', 'mumbai', 'kovan', 'mainnet', 'goerli'];
 
+/**
+ * Converts a string into a hex representation of bytes32, with right padding
+ */
+const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
+const fromBytes32 = key => w3utils.hexToAscii(key);
+
 const chainIdMapping = Object.entries({
 	1: {
 		network: 'mainnet',
@@ -200,16 +206,10 @@ const defaults = {
 	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.02'), // 200 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0.0005'), // 5 bps
-	OTC_USDT_ADDRESS: {
-		mumbai: '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65',
+	OTC_ASSETS: {
+		mumbai: [[toBytes32('USDT'), '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65']],
 	},
 };
-
-/**
- * Converts a string into a hex representation of bytes32, with right padding
- */
-const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
-const fromBytes32 = key => w3utils.hexToAscii(key);
 
 const getFolderNameForNetwork = ({ network, useOvm = false }) => {
 	if (network.includes('ovm')) {

@@ -25,5 +25,6 @@ require('./src/commands/settle').cmd(program);
 require('./src/commands/verify').cmd(program);
 require('./src/commands/versions-history').cmd(program);
 require('./src/commands/versions-update').cmd(program);
+require('./src/commands/add-otc-assets').cmd(program);
 
 program.parse(process.argv);

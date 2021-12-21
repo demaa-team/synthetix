@@ -60,6 +60,10 @@ const verify = async ({ buildPath, deploymentPath, network, useOvm, skipVerify =
 		const { address } = deployment.targets[name];
 		// Check if this contract already has been verified.
 
+		if (name !== 'OTC') {
+			continue;
+		}
+
 		let result = await axios.get(etherscanUrl, {
 			params: {
 				module: 'contract',
