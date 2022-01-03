@@ -3,7 +3,7 @@ pragma solidity ^0.5.16;
 import "./IERC20.sol";
 
 interface IOTC {
-    enum DealState {Confirming, Cancelled, Confirmed}
+    enum DealState {Confirming, Cancelled, Confirmed, Adjudicated}
 
     //Personal profile
     function registerProfile(string calldata ipfsHash) external;
@@ -37,9 +37,11 @@ interface IOTC {
     function decreaseAmount(uint256 amount) external;
 
     //Deal
-    function makeDeal(address maker, uint256 amount) external returns (uint256);
-
-    function makeDealMax(address maker) external returns (uint256);
+    function makeDeal(
+        address maker,
+        uint256 amount,
+        bytes32 collateralType
+    ) external;
 
     function cancelDeal(uint256 dealID) external returns (bool);
 
@@ -55,6 +57,25 @@ interface IOTC {
 
     function removeAsset(bytes32 assetKey) external;
 
+    function getDealInfo(uint256 dealID)
+        external
+        view
+        returns (
+            bool,
+            address,
+            address
+        );
+
+    function isDealExpired(uint256 dealID) external view returns (bool);
+
+    function isDealClosed(uint256 dealID) external view returns (bool);
+
+    function adjudicateDeal(
+        uint256 dealID,
+        address complainant,
+        uint256 compensationRatio
+    ) external;
+
     event RegisterProfile(address indexed from, string ipfsHash);
     event UpdateProfile(address indexed from, string ipfsHash);
     event DestroyProfile(address indexed from);
@@ -63,4 +84,6 @@ interface IOTC {
     event CloseOrder(address indexed from, uint256 orderID);
     event UpdateOrder(address indexed from, uint256 orderID);
     event UpdateDeal(address indexed maker, address indexed taker, uint256 dealID, DealState dealState);
+
+    event AdjudicateDeal(address from, uint256 deal);
 }

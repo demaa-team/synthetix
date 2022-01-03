@@ -172,5 +172,8 @@
 	},
 	"OTC": {
 		"deploy": false
+	},
+	"OTCDao": {
+		"deploy": false
 	}
 }

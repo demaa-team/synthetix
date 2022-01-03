@@ -207,7 +207,11 @@ const defaults = {
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.02'), // 200 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0.0005'), // 5 bps
 	OTC_ASSETS: {
-		mumbai: [[toBytes32('USDT'), '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65']],
+		mumbai: [
+			[toBytes32('USDT'), '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65'],
+			[toBytes32('DEM'), '0xe2f45DF412e4dE94FB9faFaAC35DBE88d23d338A'],
+			[toBytes32('sUSD'), '0x29c160e8F9E35Fd529a75e9e57247bAaAA5381C9'],
+		],
 	},
 };
 

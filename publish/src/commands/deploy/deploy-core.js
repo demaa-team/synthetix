@@ -251,6 +251,12 @@ module.exports = async ({
 
 	// deploy otc module
 	await deployer.deployContract({
+		name: 'OTCDao',
+		deps: ['AddressResolver'],
+		args: [account, addressOf(readProxyForResolver)],
+	});
+
+	await deployer.deployContract({
 		name: 'OTC',
 		deps: ['AddressResolver'],
 		args: [account, addressOf(readProxyForResolver)],

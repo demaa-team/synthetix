@@ -525,33 +525,22 @@
 			}
 		}
 	},
-	"v1.3.0-polygon": {
-		"tag": "v1.3.0-polygon",
-		"fulltag": "v1.3.0-polygon",
+	"v1.5.1-polygon": {
+		"tag": "v1.5.1-polygon",
+		"fulltag": "v1.5.1-polygon",
 		"network": "mumbai",
-		"date": "2021-12-16T05:46:20+00:00",
-		"commit": "dd90ef1118aa407395d7ec78a0e318ae7c0c107f",
+		"date": "2022-01-03T11:43:41+00:00",
+		"commit": "25a85598339bb475da088df92c8cae528c5c1565",
 		"contracts": {
 			"OTC": {
-				"address": "0x431cB0f765a422dA32107171D460128456a7Ab2c",
-				"status": "replaced",
-				"keccak256": "0x09ba8bfce76e3b39c0d283e6a726a2288dd3c3fc6744747ba8d7358d03ab1768",
-				"replaced_in": "v1.4.0-polygon"
-			}
-		}
-	},
-	"v1.4.0-polygon": {
-		"tag": "v1.4.0-polygon",
-		"fulltag": "v1.4.0-polygon",
-		"network": "mumbai",
-		"date": "2021-12-21T06:41:06+00:00",
-		"block": "22930944",
-		"commit": "ab7b49e35f0cb813768abaeacdea5750797f6434",
-		"contracts": {
-			"OTC": {
-				"address": "0xBcCc2ceE2C44792cD83ADd7Ab2Ed81258432F4D0",
+				"address": "0xBcf587Ca68D67cA3A81c3653037c8fddcE55A0ef",
 				"status": "current",
-				"keccak256": "0x7c98b4ea7605528c3eeecdc2d2c86965c8ded2ca64018b4abc31a6815c78f665"
+				"keccak256": "0x73569c9e3e02ff828f1c37748805f77c184e2b82d3be81f3c01cac388f146fcd"
+			},
+			"OTCDao": {
+				"address": "0x70F9FDD3592aCa60144C046a9370413dB7831614",
+				"status": "current",
+				"keccak256": "0xfd903c179802784a28c4201adcc5d78c7367dbed8dfa3d185426290e544544aa"
 			}
 		}
 	}

@@ -157,6 +157,7 @@ const setupContract = async ({
 		ProxyERC20: [owner],
 		Depot: [owner, fundsWallet, tryGetAddressOf('AddressResolver')],
 		OTC: [owner, tryGetAddressOf('AddressResolver')],
+		OTCDao: [owner, tryGetAddressOf('AddressResolver')],
 		SynthUtil: [tryGetAddressOf('AddressResolver')],
 		DappMaintenance: [owner],
 		DebtCache: [owner, tryGetAddressOf('AddressResolver')],
@@ -645,6 +646,7 @@ const setupAllContracts = async ({
 		},
 		{ contract: 'Depot', deps: ['AddressResolver', 'SystemStatus'] },
 		{ contract: 'OTC', deps: ['AddressResolver', 'SystemStatus'] },
+		{ contract: 'OTCDao', deps: ['AddressResolver', 'SystemStatus'] },
 		{ contract: 'SynthUtil', deps: ['AddressResolver'] },
 		{ contract: 'DappMaintenance' },
 		{ contract: 'WETH' },
@@ -905,7 +907,6 @@ const setupAllContracts = async ({
 		if (contract === 'MintableSynthetix' || contract === 'BaseSynthetix') {
 			contractRegistered = 'Synthetix';
 		}
-
 		returnObj[contractRegistered + forContractName] = await setupContract({
 			accounts,
 			contract,
