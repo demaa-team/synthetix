@@ -302,8 +302,8 @@
 			"address": "0xE1046d2a29464392Fc29c2A6D508874ba2B55dae",
 			"source": "OTCDao",
 			"link": "https://mumbai.polygonscan.com/address/0xE1046d2a29464392Fc29c2A6D508874ba2B55dae",
-			"timestamp": "2022-01-20T07:39:18.914Z",
-			"txn": "",
+			"timestamp": "2022-01-20T07:39:17.000Z",
+			"txn": "https://mumbai.polygonscan.com/tx/0xd4f5872517865e76fd3ec3b79386b651de2787a0d7b987690fdb6a43113dc685",
 			"network": "mumbai"
 		},
 		"OTC": {
@@ -311,8 +311,8 @@
 			"address": "0x55841F5a5c436553693c946e1235903545ab51b5",
 			"source": "OTC",
 			"link": "https://mumbai.polygonscan.com/address/0x55841F5a5c436553693c946e1235903545ab51b5",
-			"timestamp": "2022-01-20T07:39:29.550Z",
-			"txn": "",
+			"timestamp": "2022-01-20T07:39:27.000Z",
+			"txn": "https://mumbai.polygonscan.com/tx/0xec62191ae32a23f1a798fffb0c03d5c2761c2d5123a9dabc560d9a5769c10ccf",
 			"network": "mumbai"
 		},
 		"TokenStatedUSD": {

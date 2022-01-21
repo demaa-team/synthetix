@@ -8,19 +8,10 @@
 	"AddressResolver": {
 		"deploy": false
 	},
-	"CollateralManager": {
-		"deploy": false
-	},
-	"CollateralManagerState": {
-		"deploy": false
-	},
-	"CollateralEth": {
-		"deploy": false
-	},
-	"CollateralShort": {
-		"deploy": false
-	},
 	"ReadProxyAddressResolver": {
+		"deploy": false
+	},
+	"DebtCache": {
 		"deploy": false
 	},
 	"DelegateApprovals": {
@@ -29,13 +20,13 @@
 	"DelegateApprovalsEternalStorage": {
 		"deploy": false
 	},
-	"DebtCache": {
-		"deploy": false
-	},
 	"Depot": {
 		"deploy": false
 	},
 	"EscrowChecker": {
+		"deploy": false
+	},
+	"EtherCollateral": {
 		"deploy": false
 	},
 	"ExchangeRates": {
@@ -54,9 +45,6 @@
 		"deploy": false
 	},
 	"FeePoolEternalStorage": {
-		"deploy": false
-	},
-	"FlexibleStorage": {
 		"deploy": false
 	},
 	"Issuer": {
@@ -86,9 +74,6 @@
 	"SynthetixState": {
 		"deploy": false
 	},
-	"SystemSettings": {
-		"deploy": false
-	},
 	"SystemStatus": {
 		"deploy": false
 	},
@@ -98,43 +83,25 @@
 	"DappMaintenance": {
 		"deploy": false
 	},
-	"TradingRewards": {
-		"deploy": false
-	},
-	"RewardEscrowV2": {
-		"deploy": false
-	},
-	"ProxyFeePool": {
+	"SynthdUSD": {
 		"deploy": false
 	},
 	"ProxyERC20": {
 		"deploy": false
 	},
-	"TokenStateSynthetix": {
+	"ProxyFeePool": {
 		"deploy": false
 	},
 	"ProxySynthetix": {
 		"deploy": false
 	},
-	"VirtualSynthMastercopy": {
-		"deploy": false
-	},
-	"SynthRedeemer": {
-		"deploy": true
-	},
-	"TokenStatedUSD": {
-		"deploy": false
-	},
 	"ProxydUSD": {
 		"deploy": false
 	},
-	"ProxyERC20dUSD": {
+	"TokenStateSynthetix": {
 		"deploy": false
 	},
-	"SynthdUSD": {
-		"deploy": false
-	},
-	"SynthdCN": {
+	"TokenStatedUSD": {
 		"deploy": false
 	},
 	"TokenStatedETH": {
@@ -146,28 +113,10 @@
 	"SynthdETH": {
 		"deploy": false
 	},
-	"TokenStateiETH": {
-		"deploy": false
-	},
-	"ProxyiETH": {
-		"deploy": false
-	},
-	"SynthiETH": {
-		"deploy": false
-	},
-	"EtherWrapper": {
-		"deploy": false
-	},
-	"NativeEtherWrapper": {
-		"deploy": false
-	},
-	"CollateralStateEth": {
-		"deploy": false
-	},
-	"CollateralUtil": {
-		"deploy": true
-	},
 	"TokenStatedCN": {
+		"deploy": false
+	},
+	"SynthdCN": {
 		"deploy": false
 	},
 	"ProxydCN": {
@@ -179,13 +128,55 @@
 	"OTCDao": {
 		"deploy": false
 	},
-	"EtherCollateral": {
+	"TokenStateiETH": {
+		"deploy": false
+	},
+	"ProxyiETH": {
+		"deploy": false
+	},
+	"SynthiETH": {
+		"deploy": false
+	},
+	"ProxyERC20dUSD": {
+		"deploy": false
+	},
+	"FlexibleStorage": {
+		"deploy": false
+	},
+	"SystemSettings": {
+		"deploy": false
+	},
+	"TradingRewards": {
 		"deploy": false
 	},
 	"EtherCollateraldUSD": {
 		"deploy": false
 	},
+	"CollateralEth": {
+		"deploy": false
+	},
+	"CollateralManager": {
+		"deploy": false
+	},
+	"CollateralManagerState": {
+		"deploy": false
+	},
+	"CollateralStateEth": {
+		"deploy": false
+	},
 	"CollateralStateShort": {
+		"deploy": false
+	},
+	"CollateralShort": {
+		"deploy": false
+	},
+	"RewardEscrowV2": {
+		"deploy": false
+	},
+	"EtherWrapper": {
+		"deploy": false
+	},
+	"NativeEtherWrapper": {
 		"deploy": false
 	}
 }

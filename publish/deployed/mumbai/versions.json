@@ -1,9 +1,11 @@
 {
-	"v1.5.1-polygon": {
-		"tag": "v1.5.1-polygon",
-		"fulltag": "v1.5.1-polygon",
+	"v2.0.0-mumbai": {
+		"tag": "v2.0.0-mumbai",
+		"fulltag": "v2.0.0-mumbai",
 		"network": "mumbai",
-		"commit": "",
+		"date": "2022-01-21T02:59:52+00:00",
+		"commit": "da3f8a3cf32227e22a4cb9e32308423ce6ca8edd",
+		"block": 24074543,
 		"contracts": {
 			"SafeDecimalMath": {
 				"address": "0xcc4C36F06aCb338006db666f0e03237882EDCE69",

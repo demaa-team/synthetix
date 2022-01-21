@@ -23,7 +23,7 @@ const {
 const CONTRACT_OVERRIDES = require('../contract-overrides');
 const { optimizerRuns } = require('./build').DEFAULTS;
 
-const verify = async ({ buildPath, network, deploymentPath }) => {
+const verify = async ({ buildPath, network, specifyContract, deploymentPath }) => {
 	// Note: require this here as silent error is detected on require that impacts pretty-error
 	const solc = require('solc');
 
@@ -56,9 +56,14 @@ const verify = async ({ buildPath, network, deploymentPath }) => {
 	const tableData = [];
 
 	for (const name of Object.keys(config)) {
+
+		if(!specifyContract || !name.startsWith(specifyContract)){
+			console.log(`skip contract ${name}`);
+			continue;
+		}
+
 		const { address } = deployment.targets[name];
 		// Check if this contract already has been verified.
-
 		let result = await axios.get(etherscanUrl, {
 			params: {
 				module: 'contract',
@@ -244,7 +249,7 @@ const verify = async ({ buildPath, network, deploymentPath }) => {
 	}
 
 	console.log(gray('Verification state'));
-	console.log(table(tableData));
+	// console.log(table(tableData));
 };
 
 module.exports = {
@@ -258,7 +263,8 @@ module.exports = {
 				'Path to a folder hosting compiled files from the "build" step in this script',
 				path.join(__dirname, '..', '..', '..', BUILD_FOLDER)
 			)
-			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'kovan')
+			.option('-n, --network <value>', 'The network to run off.', x => x.toLowerCase(), 'mumbai')
+			.option('-s, --specify-contract <value>', 'The network to run off.', 'OTC')
 			.option(
 				'-d, --deployment-path <value>',
 				`Path to a folder that has your input configuration file ${CONFIG_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`

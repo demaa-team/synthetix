@@ -2,8 +2,8 @@
 	"name": "synthetix-demaa",
 	"version": "2.0.0-mumbai",
 	"license": "MIT",
-	"author": "Synthetix",
-	"description": "The smart contracts which make up the Synthetix system. (synthetix.io)",
+	"author": "DEMAA",
+	"description": "The smart contracts which make up the Synthetix system. (demaa.io)",
 	"scripts": {
 		"clean-install": "rm -rf build && rm ./package-lock.json && rm -rf node_modules/* && npm install",
 		"compile": "hardhat compile",
@@ -33,10 +33,10 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Synthetixio/synthetix.git"
+		"url": "https://github.com/demaa-tema/synthetix.git"
 	},
 	"keywords": [
-		"Synthetix",
+		"DEMAA",
 		"DEM",
 		"dUSD",
 		"Solidity",
