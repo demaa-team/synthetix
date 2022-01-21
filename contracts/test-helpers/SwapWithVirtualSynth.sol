@@ -116,7 +116,7 @@ contract VirtualToken is ERC20 {
         // allow the pool to spend my synths
         synth.approve(address(pool), balanceAfterSettlement);
 
-        // now exchange all my synths (sBTC) for WBTC
+        // now exchange all my synths (dBTC) for WBTC
         pool.exchange(2, 1, balanceAfterSettlement, 0);
     }
 
@@ -142,12 +142,12 @@ contract VirtualToken is ERC20 {
 }
 
 contract SwapWithVirtualSynth {
-    ICurvePool public incomingPool = ICurvePool(0xA5407eAE9Ba41422680e2e00537571bcC53efBfD); // Curve: sUSD v2 Swap
-    ICurvePool public outgoingPool = ICurvePool(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714); // Curve: sBTC Swap
+    ICurvePool public incomingPool = ICurvePool(0xA5407eAE9Ba41422680e2e00537571bcC53efBfD); // Curve: dUSD v2 Swap
+    ICurvePool public outgoingPool = ICurvePool(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714); // Curve: dBTC Swap
 
     ISynthetix public synthetix = ISynthetix(0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F);
 
-    IERC20Detailed public sUSD = IERC20Detailed(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
+    IERC20Detailed public dUSD = IERC20Detailed(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
     IERC20Detailed public USDC = IERC20Detailed(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     IERC20Detailed public WBTC = IERC20Detailed(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
 
@@ -158,11 +158,11 @@ contract SwapWithVirtualSynth {
         // ensure the pool can transferFrom our contract
         USDC.approve(address(incomingPool), amount);
 
-        // now invoke curve USDC to sUSD
+        // now invoke curve USDC to dUSD
         incomingPool.exchange(1, 3, amount, 0);
 
-        // now exchange my sUSD to sBTC
-        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("sUSD", sUSD.balanceOf(address(this)), "sBTC", bytes32(0));
+        // now exchange my dUSD to dBTC
+        (, IVirtualSynth vSynth) = synthetix.exchangeWithVirtual("dUSD", dUSD.balanceOf(address(this)), "dBTC", bytes32(0));
 
         // wrap this vSynth in a new token ERC20 contract
         VirtualToken vToken = new VirtualToken(vSynth, outgoingPool, WBTC);

@@ -32,7 +32,7 @@
 	"EtherCollateral": {
 		"deploy": true
 	},
-	"EtherCollateralsUSD": {
+	"EtherCollateraldUSD": {
 		"deploy": true
 	},
 	"FeePool": {
@@ -92,7 +92,7 @@
 	"DappMaintenance": {
 		"deploy": true
 	},
-	"SynthsUSD": {
+	"SynthdUSD": {
 		"deploy": true
 	},
 	"ProxyERC20": {
@@ -128,7 +128,7 @@
 	"ProxysETH": {
 		"deploy": true
 	},
-	"SynthsETH": {
+	"SynthdETH": {
 		"deploy": true
 	},
 	"SynthetixBridgeToBase": {

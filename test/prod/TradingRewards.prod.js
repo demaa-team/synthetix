@@ -113,8 +113,8 @@ contract('TradingRewards (prod tests)', accounts => {
 				({ exchangeLogs } = await exchangeSynths({
 					network,
 					account: user,
-					fromCurrency: 'sUSD',
-					toCurrency: 'sETH',
+					fromCurrency: 'dUSD',
+					toCurrency: 'dETH',
 					amount: toUnit('1'),
 				}));
 			});
@@ -154,8 +154,8 @@ contract('TradingRewards (prod tests)', accounts => {
 					network,
 					withTradingRewards: true,
 					account: user,
-					fromCurrency: 'sUSD',
-					toCurrency: 'sETH',
+					fromCurrency: 'dUSD',
+					toCurrency: 'dETH',
 					amount: toUnit('1'),
 				}));
 			});

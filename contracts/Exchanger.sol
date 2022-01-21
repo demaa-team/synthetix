@@ -77,7 +77,7 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         uint timestamp;
     }
 
-    bytes32 private constant sUSD = "sUSD";
+    bytes32 private constant dUSD = "dUSD";
 
     // SIP-65: Decentralized circuit breaker
     uint public constant CIRCUIT_BREAKER_SUSPENSION_REASON = 65;
@@ -455,7 +455,7 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
     }
 
     function _updateSNXIssuedDebtOnExchange(bytes32[2] memory currencyKeys, uint[2] memory currencyRates) internal {
-        bool includesSUSD = currencyKeys[0] == sUSD || currencyKeys[1] == sUSD;
+        bool includesSUSD = currencyKeys[0] == dUSD || currencyKeys[1] == dUSD;
         uint numKeys = includesSUSD ? 2 : 3;
 
         bytes32[] memory keys = new bytes32[](numKeys);
@@ -467,7 +467,7 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         rates[1] = currencyRates[1];
 
         if (!includesSUSD) {
-            keys[2] = sUSD; // And we'll also update sUSD to account for any fees if it wasn't one of the exchanged currencies
+            keys[2] = dUSD; // And we'll also update dUSD to account for any fees if it wasn't one of the exchanged currencies
             rates[2] = SafeDecimalMath.unit();
         }
 
@@ -556,18 +556,18 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
 
         // Remit the fee if required
         if (fee > 0) {
-            // Normalize fee to sUSD
+            // Normalize fee to dUSD
             // Note: `fee` is being reused to avoid stack too deep errors.
-            fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, sUSD);
+            fee = exchangeRates().effectiveValue(destinationCurrencyKey, fee, dUSD);
 
             // Remit the fee in sUSDs
-            issuer().synths(sUSD).issue(feePool().FEE_ADDRESS(), fee);
+            issuer().synths(dUSD).issue(feePool().FEE_ADDRESS(), fee);
 
             // Tell the fee pool about this
             feePool().recordFeePaid(fee);
         }
 
-        // Note: As of this point, `fee` is denominated in sUSD.
+        // Note: As of this point, `fee` is denominated in dUSD.
 
         // Nothing changes as far as issuance data goes because the total value in the system hasn't changed.
         // But we will update the debt snapshot in case exchange rates have fluctuated since the last exchange
@@ -810,11 +810,11 @@ contract Exchanger is Owned, MixinSystemSettings, IExchanger {
         // Get the exchange fee rate as per destination currencyKey
         exchangeFeeRate = getExchangeFeeRate(destinationCurrencyKey);
 
-        if (sourceCurrencyKey == sUSD || destinationCurrencyKey == sUSD) {
+        if (sourceCurrencyKey == dUSD || destinationCurrencyKey == dUSD) {
             return exchangeFeeRate;
         }
 
-        // Is this a swing trade? long to short or short to long skipping sUSD.
+        // Is this a swing trade? long to short or short to long skipping dUSD.
         if (
             (sourceCurrencyKey[0] == 0x73 && destinationCurrencyKey[0] == 0x69) ||
             (sourceCurrencyKey[0] == 0x69 && destinationCurrencyKey[0] == 0x73)

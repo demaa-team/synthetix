@@ -97,8 +97,8 @@ contract('ExchangeRates (prod tests)', accounts => {
 				network,
 				deploymentPath,
 				account: user,
-				fromCurrency: 'sUSD',
-				toCurrency: 'sETH',
+				fromCurrency: 'dUSD',
+				toCurrency: 'dETH',
 				amount: toUnit('10'),
 			});
 			waitingPeriod = Number(await SystemSettings.waitingPeriodSecs());
@@ -106,7 +106,7 @@ contract('ExchangeRates (prod tests)', accounts => {
 
 		it('should settle', async () => {
 			await fastForward(waitingPeriod);
-			await Exchanger.settle(user, toBytes32('sETH'), { from: user });
+			await Exchanger.settle(user, toBytes32('dETH'), { from: user });
 		});
 	});
 });

@@ -306,8 +306,8 @@
 			"txn": "",
 			"network": "mainnet"
 		},
-		"SynthsUSD": {
-			"name": "SynthsUSD",
+		"SynthdUSD": {
+			"name": "SynthdUSD",
 			"address": "0xF2FF43DA7B6e5963059b7004df43b5c5870EEb18",
 			"source": "Synth",
 			"link": "https://etherscan.io/address/0xF2FF43DA7B6e5963059b7004df43b5c5870EEb18",
@@ -324,8 +324,8 @@
 			"txn": "",
 			"network": "mainnet"
 		},
-		"EtherCollateralsUSD": {
-			"name": "EtherCollateralsUSD",
+		"EtherCollateraldUSD": {
+			"name": "EtherCollateraldUSD",
 			"address": "0xC0c66470E766AE2026E6695966C56C90741811AA",
 			"source": "EmptyEtherCollateral",
 			"link": "https://etherscan.io/address/0xC0c66470E766AE2026E6695966C56C90741811AA",

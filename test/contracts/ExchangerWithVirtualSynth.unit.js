@@ -46,7 +46,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 		describe('exchanging', () => {
 			describe('exchangeWithVirtual', () => {
 				describe('failure modes', () => {
-					const args = [owner, toBytes32('sUSD'), '100', toBytes32('sETH'), owner, toBytes32()];
+					const args = [owner, toBytes32('dUSD'), '100', toBytes32('dETH'), owner, toBytes32()];
 
 					behaviors.whenInstantiated({ owner }, () => {
 						// as we aren't calling as Synthetix, we need to mock the check for synths
@@ -84,9 +84,9 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																await assert.revert(
 																	this.instance.exchangeWithVirtual(
 																		owner,
-																		toBytes32('sUSD'),
+																		toBytes32('dUSD'),
 																		'0',
-																		toBytes32('sETH'),
+																		toBytes32('dETH'),
 																		owner,
 																		toBytes32(),
 																		{ from: this.mocks.Synthetix.address }
@@ -98,7 +98,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 																await assert.revert(
 																	this.instance.exchangeWithVirtual(
 																		owner,
-																		toBytes32('sUSD'),
+																		toBytes32('dUSD'),
 																		'100',
 																		toBytes32('iETH'),
 																		owner,
@@ -136,9 +136,9 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														beforeEach(async () => {
 															txn = await this.instance.exchangeWithVirtual(
 																owner,
-																toBytes32('sUSD'),
+																toBytes32('dUSD'),
 																amount,
-																toBytes32('sETH'),
+																toBytes32('dETH'),
 																owner,
 																toBytes32(),
 																{ from: this.mocks.Synthetix.address }
@@ -147,7 +147,7 @@ contract('ExchangerWithVirtualSynth (unit tests)', async accounts => {
 														it('emits a VirtualSynthCreated event with the correct underlying synth and amount', async () => {
 															assert.eventEqual(txn, 'VirtualSynthCreated', {
 																synth: this.mocks.synth.smocked.proxy.will.returnValue,
-																currencyKey: toBytes32('sETH'),
+																currencyKey: toBytes32('dETH'),
 																amount,
 																recipient: owner,
 															});

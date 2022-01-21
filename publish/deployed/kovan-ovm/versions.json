@@ -184,7 +184,7 @@
 				"status": "current",
 				"keccak256": "0x067912d947f7e44dc3cc78c50cba795498728b2e8c213acc9a80f317df773762"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x4305B0485aD00548a17473ada5b3bA8be98d283F",
 				"status": "current",
 				"keccak256": "0x46ea3a53d11e9a3e1dcbb57dc0c282dcd37f3dea3d25fc83d2849d9da9055074"
@@ -194,7 +194,7 @@
 				"status": "current",
 				"keccak256": "0x7a479ab85e4661d4f1eb57135d710b20bd2e4ab066a37a1c1b7b9eeb536da3f6"
 			},
-			"EtherCollateralsUSD": {
+			"EtherCollateraldUSD": {
 				"address": "0x4c22BC6FC957efb8D6737982e522950e77F0F47f",
 				"status": "current",
 				"keccak256": "0x7a479ab85e4661d4f1eb57135d710b20bd2e4ab066a37a1c1b7b9eeb536da3f6"
@@ -283,7 +283,7 @@
 				"status": "current",
 				"keccak256": "0x067912d947f7e44dc3cc78c50cba795498728b2e8c213acc9a80f317df773762"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x41B7BE5A411e73Baf5B2C82dCD1C110b0c177335",
 				"status": "current",
 				"keccak256": "0xf4ea326028b47508046125b31813d6dd139e2a4d64ada6009eefaa67cba461c7"

@@ -236,8 +236,8 @@ describe('deployments', () => {
 									'Synthetix',
 									'SynthetixEscrow',
 									'SynthetixState',
-									'SynthsUSD',
-									'SynthsETH',
+									'SynthdUSD',
+									'SynthdETH',
 									'SystemSettings',
 									'SystemStatus',
 								].forEach(name => {

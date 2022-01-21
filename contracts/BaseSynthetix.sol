@@ -21,9 +21,9 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
 
     // Available Synths which can be used with the system
     string public constant TOKEN_NAME = "Synthetix Network Token";
-    string public constant TOKEN_SYMBOL = "SNX";
+    string public constant TOKEN_SYMBOL = "DEM";
     uint8 public constant DECIMALS = 18;
-    bytes32 public constant sUSD = "sUSD";
+    bytes32 public constant dUSD = "dUSD";
 
     // ========== ADDRESS RESOLVER CONFIGURATION ==========
     bytes32 private constant CONTRACT_SYNTHETIXSTATE = "SynthetixState";
@@ -87,7 +87,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     }
 
     // TODO: refactor the name of this function. It also incorporates the exclusion of
-    // issued sETH by the EtherWrapper.
+    // issued dETH by the EtherWrapper.
     function totalIssuedSynthsExcludeEtherCollateral(bytes32 currencyKey) external view returns (uint) {
         return issuer().totalIssuedSynths(currencyKey, true);
     }
@@ -154,8 +154,8 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
         if (initialDebtOwnership > 0) {
             (uint transferable, bool anyRateIsInvalid) =
                 issuer().transferableSynthetixAndAnyRateIsInvalid(account, tokenState.balanceOf(account));
-            require(value <= transferable, "Cannot transfer staked or escrowed SNX");
-            require(!anyRateIsInvalid, "A synth or SNX rate is invalid");
+            require(value <= transferable, "Cannot transfer staked or escrowed DEM");
+            require(!anyRateIsInvalid, "A synth or DEM rate is invalid");
         }
         return true;
     }

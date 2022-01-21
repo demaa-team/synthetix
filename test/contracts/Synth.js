@@ -23,7 +23,7 @@ const {
 } = require('../..');
 
 contract('Synth', async accounts => {
-	const [sUSD, SNX, sEUR] = ['sUSD', 'SNX', 'sEUR'].map(toBytes32);
+	const [dUSD, DEM, sEUR] = ['dUSD', 'DEM', 'sEUR'].map(toBytes32);
 
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
@@ -63,7 +63,7 @@ contract('Synth', async accounts => {
 				'AddressResolver',
 				'DebtCache',
 				'Issuer', // required to issue via Synthetix
-				'Exchanger', // required to exchange into sUSD when transferring to the FeePool
+				'Exchanger', // required to exchange into dUSD when transferring to the FeePool
 				'SystemSettings',
 				'FlexibleStorage',
 				'CollateralManager',
@@ -80,7 +80,7 @@ contract('Synth', async accounts => {
 		const timestamp = await currentTime();
 
 		// Send a price update to guarantee we're not stale.
-		await exchangeRates.updateRates([SNX], ['0.1'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([DEM], ['0.1'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 		await debtCache.takeDebtSnapshot();
@@ -164,7 +164,7 @@ contract('Synth', async accounts => {
 
 		['System', 'Synth'].forEach(section => {
 			describe(`when ${section} is suspended`, () => {
-				const synth = toBytes32('sUSD');
+				const synth = toBytes32('dUSD');
 				beforeEach(async () => {
 					await setStatus({ owner, systemStatus, section, suspend: true, synth });
 				});
@@ -201,32 +201,32 @@ contract('Synth', async accounts => {
 				});
 			});
 		});
-		describe('when sETH is suspended', () => {
-			const synth = toBytes32('sETH');
+		describe('when dETH is suspended', () => {
+			const synth = toBytes32('dETH');
 			beforeEach(async () => {
 				await setStatus({ owner, systemStatus, section: 'Synth', synth, suspend: true });
 			});
-			it('when transfer() is invoked for sUSD, it works as expected', async () => {
+			it('when transfer() is invoked for dUSD, it works as expected', async () => {
 				await sUSDContract.transfer(account1, amount, {
 					from: owner,
 				});
 			});
-			it('when transferFrom() is invoked for sUSD, it works as expected', async () => {
+			it('when transferFrom() is invoked for dUSD, it works as expected', async () => {
 				await sUSDContract.transferFrom(owner, account1, amount, {
 					from: account1,
 				});
 			});
-			describe('when sUSD is suspended for exchanging', () => {
-				const synth = toBytes32('sUSD');
+			describe('when dUSD is suspended for exchanging', () => {
+				const synth = toBytes32('dUSD');
 				beforeEach(async () => {
 					await setStatus({ owner, systemStatus, section: 'SynthExchange', synth, suspend: true });
 				});
-				it('when transfer() is invoked for sUSD, it works as expected', async () => {
+				it('when transfer() is invoked for dUSD, it works as expected', async () => {
 					await sUSDContract.transfer(account1, amount, {
 						from: owner,
 					});
 				});
-				it('when transferFrom() is invoked for sETH, it works as expected', async () => {
+				it('when transferFrom() is invoked for dETH, it works as expected', async () => {
 					await sUSDContract.transferFrom(owner, account1, amount, {
 						from: account1,
 					});
@@ -236,11 +236,11 @@ contract('Synth', async accounts => {
 	});
 
 	it('should transfer (ERC20) without error @gasprofile', async () => {
-		// Issue 10,000 sUSD.
+		// Issue 10,000 dUSD.
 		const amount = toUnit('10000');
 		await synthetix.issueSynths(amount, { from: owner });
 
-		// Do a single transfer of all our sUSD.
+		// Do a single transfer of all our dUSD.
 		const transaction = await sUSDContract.transfer(account1, amount, {
 			from: owner,
 		});
@@ -261,7 +261,7 @@ contract('Synth', async accounts => {
 	});
 
 	it('should revert when transferring (ERC20) with insufficient balance', async () => {
-		// Issue 10,000 sUSD.
+		// Issue 10,000 dUSD.
 		const amount = toUnit('10000');
 		await synthetix.issueSynths(amount, { from: owner });
 
@@ -272,14 +272,14 @@ contract('Synth', async accounts => {
 	});
 
 	it('should transferFrom (ERC20) without error @gasprofile', async () => {
-		// Issue 10,000 sUSD.
+		// Issue 10,000 dUSD.
 		const amount = toUnit('10000');
 		await synthetix.issueSynths(amount, { from: owner });
 
 		// Give account1 permission to act on our behalf
 		await sUSDContract.approve(account1, amount, { from: owner });
 
-		// Do a single transfer of all our sUSD.
+		// Do a single transfer of all our dUSD.
 		const transaction = await sUSDContract.transferFrom(owner, account1, amount, {
 			from: account1,
 		});
@@ -303,7 +303,7 @@ contract('Synth', async accounts => {
 	});
 
 	it('should revert when calling transferFrom (ERC20) with insufficient allowance', async () => {
-		// Issue 10,000 sUSD.
+		// Issue 10,000 dUSD.
 		const amount = toUnit('10000');
 		await synthetix.issueSynths(amount, { from: owner });
 
@@ -321,7 +321,7 @@ contract('Synth', async accounts => {
 	});
 
 	it('should revert when calling transferFrom (ERC20) with insufficient balance', async () => {
-		// Issue 10,000 - 1 wei sUSD.
+		// Issue 10,000 - 1 wei dUSD.
 		const amount = toUnit('10000');
 		await synthetix.issueSynths(amount.sub(web3.utils.toBN('1')), { from: owner });
 
@@ -383,12 +383,12 @@ contract('Synth', async accounts => {
 	});
 
 	it('should transfer (ERC20) with no fee', async () => {
-		// Issue 10,000 sUSD.
+		// Issue 10,000 dUSD.
 		const amount = toUnit('10000');
 
 		await synthetix.issueSynths(amount, { from: owner });
 
-		// Do a single transfer of all our sUSD.
+		// Do a single transfer of all our dUSD.
 		const transaction = await sUSDContract.transfer(account1, amount, {
 			from: owner,
 		});
@@ -415,7 +415,7 @@ contract('Synth', async accounts => {
 	describe('transfer / transferFrom And Settle', async () => {
 		let amount;
 		beforeEach(async () => {
-			// Issue 1,000 sUSD.
+			// Issue 1,000 dUSD.
 			amount = toUnit('1000');
 
 			await synthetix.issueSynths(amount, { from: owner });
@@ -429,7 +429,7 @@ contract('Synth', async accounts => {
 
 			['System', 'Synth'].forEach(section => {
 				describe(`when ${section} is suspended`, () => {
-					const synth = toBytes32('sUSD');
+					const synth = toBytes32('dUSD');
 					beforeEach(async () => {
 						await setStatus({ owner, systemStatus, section, suspend: true, synth });
 					});
@@ -466,17 +466,17 @@ contract('Synth', async accounts => {
 					});
 				});
 			});
-			describe('when sETH is suspended', () => {
-				const synth = toBytes32('sETH');
+			describe('when dETH is suspended', () => {
+				const synth = toBytes32('dETH');
 				beforeEach(async () => {
 					await setStatus({ owner, systemStatus, section: 'Synth', synth, suspend: true });
 				});
-				it('when transferAndSettle() is invoked for sUSD, it works as expected', async () => {
+				it('when transferAndSettle() is invoked for dUSD, it works as expected', async () => {
 					await sUSDContract.transferAndSettle(account1, amount, {
 						from: owner,
 					});
 				});
-				it('when transferFromAndSettle() is invoked for sUSD, it works as expected', async () => {
+				it('when transferFromAndSettle() is invoked for dUSD, it works as expected', async () => {
 					await sUSDContract.transferFromAndSettle(owner, account1, amount, {
 						from: account1,
 					});
@@ -531,8 +531,8 @@ contract('Synth', async accounts => {
 				it('then transferableSynths should be the total amount minus the reclaim', async () => {
 					assert.bnEqual(await sUSDContract.transferableSynths(owner), toUnit('990'));
 				});
-				it('should transfer all and settle 1000 sUSD less reclaim amount', async () => {
-					// Do a single transfer of all our sUSD.
+				it('should transfer all and settle 1000 dUSD less reclaim amount', async () => {
+					// Do a single transfer of all our dUSD.
 					await sUSDContract.transferAndSettle(account1, amount, {
 						from: owner,
 					});
@@ -545,11 +545,11 @@ contract('Synth', async accounts => {
 					// The recipient should have the correct amount minus reclaimed
 					assert.bnEqual(await sUSDContract.balanceOf(account1), expectedAmountTransferred);
 				});
-				it('should transferFrom all and settle 1000 sUSD less reclaim amount', async () => {
+				it('should transferFrom all and settle 1000 dUSD less reclaim amount', async () => {
 					// Give account1 permission to act on our behalf
 					await sUSDContract.approve(account1, amount, { from: owner });
 
-					// Do a single transfer of all our sUSD.
+					// Do a single transfer of all our dUSD.
 					await sUSDContract.transferFromAndSettle(owner, account1, amount, {
 						from: account1,
 					});
@@ -563,9 +563,9 @@ contract('Synth', async accounts => {
 					assert.bnEqual(await sUSDContract.balanceOf(account1), expectedAmountTransferred);
 				});
 				describe('when account has more balance than transfer amount + reclaim', async () => {
-					it('should transfer 50 sUSD and burn 10 sUSD', async () => {
+					it('should transfer 50 dUSD and burn 10 dUSD', async () => {
 						const transferAmount = toUnit('50');
-						// Do a single transfer of all our sUSD.
+						// Do a single transfer of all our dUSD.
 						await sUSDContract.transferAndSettle(account1, transferAmount, {
 							from: owner,
 						});
@@ -581,7 +581,7 @@ contract('Synth', async accounts => {
 						// The recipient should have the correct amount
 						assert.bnEqual(await sUSDContract.balanceOf(account1), expectedAmountTransferred);
 					});
-					it('should transferFrom 50 sUSD and settle reclaim amount', async () => {
+					it('should transferFrom 50 dUSD and settle reclaim amount', async () => {
 						const transferAmount = toUnit('50');
 
 						// Give account1 permission to act on our behalf
@@ -613,7 +613,7 @@ contract('Synth', async accounts => {
 					await exchanger.setNumEntries('1');
 					balanceBefore = await sUSDContract.balanceOf(owner);
 				});
-				describe('when reclaim 600 sUSD and attempting to transfer 500 sUSD synths', async () => {
+				describe('when reclaim 600 dUSD and attempting to transfer 500 dUSD synths', async () => {
 					// original balance is 1000, reclaim 600 and should send 400
 					const transferAmount = toUnit('500');
 
@@ -642,7 +642,7 @@ contract('Synth', async accounts => {
 						});
 
 						it('should transfer remaining balance less reclaimed', async () => {
-							// Do a single transfer of all our sUSD.
+							// Do a single transfer of all our dUSD.
 							await sUSDContract.transferAndSettle(account1, transferAmount, {
 								from: owner,
 							});
@@ -681,7 +681,7 @@ contract('Synth', async accounts => {
 	describe('when transferring synths to FEE_ADDRESS', async () => {
 		let amount;
 		beforeEach(async () => {
-			// Issue 10,000 sUSD.
+			// Issue 10,000 dUSD.
 			amount = toUnit('10000');
 
 			await synthetix.issueSynths(amount, { from: owner });
@@ -689,7 +689,7 @@ contract('Synth', async accounts => {
 		it('should transfer to FEE_ADDRESS and recorded as fee', async () => {
 			const feeBalanceBefore = await sUSDContract.balanceOf(FEE_ADDRESS);
 
-			// Do a single transfer of all our sUSD.
+			// Do a single transfer of all our dUSD.
 			const transaction = await sUSDContract.transfer(FEE_ADDRESS, amount, {
 				from: owner,
 			});
@@ -704,7 +704,7 @@ contract('Synth', async accounts => {
 			);
 
 			const firstFeePeriod = await feePool.recentFeePeriods(0);
-			// FEE_ADDRESS balance of sUSD increased
+			// FEE_ADDRESS balance of dUSD increased
 			assert.bnEqual(await sUSDContract.balanceOf(FEE_ADDRESS), feeBalanceBefore.add(amount));
 
 			// fees equal to amount are recorded in feesToDistribute
@@ -742,7 +742,7 @@ contract('Synth', async accounts => {
 				await debtCache.takeDebtSnapshot();
 			});
 
-			it('when transferring it to FEE_ADDRESS it should exchange into sUSD first before sending', async () => {
+			it('when transferring it to FEE_ADDRESS it should exchange into dUSD first before sending', async () => {
 				// allocate the user some sEUR
 				await issueSynthsToUser({
 					owner,
@@ -760,7 +760,7 @@ contract('Synth', async accounts => {
 				// balance of sEUR after exchange fees
 				const balanceOf = await sEURContract.balanceOf(owner);
 
-				const amountInUSD = await exchangeRates.effectiveValue(sEUR, balanceOf, sUSD);
+				const amountInUSD = await exchangeRates.effectiveValue(sEUR, balanceOf, dUSD);
 
 				// Do a single transfer of all sEUR to FEE_ADDRESS
 				await sEURContract.transfer(FEE_ADDRESS, balanceOf, {
@@ -769,7 +769,7 @@ contract('Synth', async accounts => {
 
 				const firstFeePeriod = await feePool.recentFeePeriods(0);
 
-				// FEE_ADDRESS balance of sUSD increased by USD amount given from exchange
+				// FEE_ADDRESS balance of dUSD increased by USD amount given from exchange
 				assert.bnEqual(
 					await sUSDContract.balanceOf(FEE_ADDRESS),
 					feeBalanceBefore.add(amountInUSD)
@@ -784,7 +784,7 @@ contract('Synth', async accounts => {
 	describe('when transferring synths to ZERO_ADDRESS', async () => {
 		let amount;
 		beforeEach(async () => {
-			// Issue 10,000 sUSD.
+			// Issue 10,000 dUSD.
 			amount = toUnit('1000');
 
 			await synthetix.issueSynths(amount, { from: owner });
@@ -793,7 +793,7 @@ contract('Synth', async accounts => {
 			const balanceBefore = await sUSDContract.balanceOf(owner);
 			const totalSupplyBefore = await sUSDContract.totalSupply();
 
-			// Do a single transfer of all our sUSD to ZERO_ADDRESS.
+			// Do a single transfer of all our dUSD to ZERO_ADDRESS.
 			const transaction = await sUSDContract.transfer(ZERO_ADDRESS, amount, {
 				from: owner,
 			});

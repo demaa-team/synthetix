@@ -75,7 +75,7 @@ const itCanPerformEscrowMigration = ({ ctx }) => {
 			);
 		});
 
-		describe('when a user owns enough SNX', () => {
+		describe('when a user owns enough DEM', () => {
 			const snxAmount = ethers.utils.parseEther('100');
 
 			let user1BalanceL1;
@@ -84,7 +84,7 @@ const itCanPerformEscrowMigration = ({ ctx }) => {
 				user1BalanceL1 = await SynthetixL1.balanceOf(user1L1.address);
 			});
 
-			before('transfer SNX to the L1 user', async () => {
+			before('transfer DEM to the L1 user', async () => {
 				SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
 
 				const tx = await SynthetixL1.transfer(user1L1.address, snxAmount);
@@ -95,7 +95,7 @@ const itCanPerformEscrowMigration = ({ ctx }) => {
 				assert.bnEqual(await SynthetixL1.balanceOf(user1L1.address), user1BalanceL1.add(snxAmount));
 			});
 
-			describe('when the user approves the reward escrow to transfer their SNX', () => {
+			describe('when the user approves the reward escrow to transfer their DEM', () => {
 				before('approve reward escrow ', async () => {
 					SynthetixL1 = SynthetixL1.connect(user1L1);
 

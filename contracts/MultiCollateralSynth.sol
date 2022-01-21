@@ -5,7 +5,7 @@ import "./Synth.sol";
 
 // Internal references
 import "./interfaces/ICollateralManager.sol";
-import "./interfaces/IEtherCollateralsUSD.sol";
+import "./interfaces/IEtherCollateraldUSD.sol";
 import "./interfaces/IEtherCollateral.sol";
 import "./interfaces/IEtherWrapper.sol";
 
@@ -15,7 +15,7 @@ contract MultiCollateralSynth is Synth {
 
     bytes32 private constant CONTRACT_COLLATERALMANAGER = "CollateralManager";
     bytes32 private constant CONTRACT_ETH_COLLATERAL = "EtherCollateral";
-    bytes32 private constant CONTRACT_ETH_COLLATERAL_SUSD = "EtherCollateralsUSD";
+    bytes32 private constant CONTRACT_ETH_COLLATERAL_SUSD = "EtherCollateraldUSD";
     bytes32 private constant CONTRACT_ETHER_WRAPPER = "EtherWrapper";
 
     /* ========== CONSTRUCTOR ========== */
@@ -41,8 +41,8 @@ contract MultiCollateralSynth is Synth {
         return IEtherCollateral(requireAndGetAddress(CONTRACT_ETH_COLLATERAL));
     }
 
-    function etherCollateralsUSD() internal view returns (IEtherCollateralsUSD) {
-        return IEtherCollateralsUSD(requireAndGetAddress(CONTRACT_ETH_COLLATERAL_SUSD));
+    function etherCollateralsUSD() internal view returns (IEtherCollateraldUSD) {
+        return IEtherCollateraldUSD(requireAndGetAddress(CONTRACT_ETH_COLLATERAL_SUSD));
     }
 
     function etherWrapper() internal view returns (IEtherWrapper) {

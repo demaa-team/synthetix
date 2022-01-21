@@ -31,7 +31,7 @@ contract('Binary Options (prod tests)', accounts => {
 	let network, deploymentPath;
 
 	let BinaryOptionMarketManager;
-	let SynthsUSD;
+	let SynthdUSD;
 
 	before('prepare', async function() {
 		network = config.targetNetwork;
@@ -52,10 +52,10 @@ contract('Binary Options (prod tests)', accounts => {
 			await mockOptimismBridge({ network, deploymentPath });
 		}
 
-		({ SynthsUSD, BinaryOptionMarketManager } = await connectContracts({
+		({ SynthdUSD, BinaryOptionMarketManager } = await connectContracts({
 			network,
 			requests: [
-				{ contractName: 'SynthsUSD', abiName: 'Synth' },
+				{ contractName: 'SynthdUSD', abiName: 'Synth' },
 				{ contractName: 'BinaryOptionMarketManager' },
 			],
 		}));
@@ -95,7 +95,7 @@ contract('Binary Options (prod tests)', accounts => {
 			now = await currentTime();
 			const amount = toUnit('1000');
 
-			await SynthsUSD.approve(BinaryOptionMarketManager.address, amount, {
+			await SynthdUSD.approve(BinaryOptionMarketManager.address, amount, {
 				from: user1,
 			});
 
@@ -134,7 +134,7 @@ contract('Binary Options (prod tests)', accounts => {
 		it('pricesAfterBidOrRefund correctly computes the result of bids.', async () => {
 			const longBid = toUnit(100);
 
-			await SynthsUSD.approve(binaryOptionMarket.address, longBid, {
+			await SynthdUSD.approve(binaryOptionMarket.address, longBid, {
 				from: user1,
 			});
 

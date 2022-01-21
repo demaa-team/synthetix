@@ -203,7 +203,7 @@
 				"address": "0xf09Fb6257C8e91Cc217c91AEb0d3f7f3A4b7d054",
 				"status": "deleted"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xdC703901cdc5a6BFCE0BaACae4FC5937C03AC247",
 				"status": "replaced",
 				"replaced_in": "v2.1.9-1"
@@ -546,7 +546,7 @@
 				"address": "0x80bc73906827eC2a48b9f4E0Da6184Ed3a8E5995",
 				"status": "deleted"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x0198c4037Dc6Ef6e2f8719b4502722812424c09e",
 				"status": "replaced",
 				"replaced_in": "v2.1.11-160"
@@ -861,7 +861,7 @@
 				"address": "0xa6b62Fed9Bee49ec18a8f4620148De33a4Ac6157",
 				"status": "deleted"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xCF779D828cf478504f3419108925B122e482DE24",
 				"status": "replaced",
 				"replaced_in": "v2.3.1-rc0-8"
@@ -1015,7 +1015,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.3.1-rc0-8"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x6a4C8Bdd6b330B446be8Ad341f4e4AB5581B6B4F",
 				"status": "replaced",
 				"replaced_in": "v2.3.1-rc0-8"
@@ -1291,7 +1291,7 @@
 				"address": "0x7aC3eF3613c8995d26E678434449E3Fc6C2582E4",
 				"status": "deleted"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x233B0D43715Fe24bC4de2fF260c9Dc9d85e2E36A",
 				"status": "replaced",
 				"replaced_in": "v2.4.0-release-candidate-11"
@@ -1410,7 +1410,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.4.0-release-candidate-11"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x1f9e165C5aA3bD0E31E757D955fe04419781534A",
 				"status": "replaced",
 				"replaced_in": "v2.4.0-release-candidate-11"
@@ -1721,7 +1721,7 @@
 				"address": "0xC1701AbD559FC263829CA3917d03045F95b5224A",
 				"status": "deleted"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xB0eeaf49E986D624439a01423066528127F97B36",
 				"status": "replaced",
 				"replaced_in": "v2.9.1-8"
@@ -1829,7 +1829,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.10.0-alpha-3-1"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xAb16cE44e6FA10F3d5d0eC69EB439c6815f37a24",
 				"status": "replaced",
 				"replaced_in": "v2.10.0-alpha-3-1"
@@ -2394,7 +2394,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.10.0-alpha-3-1"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x9ffaE08817Bd33A0392C6Fe4CBB233999428468C",
 				"status": "replaced",
 				"replaced_in": "v2.10.0-alpha-3-1"
@@ -2577,7 +2577,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.10.2-alpha-48"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x079004837762F9b37C6A18b024C32031654Aa684",
 				"status": "replaced",
 				"replaced_in": "v2.10.2-alpha-48"
@@ -2600,7 +2600,7 @@
 				"address": "0x54c4B5cb58C880DD1734123c8b588e49eDf442Fb",
 				"status": "current"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x13BD0311540422E4605e7C9A3Df208c5E453B495",
 				"status": "replaced",
 				"replaced_in": "v2.10.2-alpha-48"
@@ -2790,7 +2790,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.17.0-release-candidate-1"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x1Df8A113eE40b687c69f0f42CF03ee2CDECc39c0",
 				"status": "replaced",
 				"replaced_in": "v2.12.2-51"
@@ -2809,7 +2809,7 @@
 				"address": "0xf5094E5Cc5e29D54cb5bD217c7E72e53726d344F",
 				"status": "deleted"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x67F09952c797BC01407404E77953137f334fc7f7",
 				"status": "replaced",
 				"replaced_in": "v2.12.2-51"
@@ -3014,12 +3014,12 @@
 				"status": "replaced",
 				"replaced_in": "v2.13.0-gas-opt-1-5"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xffF44d5ac701166DD3B956b4907324b8d0956aAA",
 				"status": "replaced",
 				"replaced_in": "v2.17.0-release-candidate-1"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xa0e2Fe6EEacDaCca1336Ec8456E8a70ac467Af2A",
 				"status": "replaced",
 				"replaced_in": "v2.17.0-release-candidate-1"
@@ -3449,7 +3449,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-89"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xC48f41730D80e6c5207c05E321BE21A7e18e3916",
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-89"
@@ -3468,7 +3468,7 @@
 				"address": "0xe2fd57caF070A3F995D597a8B21cbF206E34Ff38",
 				"status": "deleted"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x6070e7F24fC04D1830B807Ee75F2f04713BDBC59",
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-89"
@@ -3696,7 +3696,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-2"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x9e3B9c3Bbb010177A8d3c20731401658c49a5496",
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-2"
@@ -3711,7 +3711,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-2"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x737b3c4f55e2eb20eEeD8f7c2b84d8CC995002AC",
 				"status": "replaced",
 				"replaced_in": "v2.19.0-alpha-2"
@@ -3898,7 +3898,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-31"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x503D0F7ed9bBd89b52490179a5Aa41A966C11b84",
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-31"
@@ -3913,7 +3913,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-31"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xA04e5AF804c1eECfB0505063B775A99fA0Ba59D9",
 				"status": "replaced",
 				"replaced_in": "v2.19.2-alpha-4"
@@ -4050,7 +4050,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-31"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xd3431Dc2d830ECf861E7043B272628E0801cDe26",
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-31"
@@ -4125,7 +4125,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-39"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xC122897dc0F276da46C2824881b3D0e7d6e3bBac",
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-39"
@@ -4140,7 +4140,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-39"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xF86b65B42fE4BcCB530E817dFdA19eBfE6033757",
 				"status": "replaced",
 				"replaced_in": "v2.19.1-alpha-39"
@@ -4258,7 +4258,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.20.0-alpha-1-26"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xc1EeC0fE3Ba7f7ca1620Ccb349C5537fAcbe8ccA",
 				"status": "replaced",
 				"replaced_in": "v2.20.0-alpha-1-26"
@@ -4273,7 +4273,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.20.0-alpha-1-26"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x2106A59c56468C23DA29e69D41513911D43BaDc2",
 				"status": "replaced",
 				"replaced_in": "v2.20.0-alpha-1-26"
@@ -4475,7 +4475,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.21.0-3"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xA34054012a4dd61AaE24aDb7262164fcE9a494C2",
 				"status": "replaced",
 				"replaced_in": "v2.21.0-3"
@@ -4490,7 +4490,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.21.0-3"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xF9045DF72192BE7A91B92FF4C03a5Aa15A2944fC",
 				"status": "replaced",
 				"replaced_in": "v2.21.0-3"
@@ -4663,7 +4663,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.21.0-13"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x9251D74C9eB5d53cD52C4Ec00d15f9be07E3fDED",
 				"status": "replaced",
 				"replaced_in": "v2.21.0-13"
@@ -4678,7 +4678,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.21.0-13"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x45e8Fc8C7B41905DC81C88982CFF97cB452D3C8f",
 				"status": "replaced",
 				"replaced_in": "v2.21.0-13"
@@ -4846,7 +4846,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.21.0-7"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x8E20577D62D3Eab7BA9aC1b5e480d85B1A4B1D33",
 				"status": "replaced",
 				"replaced_in": "v2.21.0-7"
@@ -4861,7 +4861,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.21.0-7"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x8512bC3B2976A6f63e3D8ed1bf5B7d4cDCa139DE",
 				"status": "replaced",
 				"replaced_in": "v2.21.0-7"
@@ -5044,7 +5044,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.35.1-alpha"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x5645046F48950d14628568f4B05f16130C95Fb96",
 				"status": "replaced",
 				"replaced_in": "v2.28.2-alpha"
@@ -5059,7 +5059,7 @@
 				"status": "replaced",
 				"replaced_in": "v2.35.1-alpha"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x38456AbF37Ee61800069C9D22005984624f9b662",
 				"status": "replaced",
 				"replaced_in": "v2.35.1-alpha"
@@ -5758,7 +5758,7 @@
 				"keccak256": "0x1b5c5a7be8072e6d9e89d218345a7692365a4236fd3d82ea85476d0fad9c30c1",
 				"replaced_in": "v2.35.1-alpha"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0xe364063B7DD23cc3042B3494471D25D73c4f103a",
 				"status": "replaced",
 				"keccak256": "0x57656435b5e4802ca27f43c7d08303595636c0d8126a3cf22fabd32b66f8345a",
@@ -5776,7 +5776,7 @@
 				"keccak256": "0x1f8c08501b9ab30111c180b9099b56550459fc7a5179c4c6e2afae2dbf7b4f56",
 				"replaced_in": "v2.38.0-alpha"
 			},
-			"EtherCollateralsUSD": {
+			"EtherCollateraldUSD": {
 				"address": "0x62B66e664d68a0dd2494aE148C6c556d27af885F",
 				"status": "current",
 				"keccak256": "0x85918fcd0515828e0a6698e27e43151d5e0333d936ea6b5a9f6f9341a9b68266"
@@ -5982,7 +5982,7 @@
 				"status": "current",
 				"keccak256": "0x9afb6e2a0d5f2579a2445f381c82c673c722edd212334b17eec51a4f67a5597e"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x57e4f1D434A59eBc0Bac64Adba0fbf7d56De91f6",
 				"status": "replaced",
 				"keccak256": "0x94007d920c4ff57af3c37a310351082f6ac65b5e35fb91a5fe14aa1b5d873ad3",
@@ -5998,7 +5998,7 @@
 				"status": "current",
 				"keccak256": "0x9afb6e2a0d5f2579a2445f381c82c673c722edd212334b17eec51a4f67a5597e"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0x2fb33E35829D2bb04D8b5eB9531DA129E72BceD4",
 				"status": "replaced",
 				"keccak256": "0x94007d920c4ff57af3c37a310351082f6ac65b5e35fb91a5fe14aa1b5d873ad3",
@@ -6545,12 +6545,12 @@
 				"status": "current",
 				"keccak256": "0xd443eddc5b999da689239836ac3a79c09c32bba640079e4fc9845969f1eba4e4"
 			},
-			"SynthsUSD": {
+			"SynthdUSD": {
 				"address": "0x253E60880f7393B02ef963fB98DD28eaC6a0026E",
 				"status": "current",
 				"keccak256": "0x1702a8b622628a65be6ec32ecb892fa0597cce26c30a95f80e658e490c253bb9"
 			},
-			"SynthsETH": {
+			"SynthdETH": {
 				"address": "0xce754192eE9265D71b6286Db05329a16F20291CD",
 				"status": "current",
 				"keccak256": "0x1702a8b622628a65be6ec32ecb892fa0597cce26c30a95f80e658e490c253bb9"

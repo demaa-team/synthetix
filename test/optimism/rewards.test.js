@@ -3,7 +3,7 @@ const { assert } = require('../contracts/common');
 const { connectContract } = require('./utils/connectContract');
 
 const itCanPerformRewardDeposits = ({ ctx }) => {
-	describe('[REWARDS] when migrating SNX rewards from L1 to L2', () => {
+	describe('[REWARDS] when migrating DEM rewards from L1 to L2', () => {
 		const amountToDeposit = ethers.utils.parseEther('100');
 
 		let SynthetixL1, SynthetixBridgeToOptimismL1, SystemStatusL1, SynthetixBridgeEscrowL1;
@@ -46,7 +46,7 @@ const itCanPerformRewardDeposits = ({ ctx }) => {
 		// No approval
 		// --------------------------
 
-		describe('before the owner approves the L1 bridge to transfer its SNX', () => {
+		describe('before the owner approves the L1 bridge to transfer its DEM', () => {
 			before('make sure approval is zero', async () => {
 				SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
 
@@ -71,7 +71,7 @@ const itCanPerformRewardDeposits = ({ ctx }) => {
 		// Approval
 		// --------------------------
 
-		describe('when the owner approves the L1 bridge to transfer its SNX', () => {
+		describe('when the owner approves the L1 bridge to transfer its DEM', () => {
 			before('approve', async () => {
 				SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
 
@@ -113,7 +113,7 @@ const itCanPerformRewardDeposits = ({ ctx }) => {
 			// Deposit rewards
 			// --------------------------
 
-			describe('when the owner deposits SNX to the L1 bridge', () => {
+			describe('when the owner deposits DEM to the L1 bridge', () => {
 				let ownerBalanceL1, escrowBalanceL1;
 				let rewardsToDistributeL2;
 				let rewardDepositReceipt;
@@ -159,7 +159,7 @@ const itCanPerformRewardDeposits = ({ ctx }) => {
 					);
 				});
 
-				it('shows that the bridge escrow received the SNX', async () => {
+				it('shows that the bridge escrow received the DEM', async () => {
 					assert.bnEqual(
 						await SynthetixL1.balanceOf(SynthetixBridgeEscrowL1.address),
 						escrowBalanceL1.add(amountToDeposit)

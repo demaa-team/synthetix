@@ -12,7 +12,7 @@ contract('BinaryOptionMarketData @gas-skip', accounts => {
 	before(async () => {
 		const { AddressResolver: addressResolver } = await setupAllContracts({
 			accounts,
-			synths: ['sUSD'],
+			synths: ['dUSD'],
 			contracts: [
 				'BinaryOptionMarketManager',
 				'AddressResolver',

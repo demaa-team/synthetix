@@ -37,10 +37,10 @@ const {
 contract('Issuer (via Synthetix)', async accounts => {
 	const WEEK = 604800;
 
-	const [sUSD, sAUD, sEUR, SNX, sETH, ETH] = ['sUSD', 'sAUD', 'sEUR', 'SNX', 'sETH', 'ETH'].map(
+	const [dUSD, sAUD, sEUR, DEM, dETH, ETH] = ['dUSD', 'sAUD', 'sEUR', 'DEM', 'dETH', 'ETH'].map(
 		toBytes32
 	);
-	const synthKeys = [sUSD, sAUD, sEUR, sETH, SNX];
+	const synthKeys = [dUSD, sAUD, sEUR, dETH, DEM];
 
 	const [, owner, oracle, account1, account2, account3, account6] = accounts;
 
@@ -69,7 +69,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 	// run this once before all tests to prepare our environment, snapshots on beforeEach will take
 	// care of resetting to this state
 	before(async () => {
-		synths = ['sUSD', 'sAUD', 'sEUR', 'sETH'];
+		synths = ['dUSD', 'sAUD', 'sEUR', 'dETH'];
 		({
 			Synthetix: synthetix,
 			SynthetixState: synthetixState,
@@ -78,8 +78,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 			ExchangeRates: exchangeRates,
 			SynthetixEscrow: escrow,
 			RewardEscrowV2: rewardEscrowV2,
-			SynthsUSD: sUSDContract,
-			SynthsETH: sETHContract,
+			SynthdUSD: sUSDContract,
+			SynthdETH: sETHContract,
 			SynthsAUD: sAUDContract,
 			SynthsEUR: sEURContract,
 			FeePool: feePool,
@@ -101,7 +101,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				'SystemSettings',
 				'Issuer',
 				'DebtCache',
-				'Exchanger', // necessary for burnSynths to check settlement of sUSD
+				'Exchanger', // necessary for burnSynths to check settlement of dUSD
 				'DelegateApprovals', // necessary for *OnBehalf functions
 				'FlexibleStorage',
 				'CollateralManager',
@@ -115,7 +115,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 		timestamp = await currentTime();
 
 		await exchangeRates.updateRates(
-			[sAUD, sEUR, SNX, sETH],
+			[sAUD, sEUR, DEM, dETH],
 			['0.5', '1.25', '0.1', '200'].map(toUnit),
 			timestamp,
 			{ from: oracle }
@@ -252,7 +252,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				let now;
 
 				beforeEach(async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('1000'), { from: owner });
 
 					now = await currentTime();
@@ -310,7 +310,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await fastForward(10);
 						// Send a price update to give the synth rates
 						await exchangeRates.updateRates(
-							[sAUD, sEUR, sETH, ETH, SNX],
+							[sAUD, sEUR, dETH, ETH, DEM],
 							['0.5', '1.25', '100', '100', '2'].map(toUnit),
 							await currentTime(),
 							{ from: oracle }
@@ -327,17 +327,17 @@ contract('Issuer (via Synthetix)', async accounts => {
 							await sUSDContract.issue(account1, toUnit('1'));
 
 							// and since we are are bypassing the usual issuance flow here, we must cache the debt snapshot
-							assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('0'));
+							assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('0'));
 							await debtCache.takeDebtSnapshot();
 						});
-						it('then totalIssuedSynths in should correctly calculate the total issued synths in sUSD', async () => {
-							assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('1111'));
+						it('then totalIssuedSynths in should correctly calculate the total issued synths in dUSD', async () => {
+							assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('1111'));
 						});
 						it('and in another synth currency', async () => {
 							assert.bnEqual(await synthetix.totalIssuedSynths(sAUD), toUnit('2222'));
 						});
-						it('and in SNX', async () => {
-							assert.bnEqual(await synthetix.totalIssuedSynths(SNX), divideDecimal('1111', '2'));
+						it('and in DEM', async () => {
+							assert.bnEqual(await synthetix.totalIssuedSynths(DEM), divideDecimal('1111', '2'));
 						});
 						it('and in a non-synth currency', async () => {
 							assert.bnEqual(await synthetix.totalIssuedSynths(ETH), divideDecimal('1111', '100'));
@@ -355,25 +355,25 @@ contract('Issuer (via Synthetix)', async accounts => {
 							// as our synths are mocks, let's issue some amount to users
 							await sUSDContract.issue(account1, toUnit('1000'));
 
-							await sAUDContract.issue(account1, toUnit('1000')); // 500 sUSD worth
-							await sAUDContract.issue(account2, toUnit('1000')); // 500 sUSD worth
+							await sAUDContract.issue(account1, toUnit('1000')); // 500 dUSD worth
+							await sAUDContract.issue(account2, toUnit('1000')); // 500 dUSD worth
 
-							await sEURContract.issue(account3, toUnit('80')); // 100 sUSD worth
+							await sEURContract.issue(account3, toUnit('80')); // 100 dUSD worth
 
-							await sETHContract.issue(account1, toUnit('1')); // 100 sUSD worth
+							await sETHContract.issue(account1, toUnit('1')); // 100 dUSD worth
 
 							// and since we are are bypassing the usual issuance flow here, we must cache the debt snapshot
-							assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('0'));
+							assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('0'));
 							await debtCache.takeDebtSnapshot();
 						});
-						it('then totalIssuedSynths in should correctly calculate the total issued synths in sUSD', async () => {
-							assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('2200'));
+						it('then totalIssuedSynths in should correctly calculate the total issued synths in dUSD', async () => {
+							assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('2200'));
 						});
 						it('and in another synth currency', async () => {
 							assert.bnEqual(await synthetix.totalIssuedSynths(sAUD), toUnit('4400', '2'));
 						});
-						it('and in SNX', async () => {
-							assert.bnEqual(await synthetix.totalIssuedSynths(SNX), divideDecimal('2200', '2'));
+						it('and in DEM', async () => {
+							assert.bnEqual(await synthetix.totalIssuedSynths(DEM), divideDecimal('2200', '2'));
 						});
 						it('and in a non-synth currency', async () => {
 							assert.bnEqual(await synthetix.totalIssuedSynths(ETH), divideDecimal('2200', '100'));
@@ -407,10 +407,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(amountIssuedAcc1, { from: account1 });
 					await synthetix.issueSynths(amountIssuedAcc2, { from: account2 });
 
-					await synthetix.exchange(sUSD, amountIssuedAcc2, sAUD, { from: account2 });
+					await synthetix.exchange(dUSD, amountIssuedAcc2, sAUD, { from: account2 });
 
 					const PRECISE_UNIT = web3.utils.toWei(web3.utils.toBN('1'), 'gether');
-					let totalIssuedSynthsUSD = await synthetix.totalIssuedSynths(sUSD);
+					let totalIssuedSynthsUSD = await synthetix.totalIssuedSynths(dUSD);
 					const account1DebtRatio = divideDecimal(
 						amountIssuedAcc1,
 						totalIssuedSynthsUSD,
@@ -427,7 +427,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await exchangeRates.updateRates([sAUD], [newAUDRate], timestamp, { from: oracle });
 					await debtCache.takeDebtSnapshot();
 
-					totalIssuedSynthsUSD = await synthetix.totalIssuedSynths(sUSD);
+					totalIssuedSynthsUSD = await synthetix.totalIssuedSynths(dUSD);
 					const conversionFactor = web3.utils.toBN(1000000000);
 					const expectedDebtAccount1 = multiplyDecimal(
 						account1DebtRatio,
@@ -440,8 +440,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 						PRECISE_UNIT
 					).div(conversionFactor);
 
-					assert.bnClose(await synthetix.debtBalanceOf(account1, sUSD), expectedDebtAccount1);
-					assert.bnClose(await synthetix.debtBalanceOf(account2, sUSD), expectedDebtAccount2);
+					assert.bnClose(await synthetix.debtBalanceOf(account1, dUSD), expectedDebtAccount1);
+					assert.bnClose(await synthetix.debtBalanceOf(account2, dUSD), expectedDebtAccount2);
 				});
 
 				it("should correctly calculate a user's debt balance without prior issuance", async () => {
@@ -452,14 +452,14 @@ contract('Issuer (via Synthetix)', async accounts => {
 						from: owner,
 					});
 
-					const debt1 = await synthetix.debtBalanceOf(account1, toBytes32('sUSD'));
-					const debt2 = await synthetix.debtBalanceOf(account2, toBytes32('sUSD'));
+					const debt1 = await synthetix.debtBalanceOf(account1, toBytes32('dUSD'));
+					const debt2 = await synthetix.debtBalanceOf(account2, toBytes32('dUSD'));
 					assert.bnEqual(debt1, 0);
 					assert.bnEqual(debt2, 0);
 				});
 
 				it("should correctly calculate a user's debt balance with prior issuance", async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('200000'), {
 						from: owner,
 					});
@@ -468,14 +468,14 @@ contract('Issuer (via Synthetix)', async accounts => {
 					const issuedSynths = toUnit('1001');
 					await synthetix.issueSynths(issuedSynths, { from: account1 });
 
-					const debt = await synthetix.debtBalanceOf(account1, toBytes32('sUSD'));
+					const debt = await synthetix.debtBalanceOf(account1, toBytes32('dUSD'));
 					assert.bnEqual(debt, issuedSynths);
 				});
 			});
 
 			describe('remainingIssuableSynths()', () => {
 				it("should correctly calculate a user's remaining issuable synths with prior issuance", async () => {
-					const snx2usdRate = await exchangeRates.rateForCurrency(SNX);
+					const snx2usdRate = await exchangeRates.rateForCurrency(DEM);
 					const issuanceRatio = await systemSettings.issuanceRatio();
 
 					const issuedSynthetixs = web3.utils.toBN('200012');
@@ -497,7 +497,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should correctly calculate a user's remaining issuable synths without prior issuance", async () => {
-					const snx2usdRate = await exchangeRates.rateForCurrency(SNX);
+					const snx2usdRate = await exchangeRates.rateForCurrency(DEM);
 					const issuanceRatio = await systemSettings.issuanceRatio();
 
 					const issuedSynthetixs = web3.utils.toBN('20');
@@ -517,7 +517,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 			describe('maxIssuableSynths()', () => {
 				it("should correctly calculate a user's maximum issuable synths without prior issuance", async () => {
-					const rate = await exchangeRates.rateForCurrency(toBytes32('SNX'));
+					const rate = await exchangeRates.rateForCurrency(toBytes32('DEM'));
 					const issuedSynthetixs = web3.utils.toBN('200000');
 					await synthetix.transfer(account1, toUnit(issuedSynthetixs), {
 						from: owner,
@@ -533,13 +533,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 					assert.bnEqual(expectedIssuableSynths, maxIssuableSynths);
 				});
 
-				it("should correctly calculate a user's maximum issuable synths without any SNX", async () => {
+				it("should correctly calculate a user's maximum issuable synths without any DEM", async () => {
 					const maxIssuableSynths = await synthetix.maxIssuableSynths(account1);
 					assert.bnEqual(0, maxIssuableSynths);
 				});
 
 				it("should correctly calculate a user's maximum issuable synths with prior issuance", async () => {
-					const snx2usdRate = await exchangeRates.rateForCurrency(SNX);
+					const snx2usdRate = await exchangeRates.rateForCurrency(DEM);
 
 					const issuedSynthetixs = web3.utils.toBN('320001');
 					await synthetix.transfer(account1, toUnit(issuedSynthetixs), {
@@ -651,7 +651,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					let currencyKey, synth;
 
 					beforeEach(async () => {
-						const symbol = 'sBTC';
+						const symbol = 'dBTC';
 						currencyKey = toBytes32(symbol);
 
 						({ token: synth } = await mockToken({
@@ -667,7 +667,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					});
 
 					it('should be able to query multiple synth addresses', async () => {
-						const synthAddresses = await issuer.getSynths([currencyKey, sETH, sUSD]);
+						const synthAddresses = await issuer.getSynths([currencyKey, dETH, dUSD]);
 						assert.equal(synthAddresses[0], synth.address);
 						assert.equal(synthAddresses[1], sETHContract.address);
 						assert.equal(synthAddresses[2], sUSDContract.address);
@@ -730,10 +730,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await assert.revert(issuer.removeSynth(currencyKey, { from: owner }));
 				});
 
-				it('should revert when requesting to remove sUSD', async () => {
+				it('should revert when requesting to remove dUSD', async () => {
 					// Note: This test depends on state in the migration script, that there are hooked up synths
 					// without balances
-					const currencyKey = toBytes32('sUSD');
+					const currencyKey = toBytes32('dUSD');
 
 					// Assert that we can't remove the synth
 					await assert.revert(issuer.removeSynth(currencyKey, { from: owner }));
@@ -743,7 +743,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					let currencyKey, synth;
 
 					beforeEach(async () => {
-						const symbol = 'sBTC';
+						const symbol = 'dBTC';
 						currencyKey = toBytes32(symbol);
 
 						({ token: synth } = await mockToken({
@@ -884,10 +884,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 						);
 					});
 
-					it('should disallow removing sUSD', async () => {
-						// Assert that we can't remove sUSD
+					it('should disallow removing dUSD', async () => {
+						// Assert that we can't remove dUSD
 						await assert.revert(
-							issuer.removeSynths([currencyKey, sUSD], { from: owner }),
+							issuer.removeSynths([currencyKey, dUSD], { from: owner }),
 							'Cannot remove synth'
 						);
 					});
@@ -982,7 +982,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 							});
 						});
 					});
-					['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+					['DEM', 'sAUD', ['DEM', 'sAUD'], 'none'].forEach(type => {
 						describe(`when ${type} is stale`, () => {
 							beforeEach(async () => {
 								await fastForward(
@@ -990,9 +990,9 @@ contract('Issuer (via Synthetix)', async accounts => {
 								);
 
 								// set all rates minus those to ignore
-								const ratesToUpdate = ['SNX']
+								const ratesToUpdate = ['DEM']
 									.concat(synths)
-									.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
+									.filter(key => key !== 'dUSD' && ![].concat(type).includes(key));
 
 								const timestamp = await currentTime();
 
@@ -1018,13 +1018,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 								it('reverts on issueSynths()', async () => {
 									await assert.revert(
 										synthetix.issueSynths(toUnit('1'), { from: account1 }),
-										'A synth or SNX rate is invalid'
+										'A synth or DEM rate is invalid'
 									);
 								});
 								it('reverts on issueMaxSynths()', async () => {
 									await assert.revert(
 										synthetix.issueMaxSynths({ from: account1 }),
-										'A synth or SNX rate is invalid'
+										'A synth or DEM rate is invalid'
 									);
 								});
 							}
@@ -1032,7 +1032,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					});
 				});
 				it('should allow the issuance of a small amount of synths', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('1000'), { from: owner });
 
 					// account1 should be able to issue
@@ -1044,7 +1044,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should be possible to issue the maximum amount of synths via issueSynths', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('1000'), { from: owner });
 
 					const maxSynths = await synthetix.maxIssuableSynths(account1);
@@ -1054,23 +1054,23 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should allow an issuer to issue synths in one flavour', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('1000'), { from: owner });
 
 					// account1 should be able to issue
 					await synthetix.issueSynths(toUnit('10'), { from: account1 });
 
-					// There should be 10 sUSD of value in the system
-					assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('10'));
+					// There should be 10 dUSD of value in the system
+					assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('10'));
 
 					// And account1 should own 100% of the debt.
-					assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('10'));
-					assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('10'));
+					assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('10'));
+					assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('10'));
 				});
 
 				// TODO: Check that the rounding errors are acceptable
 				it('should allow two issuers to issue synths in one flavour', async () => {
-					// Give some SNX to account1 and account2
+					// Give some DEM to account1 and account2
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1083,18 +1083,18 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(toUnit('20'), { from: account2 });
 
 					// There should be 30sUSD of value in the system
-					assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('30'));
+					assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('30'));
 
 					// And the debt should be split 50/50.
 					// But there's a small rounding error.
 					// This is ok, as when the last person exits the system, their debt percentage is always 100% so
 					// these rounding errors don't cause the system to be out of balance.
-					assert.bnClose(await synthetix.debtBalanceOf(account1, sUSD), toUnit('10'));
-					assert.bnClose(await synthetix.debtBalanceOf(account2, sUSD), toUnit('20'));
+					assert.bnClose(await synthetix.debtBalanceOf(account1, dUSD), toUnit('10'));
+					assert.bnClose(await synthetix.debtBalanceOf(account2, dUSD), toUnit('20'));
 				});
 
 				it('should allow multi-issuance in one flavour', async () => {
-					// Give some SNX to account1 and account2
+					// Give some DEM to account1 and account2
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1107,20 +1107,20 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(toUnit('20'), { from: account2 });
 					await synthetix.issueSynths(toUnit('10'), { from: account1 });
 
-					// There should be 40 sUSD of value in the system
-					assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('40'));
+					// There should be 40 dUSD of value in the system
+					assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('40'));
 
 					// And the debt should be split 50/50.
 					// But there's a small rounding error.
 					// This is ok, as when the last person exits the system, their debt percentage is always 100% so
 					// these rounding errors don't cause the system to be out of balance.
-					assert.bnClose(await synthetix.debtBalanceOf(account1, sUSD), toUnit('20'));
-					assert.bnClose(await synthetix.debtBalanceOf(account2, sUSD), toUnit('20'));
+					assert.bnClose(await synthetix.debtBalanceOf(account1, dUSD), toUnit('20'));
+					assert.bnClose(await synthetix.debtBalanceOf(account2, dUSD), toUnit('20'));
 				});
 
 				describe('issueMaxSynths', () => {
 					it('should allow an issuer to issue max synths in one flavour', async () => {
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('10000'), {
 							from: owner,
 						});
@@ -1128,16 +1128,16 @@ contract('Issuer (via Synthetix)', async accounts => {
 						// Issue
 						await synthetix.issueMaxSynths({ from: account1 });
 
-						// There should be 200 sUSD of value in the system
-						assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('200'));
+						// There should be 200 dUSD of value in the system
+						assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('200'));
 
 						// And account1 should own all of it.
-						assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('200'));
+						assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('200'));
 					});
 				});
 
 				it('should allow an issuer to issue max synths via the standard issue call', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1148,20 +1148,20 @@ contract('Issuer (via Synthetix)', async accounts => {
 					// Issue
 					await synthetix.issueSynths(maxIssuable, { from: account1 });
 
-					// There should be 200 sUSD of value in the system
-					assert.bnEqual(await synthetix.totalIssuedSynths(sUSD), toUnit('200'));
+					// There should be 200 dUSD of value in the system
+					assert.bnEqual(await synthetix.totalIssuedSynths(dUSD), toUnit('200'));
 
 					// And account1 should own all of it.
-					assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('200'));
+					assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('200'));
 				});
 
 				it('should disallow an issuer from issuing synths beyond their remainingIssuableSynths', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
 
-					// They should now be able to issue sUSD
+					// They should now be able to issue dUSD
 					const issuableSynths = await getRemainingIssuableSynths(account1);
 					assert.bnEqual(issuableSynths, toUnit('200'));
 
@@ -1214,7 +1214,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					['SNX', 'sAUD', ['SNX', 'sAUD'], 'none'].forEach(type => {
+					['DEM', 'sAUD', ['DEM', 'sAUD'], 'none'].forEach(type => {
 						describe(`when ${type} is stale`, () => {
 							beforeEach(async () => {
 								await fastForward(
@@ -1222,15 +1222,15 @@ contract('Issuer (via Synthetix)', async accounts => {
 								);
 
 								// set all rates minus those to ignore
-								const ratesToUpdate = ['SNX']
+								const ratesToUpdate = ['DEM']
 									.concat(synths)
-									.filter(key => key !== 'sUSD' && ![].concat(type).includes(key));
+									.filter(key => key !== 'dUSD' && ![].concat(type).includes(key));
 
 								const timestamp = await currentTime();
 
 								await exchangeRates.updateRates(
 									ratesToUpdate.map(toBytes32),
-									ratesToUpdate.map(rate => toUnit(rate === 'SNX' ? '0.1' : '1')),
+									ratesToUpdate.map(rate => toUnit(rate === 'DEM' ? '0.1' : '1')),
 									timestamp,
 									{
 										from: oracle,
@@ -1250,13 +1250,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 								it('then calling burn() reverts', async () => {
 									await assert.revert(
 										synthetix.burnSynths(toUnit('1'), { from: account1 }),
-										'A synth or SNX rate is invalid'
+										'A synth or DEM rate is invalid'
 									);
 								});
 								it('and calling burnSynthsToTarget() reverts', async () => {
 									await assert.revert(
 										synthetix.burnSynthsToTarget({ from: account1 }),
-										'A synth or SNX rate is invalid'
+										'A synth or DEM rate is invalid'
 									);
 								});
 							}
@@ -1265,7 +1265,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should allow an issuer with outstanding debt to burn synths and decrease debt', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1273,18 +1273,18 @@ contract('Issuer (via Synthetix)', async accounts => {
 					// Issue
 					await synthetix.issueMaxSynths({ from: account1 });
 
-					// account1 should now have 200 sUSD of debt.
-					assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('200'));
+					// account1 should now have 200 dUSD of debt.
+					assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('200'));
 
-					// Burn 100 sUSD
+					// Burn 100 dUSD
 					await synthetix.burnSynths(toUnit('100'), { from: account1 });
 
-					// account1 should now have 100 sUSD of debt.
-					assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('100'));
+					// account1 should now have 100 dUSD of debt.
+					assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('100'));
 				});
 
 				it('should disallow an issuer without outstanding debt from burning synths', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1310,7 +1310,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should revert when trying to burn synths that do not exist', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1323,11 +1323,11 @@ contract('Issuer (via Synthetix)', async accounts => {
 						from: account1,
 					});
 
-					const debtBefore = await synthetix.debtBalanceOf(account1, sUSD);
+					const debtBefore = await synthetix.debtBalanceOf(account1, dUSD);
 
 					assert.ok(!debtBefore.isNeg());
 
-					// Burning any amount of sUSD beyond what is owned will cause a revert
+					// Burning any amount of dUSD beyond what is owned will cause a revert
 					await assert.revert(
 						synthetix.burnSynths('1', { from: account1 }),
 						'SafeMath: subtraction overflow'
@@ -1335,7 +1335,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should only burn up to a user's actual debt level", async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1369,7 +1369,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should successfully burn all user's synths @gasprofile", async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('10000'), {
 						from: owner,
 					});
@@ -1386,7 +1386,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should burn the correct amount of synths', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('200000'), {
 						from: owner,
 					});
@@ -1406,7 +1406,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it('should burn the correct amount of synths', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('200000'), {
 						from: owner,
 					});
@@ -1421,13 +1421,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(issuedSynthsPt2, { from: account1 });
 					await synthetix.issueSynths(toUnit('1000'), { from: account2 });
 
-					const debt = await synthetix.debtBalanceOf(account1, sUSD);
+					const debt = await synthetix.debtBalanceOf(account1, dUSD);
 					assert.bnClose(debt, toUnit('4000'));
 				});
 
 				describe('debt calculation in multi-issuance scenarios', () => {
 					it('should correctly calculate debt in a multi-issuance multi-burn scenario @gasprofile', async () => {
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('500000'), {
 							from: owner,
 						});
@@ -1454,9 +1454,9 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await synthetix.burnSynths(burnAllSynths, { from: account2 });
 						await synthetix.burnSynths(burnAllSynths, { from: account3 });
 
-						const debtBalance1After = await synthetix.debtBalanceOf(account1, sUSD);
-						const debtBalance2After = await synthetix.debtBalanceOf(account2, sUSD);
-						const debtBalance3After = await synthetix.debtBalanceOf(account3, sUSD);
+						const debtBalance1After = await synthetix.debtBalanceOf(account1, dUSD);
+						const debtBalance2After = await synthetix.debtBalanceOf(account2, dUSD);
+						const debtBalance3After = await synthetix.debtBalanceOf(account3, dUSD);
 
 						assert.bnEqual(debtBalance1After, '0');
 						assert.bnEqual(debtBalance2After, '0');
@@ -1464,7 +1464,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					});
 
 					it('should allow user to burn all synths issued even after other users have issued', async () => {
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('500000'), {
 							from: owner,
 						});
@@ -1484,15 +1484,15 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await synthetix.issueSynths(issuedSynths2, { from: account2 });
 						await synthetix.issueSynths(issuedSynths3, { from: account3 });
 
-						const debtBalanceBefore = await synthetix.debtBalanceOf(account1, sUSD);
+						const debtBalanceBefore = await synthetix.debtBalanceOf(account1, dUSD);
 						await synthetix.burnSynths(debtBalanceBefore, { from: account1 });
-						const debtBalanceAfter = await synthetix.debtBalanceOf(account1, sUSD);
+						const debtBalanceAfter = await synthetix.debtBalanceOf(account1, dUSD);
 
 						assert.bnEqual(debtBalanceAfter, '0');
 					});
 
 					it('should allow a user to burn up to their balance if they try too burn too much', async () => {
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('500000'), {
 							from: owner,
 						});
@@ -1504,13 +1504,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await synthetix.burnSynths(issuedSynths1.add(toUnit('9000')), {
 							from: account1,
 						});
-						const debtBalanceAfter = await synthetix.debtBalanceOf(account1, sUSD);
+						const debtBalanceAfter = await synthetix.debtBalanceOf(account1, dUSD);
 
 						assert.bnEqual(debtBalanceAfter, '0');
 					});
 
 					it('should allow users to burn their debt and adjust the debtBalanceOf correctly for remaining users', async () => {
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('40000000'), {
 							from: owner,
 						});
@@ -1525,8 +1525,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await synthetix.issueSynths(issuedSynths1, { from: account1 });
 						await synthetix.issueSynths(issuedSynths2, { from: account2 });
 
-						let debtBalance1After = await synthetix.debtBalanceOf(account1, sUSD);
-						let debtBalance2After = await synthetix.debtBalanceOf(account2, sUSD);
+						let debtBalance1After = await synthetix.debtBalanceOf(account1, dUSD);
+						let debtBalance2After = await synthetix.debtBalanceOf(account2, dUSD);
 
 						// debtBalanceOf has rounding error but is within tolerance
 						assert.bnClose(debtBalance1After, toUnit('150000'));
@@ -1535,8 +1535,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 						// Account 1 burns 100,000
 						await synthetix.burnSynths(toUnit('100000'), { from: account1 });
 
-						debtBalance1After = await synthetix.debtBalanceOf(account1, sUSD);
-						debtBalance2After = await synthetix.debtBalanceOf(account2, sUSD);
+						debtBalance1After = await synthetix.debtBalanceOf(account1, dUSD);
+						debtBalance2After = await synthetix.debtBalanceOf(account2, dUSD);
 
 						assert.bnClose(debtBalance1After, toUnit('50000'));
 						assert.bnClose(debtBalance2After, toUnit('50000'));
@@ -1555,27 +1555,27 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 				describe('burnSynthsToTarget', () => {
 					beforeEach(async () => {
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('40000'), {
 							from: owner,
 						});
-						// Set SNX price to 1
-						await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, {
+						// Set DEM price to 1
+						await exchangeRates.updateRates([DEM], ['1'].map(toUnit), timestamp, {
 							from: oracle,
 						});
 						await debtCache.takeDebtSnapshot();
 						// Issue
 						await synthetix.issueMaxSynths({ from: account1 });
-						assert.bnClose(await synthetix.debtBalanceOf(account1, sUSD), toUnit('8000'));
+						assert.bnClose(await synthetix.debtBalanceOf(account1, dUSD), toUnit('8000'));
 
 						// Set minimumStakeTime to 1 hour
 						await systemSettings.setMinimumStakeTime(60 * 60, { from: owner });
 					});
 
-					describe('when the SNX price drops 50%', () => {
+					describe('when the DEM price drops 50%', () => {
 						let maxIssuableSynths;
 						beforeEach(async () => {
-							await exchangeRates.updateRates([SNX], ['.5'].map(toUnit), timestamp, {
+							await exchangeRates.updateRates([DEM], ['.5'].map(toUnit), timestamp, {
 								from: oracle,
 							});
 							await debtCache.takeDebtSnapshot();
@@ -1586,9 +1586,9 @@ contract('Issuer (via Synthetix)', async accounts => {
 						it('then the maxIssuableSynths drops 50%', async () => {
 							assert.bnClose(maxIssuableSynths, toUnit('4000'));
 						});
-						it('then calling burnSynthsToTarget() reduces sUSD to c-ratio target', async () => {
+						it('then calling burnSynthsToTarget() reduces dUSD to c-ratio target', async () => {
 							await synthetix.burnSynthsToTarget({ from: account1 });
-							assert.bnClose(await synthetix.debtBalanceOf(account1, sUSD), toUnit('4000'));
+							assert.bnClose(await synthetix.debtBalanceOf(account1, dUSD), toUnit('4000'));
 						});
 						it('then fees are claimable', async () => {
 							await synthetix.burnSynthsToTarget({ from: account1 });
@@ -1596,10 +1596,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					describe('when the SNX price drops 10%', () => {
+					describe('when the DEM price drops 10%', () => {
 						let maxIssuableSynths;
 						beforeEach(async () => {
-							await exchangeRates.updateRates([SNX], ['.9'].map(toUnit), timestamp, {
+							await exchangeRates.updateRates([DEM], ['.9'].map(toUnit), timestamp, {
 								from: oracle,
 							});
 							await debtCache.takeDebtSnapshot();
@@ -1609,9 +1609,9 @@ contract('Issuer (via Synthetix)', async accounts => {
 						it('then the maxIssuableSynths drops 10%', async () => {
 							assert.bnEqual(maxIssuableSynths, toUnit('7200'));
 						});
-						it('then calling burnSynthsToTarget() reduces sUSD to c-ratio target', async () => {
+						it('then calling burnSynthsToTarget() reduces dUSD to c-ratio target', async () => {
 							await synthetix.burnSynthsToTarget({ from: account1 });
-							assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('7200'));
+							assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('7200'));
 						});
 						it('then fees are claimable', async () => {
 							await synthetix.burnSynthsToTarget({ from: account1 });
@@ -1619,10 +1619,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					describe('when the SNX price drops 90%', () => {
+					describe('when the DEM price drops 90%', () => {
 						let maxIssuableSynths;
 						beforeEach(async () => {
-							await exchangeRates.updateRates([SNX], ['.1'].map(toUnit), timestamp, {
+							await exchangeRates.updateRates([DEM], ['.1'].map(toUnit), timestamp, {
 								from: oracle,
 							});
 							await debtCache.takeDebtSnapshot();
@@ -1632,9 +1632,9 @@ contract('Issuer (via Synthetix)', async accounts => {
 						it('then the maxIssuableSynths drops 10%', async () => {
 							assert.bnEqual(maxIssuableSynths, toUnit('800'));
 						});
-						it('then calling burnSynthsToTarget() reduces sUSD to c-ratio target', async () => {
+						it('then calling burnSynthsToTarget() reduces dUSD to c-ratio target', async () => {
 							await synthetix.burnSynthsToTarget({ from: account1 });
-							assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('800'));
+							assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('800'));
 						});
 						it('then fees are claimable', async () => {
 							await synthetix.burnSynthsToTarget({ from: account1 });
@@ -1642,10 +1642,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					describe('when the SNX price increases 100%', () => {
+					describe('when the DEM price increases 100%', () => {
 						let maxIssuableSynths;
 						beforeEach(async () => {
-							await exchangeRates.updateRates([SNX], ['2'].map(toUnit), timestamp, {
+							await exchangeRates.updateRates([DEM], ['2'].map(toUnit), timestamp, {
 								from: oracle,
 							});
 							await debtCache.takeDebtSnapshot();
@@ -1680,21 +1680,21 @@ contract('Issuer (via Synthetix)', async accounts => {
 								exchangeFeeRates: synthKeys.map(() => exchangeFeeRate),
 							});
 						});
-						describe('and a user has 1250 sUSD issued', () => {
+						describe('and a user has 1250 dUSD issued', () => {
 							beforeEach(async () => {
 								await synthetix.transfer(account1, toUnit('1000000'), { from: owner });
 								await synthetix.issueSynths(amount, { from: account1 });
 							});
 							describe('and is has been exchanged into sEUR at a rate of 1.25:1 and the waiting period has expired', () => {
 								beforeEach(async () => {
-									await synthetix.exchange(sUSD, amount, sEUR, { from: account1 });
+									await synthetix.exchange(dUSD, amount, sEUR, { from: account1 });
 									await fastForward(90); // make sure the waiting period is expired on this
 								});
-								describe('and they have exchanged all of it back into sUSD', () => {
+								describe('and they have exchanged all of it back into dUSD', () => {
 									beforeEach(async () => {
-										await synthetix.exchange(sEUR, toUnit('1000'), sUSD, { from: account1 });
+										await synthetix.exchange(sEUR, toUnit('1000'), dUSD, { from: account1 });
 									});
-									describe('when they attempt to burn the sUSD', () => {
+									describe('when they attempt to burn the dUSD', () => {
 										it('then it fails as the waiting period is ongoing', async () => {
 											await assert.revert(
 												synthetix.burnSynths(amount, { from: account1 }),
@@ -1706,12 +1706,12 @@ contract('Issuer (via Synthetix)', async accounts => {
 										beforeEach(async () => {
 											fastForward(60);
 										});
-										describe('when they attempt to burn the sUSD', () => {
+										describe('when they attempt to burn the dUSD', () => {
 											let txn;
 											beforeEach(async () => {
 												txn = await synthetix.burnSynths(amount, { from: account1 });
 											});
-											it('then it succeeds and burns the entire sUSD amount', async () => {
+											it('then it succeeds and burns the entire dUSD amount', async () => {
 												const logs = await getDecodedLogs({
 													hash: txn.tx,
 													contracts: [synthetix, sUSDContract],
@@ -1727,7 +1727,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 												const sUSDBalance = await sUSDContract.balanceOf(account1);
 												assert.equal(sUSDBalance, '0');
 
-												const debtBalance = await synthetix.debtBalanceOf(account1, sUSD);
+												const debtBalance = await synthetix.debtBalanceOf(account1, dUSD);
 												assert.equal(debtBalance, '0');
 											});
 										});
@@ -1743,12 +1743,12 @@ contract('Issuer (via Synthetix)', async accounts => {
 											beforeEach(async () => {
 												fastForward(60);
 											});
-											describe('when they attempt to burn the entire amount sUSD', () => {
+											describe('when they attempt to burn the entire amount dUSD', () => {
 												let txn;
 												beforeEach(async () => {
 													txn = await synthetix.burnSynths(amount, { from: account1 });
 												});
-												it('then it succeeds and burns their sUSD minus the reclaim amount from settlement', async () => {
+												it('then it succeeds and burns their dUSD minus the reclaim amount from settlement', async () => {
 													const logs = await getDecodedLogs({
 														hash: txn.tx,
 														contracts: [synthetix, sUSDContract],
@@ -1769,8 +1769,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 												});
 												it('and their debt balance is now 0 because they are the only debt holder in the system', async () => {
 													// the debt balance remaining is what was reclaimed from the exchange
-													const debtBalance = await synthetix.debtBalanceOf(account1, sUSD);
-													// because this user is the only one holding debt, when we burn 250 sUSD in a reclaim,
+													const debtBalance = await synthetix.debtBalanceOf(account1, dUSD);
+													// because this user is the only one holding debt, when we burn 250 dUSD in a reclaim,
 													// it removes it from the totalIssuedSynths and
 													assert.equal(debtBalance, '0');
 												});
@@ -1780,12 +1780,12 @@ contract('Issuer (via Synthetix)', async accounts => {
 													await synthetix.transfer(account2, toUnit('1000000'), { from: owner });
 													await synthetix.issueSynths(amount, { from: account2 });
 												});
-												describe('when the first user attempts to burn the entire amount sUSD', () => {
+												describe('when the first user attempts to burn the entire amount dUSD', () => {
 													let txn;
 													beforeEach(async () => {
 														txn = await synthetix.burnSynths(amount, { from: account1 });
 													});
-													it('then it succeeds and burns their sUSD minus the reclaim amount from settlement', async () => {
+													it('then it succeeds and burns their dUSD minus the reclaim amount from settlement', async () => {
 														const logs = await getDecodedLogs({
 															hash: txn.tx,
 															contracts: [synthetix, sUSDContract],
@@ -1806,8 +1806,8 @@ contract('Issuer (via Synthetix)', async accounts => {
 													});
 													it('and their debt balance is now half of the reclaimed balance because they owe half of the pool', async () => {
 														// the debt balance remaining is what was reclaimed from the exchange
-														const debtBalance = await synthetix.debtBalanceOf(account1, sUSD);
-														// because this user is holding half the debt, when we burn 250 sUSD in a reclaim,
+														const debtBalance = await synthetix.debtBalanceOf(account1, dUSD);
+														// because this user is holding half the debt, when we burn 250 dUSD in a reclaim,
 														// it removes it from the totalIssuedSynths and so both users have half of 250
 														// in owing synths
 														assert.bnEqual(debtBalance, divideDecimal('250', 2));
@@ -1825,7 +1825,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 			describe('debt calculation in multi-issuance scenarios', () => {
 				it('should correctly calculate debt in a multi-issuance scenario', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('200000'), {
 						from: owner,
 					});
@@ -1840,12 +1840,12 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(issuedSynthsPt2, { from: account1 });
 					await synthetix.issueSynths(toUnit('1000'), { from: account2 });
 
-					const debt = await synthetix.debtBalanceOf(account1, sUSD);
+					const debt = await synthetix.debtBalanceOf(account1, dUSD);
 					assert.bnClose(debt, toUnit('4000'));
 				});
 
 				it('should correctly calculate debt in a multi-issuance multi-burn scenario', async () => {
-					// Give some SNX to account1
+					// Give some DEM to account1
 					await synthetix.transfer(account1, toUnit('500000'), {
 						from: owner,
 					});
@@ -1867,7 +1867,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					await synthetix.issueSynths(toUnit('51'), { from: account2 });
 					await synthetix.burnSynths(burntSynthsPt2, { from: account1 });
 
-					const debt = await synthetix.debtBalanceOf(account1, toBytes32('sUSD'));
+					const debt = await synthetix.debtBalanceOf(account1, toBytes32('dUSD'));
 					const expectedDebt = issuedSynthsPt1
 						.add(issuedSynthsPt2)
 						.sub(burntSynthsPt1)
@@ -1891,14 +1891,14 @@ contract('Issuer (via Synthetix)', async accounts => {
 					// Issue from account1
 					const account1AmountToIssue = await synthetix.maxIssuableSynths(account1);
 					await synthetix.issueMaxSynths({ from: account1 });
-					const debtBalance1 = await synthetix.debtBalanceOf(account1, sUSD);
+					const debtBalance1 = await synthetix.debtBalanceOf(account1, dUSD);
 					assert.bnClose(debtBalance1, account1AmountToIssue);
 
 					// Issue and burn from account 2 all debt
 					await synthetix.issueSynths(toUnit('43'), { from: account2 });
-					let debt = await synthetix.debtBalanceOf(account2, sUSD);
+					let debt = await synthetix.debtBalanceOf(account2, dUSD);
 					await synthetix.burnSynths(toUnit('43'), { from: account2 });
-					debt = await synthetix.debtBalanceOf(account2, sUSD);
+					debt = await synthetix.debtBalanceOf(account2, dUSD);
 
 					assert.bnEqual(debt, 0);
 
@@ -1931,7 +1931,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 					const account1AmountToIssue = await synthetix.maxIssuableSynths(account1);
 					await synthetix.issueMaxSynths({ from: account1 });
-					const debtBalance1 = await synthetix.debtBalanceOf(account1, sUSD);
+					const debtBalance1 = await synthetix.debtBalanceOf(account1, dUSD);
 					assert.bnClose(debtBalance1, account1AmountToIssue);
 
 					let expectedDebtForAccount2 = web3.utils.toBN('0');
@@ -1950,13 +1950,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 						expectedDebtForAccount2 = expectedDebtForAccount2.sub(amountToBurn);
 
 						// Useful debug logging
-						// const db = await synthetix.debtBalanceOf(account2, sUSD);
+						// const db = await synthetix.debtBalanceOf(account2, dUSD);
 						// const variance = fromUnit(expectedDebtForAccount2.sub(db));
 						// console.log(
 						// 	`#### debtBalance: ${db}\t\t expectedDebtForAccount2: ${expectedDebtForAccount2}\t\tvariance: ${variance}`
 						// );
 					}
-					const debtBalance = await synthetix.debtBalanceOf(account2, sUSD);
+					const debtBalance = await synthetix.debtBalanceOf(account2, dUSD);
 
 					// Here we make the variance a calculation of the number of times we issue/burn.
 					// This is less than ideal, but is the result of calculating the debt based on
@@ -1983,7 +1983,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 					const account1AmountToIssue = await synthetix.maxIssuableSynths(account1);
 					await synthetix.issueMaxSynths({ from: account1 });
-					const debtBalance1 = await synthetix.debtBalanceOf(account1, sUSD);
+					const debtBalance1 = await synthetix.debtBalanceOf(account1, dUSD);
 					assert.bnClose(debtBalance1, account1AmountToIssue);
 
 					let expectedDebtForAccount2 = web3.utils.toBN('0');
@@ -2002,13 +2002,13 @@ contract('Issuer (via Synthetix)', async accounts => {
 						expectedDebtForAccount2 = expectedDebtForAccount2.sub(amountToBurn);
 
 						// Useful debug logging
-						// const db = await synthetix.debtBalanceOf(account2, sUSD);
+						// const db = await synthetix.debtBalanceOf(account2, dUSD);
 						// const variance = fromUnit(expectedDebtForAccount2.sub(db));
 						// console.log(
 						// 	`#### debtBalance: ${db}\t\t expectedDebtForAccount2: ${expectedDebtForAccount2}\t\tvariance: ${variance}`
 						// );
 					}
-					const debtBalance = await synthetix.debtBalanceOf(account2, sUSD);
+					const debtBalance = await synthetix.debtBalanceOf(account2, dUSD);
 
 					// Here we make the variance a calculation of the number of times we issue/burn.
 					// This is less than ideal, but is the result of calculating the debt based on
@@ -2035,7 +2035,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 
 					const account1AmountToIssue = await synthetix.maxIssuableSynths(account1);
 					await synthetix.issueMaxSynths({ from: account1 });
-					const debtBalance1 = await synthetix.debtBalanceOf(account1, sUSD);
+					const debtBalance1 = await synthetix.debtBalanceOf(account1, dUSD);
 					assert.bnEqual(debtBalance1, account1AmountToIssue);
 
 					let expectedDebtForAccount2 = web3.utils.toBN('0');
@@ -2045,7 +2045,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await synthetix.issueSynths(amount, { from: account2 });
 						expectedDebtForAccount2 = expectedDebtForAccount2.add(amount);
 					}
-					const debtBalance2 = await synthetix.debtBalanceOf(account2, sUSD);
+					const debtBalance2 = await synthetix.debtBalanceOf(account2, dUSD);
 
 					// Here we make the variance a calculation of the number of times we issue/burn.
 					// This is less than ideal, but is the result of calculating the debt based on
@@ -2076,7 +2076,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				await synthetix.issueSynths(issuedSynths, { from: account1 });
 
 				// exchange into sEUR
-				await synthetix.exchange(sUSD, issuedSynths, sEUR, { from: account1 });
+				await synthetix.exchange(dUSD, issuedSynths, sEUR, { from: account1 });
 
 				// Increase the value of sEUR relative to synthetix
 				const timestamp2 = await currentTime();
@@ -2145,7 +2145,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should include escrowed synthetix when calculating a user's collaterisation ratio", async () => {
-					const snx2usdRate = await exchangeRates.rateForCurrency(SNX);
+					const snx2usdRate = await exchangeRates.rateForCurrency(DEM);
 					const transferredSynthetixs = toUnit('60000');
 					await synthetix.transfer(account1, transferredSynthetixs, {
 						from: owner,
@@ -2182,7 +2182,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should include escrowed reward synthetix when calculating a user's collateralisation ratio", async () => {
-					const snx2usdRate = await exchangeRates.rateForCurrency(SNX);
+					const snx2usdRate = await exchangeRates.rateForCurrency(DEM);
 					const transferredSynthetixs = toUnit('60000');
 					await synthetix.transfer(account1, transferredSynthetixs, {
 						from: owner,
@@ -2209,7 +2209,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					assert.bnEqual(collaterisationRatio, expectedCollaterisationRatio);
 				});
 
-				it('should permit user to issue sUSD debt with only escrowed SNX as collateral (no SNX in wallet)', async () => {
+				it('should permit user to issue dUSD debt with only escrowed DEM as collateral (no DEM in wallet)', async () => {
 					const oneWeek = 60 * 60 * 24 * 7;
 					const twelveWeeks = oneWeek * 12;
 					const now = await currentTime();
@@ -2218,7 +2218,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 					let collateral = await synthetix.collateral(account1, { from: account1 });
 					assert.bnEqual(collateral, 0);
 
-					// ensure account1 has no SNX balance
+					// ensure account1 has no DEM balance
 					const snxBalance = await synthetix.balanceOf(account1);
 					assert.bnEqual(snxBalance, 0);
 
@@ -2240,19 +2240,19 @@ contract('Issuer (via Synthetix)', async accounts => {
 					collateral = await synthetix.collateral(account1, { from: account1 });
 					assert.bnEqual(collateral, escrowedAmount);
 
-					// Issue max synths. (300 sUSD)
+					// Issue max synths. (300 dUSD)
 					await synthetix.issueMaxSynths({ from: account1 });
 
-					// There should be 300 sUSD of value for account1
-					assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('300'));
+					// There should be 300 dUSD of value for account1
+					assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('300'));
 				});
 
-				it('should permit user to issue sUSD debt with only reward escrow as collateral (no SNX in wallet)', async () => {
+				it('should permit user to issue dUSD debt with only reward escrow as collateral (no DEM in wallet)', async () => {
 					// ensure collateral of account1 is empty
 					let collateral = await synthetix.collateral(account1, { from: account1 });
 					assert.bnEqual(collateral, 0);
 
-					// ensure account1 has no SNX balance
+					// ensure account1 has no DEM balance
 					const snxBalance = await synthetix.balanceOf(account1);
 					assert.bnEqual(snxBalance, 0);
 
@@ -2269,11 +2269,11 @@ contract('Issuer (via Synthetix)', async accounts => {
 					collateral = await synthetix.collateral(account1, { from: account1 });
 					assert.bnEqual(collateral, escrowedAmount);
 
-					// Issue max synths. (300 sUSD)
+					// Issue max synths. (300 dUSD)
 					await synthetix.issueMaxSynths({ from: account1 });
 
-					// There should be 300 sUSD of value for account1
-					assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), toUnit('300'));
+					// There should be 300 dUSD of value for account1
+					assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), toUnit('300'));
 				});
 
 				it("should permit anyone checking another user's collateral", async () => {
@@ -2336,7 +2336,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 
 				it("should correctly calculate a user's max issuable synths with escrowed synthetix", async () => {
-					const snx2usdRate = await exchangeRates.rateForCurrency(SNX);
+					const snx2usdRate = await exchangeRates.rateForCurrency(DEM);
 					const transferredSynthetixs = toUnit('60000');
 					await synthetix.transfer(account1, transferredSynthetixs, {
 						from: owner,
@@ -2377,11 +2377,11 @@ contract('Issuer (via Synthetix)', async accounts => {
 				const delegate = account2;
 
 				beforeEach(async () => {
-					// Assign the authoriser SNX
+					// Assign the authoriser DEM
 					await synthetix.transfer(authoriser, toUnit('20000'), {
 						from: owner,
 					});
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, { from: oracle });
+					await exchangeRates.updateRates([DEM], ['1'].map(toUnit), timestamp, { from: oracle });
 					await debtCache.takeDebtSnapshot();
 				});
 				describe('when not approved it should revert on', async () => {
@@ -2468,7 +2468,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 							});
 							it('and calling burnSynthsToTargetOnBehalf() succeeds', async () => {
 								// need the user to be undercollaterized for this to succeed
-								await exchangeRates.updateRates([SNX], ['0.001'].map(toUnit), timestamp, {
+								await exchangeRates.updateRates([DEM], ['0.001'].map(toUnit), timestamp, {
 									from: oracle,
 								});
 								await debtCache.takeDebtSnapshot();
@@ -2520,7 +2520,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 				});
 				it('should approveBurnOnBehalf and burnSynthsToTarget', async () => {
 					await synthetix.issueMaxSynths({ from: authoriser });
-					await exchangeRates.updateRates([SNX], ['0.01'].map(toUnit), timestamp, { from: oracle });
+					await exchangeRates.updateRates([DEM], ['0.01'].map(toUnit), timestamp, { from: oracle });
 					await debtCache.takeDebtSnapshot();
 
 					await delegateApprovals.approveBurnOnBehalf(delegate, { from: authoriser });
@@ -2538,11 +2538,11 @@ contract('Issuer (via Synthetix)', async accounts => {
 				it('should have zero totalIssuedSynths', async () => {
 					// totalIssuedSynthsExcludeEtherCollateral equal totalIssuedSynths
 					assert.bnEqual(
-						await synthetix.totalIssuedSynths(sUSD),
-						await synthetix.totalIssuedSynthsExcludeEtherCollateral(sUSD)
+						await synthetix.totalIssuedSynths(dUSD),
+						await synthetix.totalIssuedSynthsExcludeEtherCollateral(dUSD)
 					);
 				});
-				describe('creating a loan on etherCollateral to issue sETH', async () => {
+				describe('creating a loan on etherCollateral to issue dETH', async () => {
 					let etherCollateral;
 					beforeEach(async () => {
 						// mock etherCollateral
@@ -2558,7 +2558,7 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await issuer.rebuildCache();
 						await debtCache.rebuildCache();
 
-						// Give some SNX to account1
+						// Give some DEM to account1
 						await synthetix.transfer(account1, toUnit('1000'), { from: owner });
 
 						// account1 should be able to issue
@@ -2569,10 +2569,10 @@ contract('Issuer (via Synthetix)', async accounts => {
 						});
 					});
 
-					it('should be able to exclude sETH issued by ether Collateral from totalIssuedSynths', async () => {
-						const totalSupplyBefore = await synthetix.totalIssuedSynths(sETH);
+					it('should be able to exclude dETH issued by ether Collateral from totalIssuedSynths', async () => {
+						const totalSupplyBefore = await synthetix.totalIssuedSynths(dETH);
 
-						// issue sETH
+						// issue dETH
 						const amountToIssue = toUnit('10');
 						await sETHContract.issue(account1, amountToIssue, { from: owner });
 						// openLoan of same amount on Ether Collateral
@@ -2580,32 +2580,32 @@ contract('Issuer (via Synthetix)', async accounts => {
 						// totalSupply of synths should exclude Ether Collateral issued synths
 						assert.bnEqual(
 							totalSupplyBefore,
-							await synthetix.totalIssuedSynthsExcludeEtherCollateral(sETH)
+							await synthetix.totalIssuedSynthsExcludeEtherCollateral(dETH)
 						);
 
 						// totalIssuedSynths after includes amount issued
 						assert.bnEqual(
-							await synthetix.totalIssuedSynths(sETH),
+							await synthetix.totalIssuedSynths(dETH),
 							totalSupplyBefore.add(amountToIssue)
 						);
 					});
 
-					it('should exclude sETH issued by ether Collateral from debtBalanceOf', async () => {
+					it('should exclude dETH issued by ether Collateral from debtBalanceOf', async () => {
 						// account1 should own 100% of the debt.
-						const debtBefore = await synthetix.debtBalanceOf(account1, sUSD);
+						const debtBefore = await synthetix.debtBalanceOf(account1, dUSD);
 						assert.bnEqual(debtBefore, toUnit('10'));
 
-						// issue sETH to mimic loan
+						// issue dETH to mimic loan
 						const amountToIssue = toUnit('10');
 						await sETHContract.issue(account1, amountToIssue, { from: owner });
 						await etherCollateral.openLoan(amountToIssue, { from: owner });
 
-						// After account1 owns 100% of sUSD debt.
+						// After account1 owns 100% of dUSD debt.
 						assert.bnEqual(
-							await synthetix.totalIssuedSynthsExcludeEtherCollateral(sUSD),
+							await synthetix.totalIssuedSynthsExcludeEtherCollateral(dUSD),
 							toUnit('10')
 						);
-						assert.bnEqual(await synthetix.debtBalanceOf(account1, sUSD), debtBefore);
+						assert.bnEqual(await synthetix.debtBalanceOf(account1, dUSD), debtBefore);
 					});
 				});
 			});
@@ -2613,11 +2613,11 @@ contract('Issuer (via Synthetix)', async accounts => {
 			describe('when EtherWrapper is set', async () => {
 				it('should have zero totalIssuedSynths', async () => {
 					assert.bnEqual(
-						await synthetix.totalIssuedSynths(sUSD),
-						await synthetix.totalIssuedSynthsExcludeEtherCollateral(sUSD)
+						await synthetix.totalIssuedSynths(dUSD),
+						await synthetix.totalIssuedSynthsExcludeEtherCollateral(dUSD)
 					);
 				});
-				describe('depositing WETH on the EtherWrapper to issue sETH', async () => {
+				describe('depositing WETH on the EtherWrapper to issue dETH', async () => {
 					let etherWrapper;
 					beforeEach(async () => {
 						// mock etherWrapper
@@ -2632,23 +2632,23 @@ contract('Issuer (via Synthetix)', async accounts => {
 						await debtCache.rebuildCache();
 					});
 
-					it('should be able to exclude sETH issued by EtherWrapper from totalIssuedSynths', async () => {
-						const totalSupplyBefore = await synthetix.totalIssuedSynths(sETH);
+					it('should be able to exclude dETH issued by EtherWrapper from totalIssuedSynths', async () => {
+						const totalSupplyBefore = await synthetix.totalIssuedSynths(dETH);
 
 						const amount = toUnit('10');
 
 						await etherWrapper.setTotalIssuedSynths(amount, { from: account1 });
 
-						// totalSupply of synths should exclude EtherWrapper issued sETH
+						// totalSupply of synths should exclude EtherWrapper issued dETH
 						assert.bnEqual(
 							totalSupplyBefore,
-							await synthetix.totalIssuedSynthsExcludeEtherCollateral(sETH)
+							await synthetix.totalIssuedSynthsExcludeEtherCollateral(dETH)
 						);
 
 						// totalIssuedSynths after includes amount issued
-						const { rate } = await exchangeRates.rateAndInvalid(sETH);
+						const { rate } = await exchangeRates.rateAndInvalid(dETH);
 						assert.bnEqual(
-							await synthetix.totalIssuedSynths(sETH),
+							await synthetix.totalIssuedSynths(dETH),
 							totalSupplyBefore.add(divideDecimalRound(amount, rate))
 						);
 					});

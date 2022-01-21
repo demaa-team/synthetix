@@ -45,7 +45,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 
 	// The address of the inverse synth that is about to be purged.
 	// Note that this must be the PROXY address, where Transfer events are emitted from.
-	const iSynthContract = getTarget({ contract: `Proxy${synth === 'sUSD' ? 'ERC20sUSD' : synth}` });
+	const iSynthContract = getTarget({ contract: `Proxy${synth === 'dUSD' ? 'ERC20sUSD' : synth}` });
 
 	if (!iSynthContract) {
 		throw new Error(`Cannot find synth contract for synth: "${synth}"`);
@@ -105,10 +105,10 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 		getTarget({ contract: 'SystemSettings' }).address
 	);
 
-	// The exchange fee incurred when users are purged into sUSD
-	const exchangeFee = await SystemSettings.methods.exchangeFeeRate(toBytes32('sUSD')).call();
+	// The exchange fee incurred when users are purged into dUSD
+	const exchangeFee = await SystemSettings.methods.exchangeFeeRate(toBytes32('dUSD')).call();
 
-	console.log(gray(`Exchange fee of sUSD is`), yellow(web3.utils.fromWei(exchangeFee)));
+	console.log(gray(`Exchange fee of dUSD is`), yellow(web3.utils.fromWei(exchangeFee)));
 
 	/** *********** --------------------- *********** **/
 
@@ -195,7 +195,7 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 
 	// Computes the balances owed to each account
 	function computeOwedBalances(balances) {
-		console.log(`\nComputing owed sUSD balances for accounts using parameters:`);
+		console.log(`\nComputing owed dUSD balances for accounts using parameters:`);
 		console.log(`    Price: ${fromWei(frozenPrice)}`);
 		console.log(`    Exchange Fee: ${fromWei(multiplyDecimal(exchangeFee, toWei('100')))}%`);
 
@@ -216,12 +216,12 @@ async function extractStakingBalances({ network = DEFAULTS.network, deploymentPa
 		const totalOwed = result.reduce((total, curr) => total.add(toBN(curr.owed)), toBN(0));
 
 		console.log(`\n${fromWei(totalStaked)} staked in total.`);
-		console.log(`${fromWei(totalOwed)} total sUSD owed.\n`);
+		console.log(`${fromWei(totalOwed)} total dUSD owed.\n`);
 		return result;
 	}
 
 	function saveOwedBalances(owedSUSDBalances) {
-		let csvString = 'Address,Staked Balance,Owed sUSD,Readable Staked Balance,Readable Owed sUSD\n';
+		let csvString = 'Address,Staked Balance,Owed dUSD,Readable Staked Balance,Readable Owed dUSD\n';
 
 		for (const balance of owedSUSDBalances) {
 			const line = `${balance.address},${balance.balance},${balance.owed},${balance.readableBalance},${balance.readableOwed}\n`;

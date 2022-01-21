@@ -47,25 +47,25 @@ contract('Rewards Integration Tests', accounts => {
 	// };
 
 	// CURRENCIES
-	const [sUSD, sAUD, sEUR, sBTC, SNX, iBTC, sETH, ETH] = [
-		'sUSD',
+	const [dUSD, sAUD, sEUR, dBTC, DEM, iBTC, dETH, ETH] = [
+		'dUSD',
 		'sAUD',
 		'sEUR',
-		'sBTC',
-		'SNX',
+		'dBTC',
+		'DEM',
 		'iBTC',
-		'sETH',
+		'dETH',
 		'ETH',
 	].map(toBytes32);
 
-	const synthKeys = [sUSD, sAUD, sEUR, sBTC, iBTC, sETH, ETH];
+	const synthKeys = [dUSD, sAUD, sEUR, dBTC, iBTC, dETH, ETH];
 
 	// Updates rates with defaults so they're not stale.
 	const updateRatesWithDefaults = async () => {
 		const timestamp = await currentTime();
 
 		await exchangeRates.updateRates(
-			[sAUD, sEUR, SNX, sBTC, iBTC, sETH, ETH],
+			[sAUD, sEUR, DEM, dBTC, iBTC, dETH, ETH],
 			['0.5', '1.25', '0.1', '5000', '4000', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -159,14 +159,14 @@ contract('Rewards Integration Tests', accounts => {
 			RewardEscrowV2: rewardEscrow,
 			SupplySchedule: supplySchedule,
 			Synthetix: synthetix,
-			SynthsUSD: sUSDContract,
+			SynthdUSD: sUSDContract,
 			SystemSettings: systemSettings,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sAUD', 'sEUR', 'sBTC', 'iBTC', 'sETH'],
+			synths: ['dUSD', 'sAUD', 'sEUR', 'dBTC', 'iBTC', 'dETH'],
 			contracts: [
 				'AddressResolver',
-				'Exchanger', // necessary for burnSynths to check settlement of sUSD
+				'Exchanger', // necessary for burnSynths to check settlement of dUSD
 				'ExchangeRates',
 				'FeePool',
 				'FeePoolEternalStorage', // necessary to claimFees()
@@ -198,7 +198,7 @@ contract('Rewards Integration Tests', accounts => {
 		// await fastForwardAndUpdateRates(YEAR + MINUTE);
 		await fastForwardAndUpdateRates(WEEK + MINUTE);
 
-		// Assign 1/3 of total SNX to 3 accounts
+		// Assign 1/3 of total DEM to 3 accounts
 		const snxTotalSupply = await synthetix.totalSupply();
 		const thirdOfSNX = third(snxTotalSupply);
 
@@ -206,7 +206,7 @@ contract('Rewards Integration Tests', accounts => {
 		await synthetix.transfer(account2, thirdOfSNX, { from: owner });
 		await synthetix.transfer(account3, thirdOfSNX, { from: owner });
 
-		// Get the SNX mintableSupply
+		// Get the DEM mintableSupply
 		periodOneMintableSupplyMinusMinterReward = (await supplySchedule.mintableSupply()).sub(
 			MINTER_SNX_REWARD
 		);
@@ -221,7 +221,7 @@ contract('Rewards Integration Tests', accounts => {
 		await systemSettings.setIssuanceRatio(toUnit('0.2'), { from: owner });
 	});
 
-	describe('3 accounts with 33.33% SNX all issue MAX and claim rewards', async () => {
+	describe('3 accounts with 33.33% DEM all issue MAX and claim rewards', async () => {
 		let FEE_PERIOD_LENGTH;
 		let CLAIMABLE_PERIODS;
 
@@ -277,7 +277,7 @@ contract('Rewards Integration Tests', accounts => {
 				// FastForward a little for minting
 				await fastForwardAndUpdateRates(MINUTE);
 
-				// Get the SNX mintableSupply - the minter reward of 200 SNX
+				// Get the DEM mintableSupply - the minter reward of 200 DEM
 				mintedRewardsSupply = (await supplySchedule.mintableSupply()).sub(MINTER_SNX_REWARD);
 				// console.log('mintedRewardsSupply', mintedRewardsSupply.toString());
 				// Mint the staking rewards
@@ -304,7 +304,7 @@ contract('Rewards Integration Tests', accounts => {
 				// FastForward a little for minting
 				await fastForwardAndUpdateRates(MINUTE);
 
-				// Get the SNX mintableSupply - the minter reward of 200 SNX
+				// Get the DEM mintableSupply - the minter reward of 200 DEM
 				mintedRewardsSupply = (await supplySchedule.mintableSupply()).sub(MINTER_SNX_REWARD);
 				// console.log('mintedRewardsSupply', mintedRewardsSupply.toString());
 				// Mint the staking rewards
@@ -327,7 +327,7 @@ contract('Rewards Integration Tests', accounts => {
 			assert.bnClose(totalRewardsAvailable, rewardsLessAccountClaims, 10);
 		});
 
-		it('should mint SNX for the all claimable fee periods then all 3 accounts claim at the end of the claimable period', async () => {
+		it('should mint DEM for the all claimable fee periods then all 3 accounts claim at the end of the claimable period', async () => {
 			let mintedRewardsSupply;
 			// We are currently in the 2nd week, close it and the next
 			for (let i = 0; i <= CLAIMABLE_PERIODS - 1; i++) {
@@ -337,7 +337,7 @@ contract('Rewards Integration Tests', accounts => {
 				// FastForward a little for minting
 				await fastForwardAndUpdateRates(MINUTE);
 
-				// Get the SNX mintableSupply - the minter reward of 200 SNX
+				// Get the DEM mintableSupply - the minter reward of 200 DEM
 				mintedRewardsSupply = (await supplySchedule.mintableSupply()).sub(MINTER_SNX_REWARD);
 
 				// Mint the staking rewards
@@ -366,7 +366,7 @@ contract('Rewards Integration Tests', accounts => {
 			assert.bnEqual(accThreeEscrowed.escrowAmount, twoWeeksRewards, '1');
 		});
 
-		it('should rollover the unclaimed SNX rewards', async () => {
+		it('should rollover the unclaimed DEM rewards', async () => {
 			// Close all claimable periods
 			for (let i = 0; i <= CLAIMABLE_PERIODS; i++) {
 				// console.log('Close Fee Period', i);
@@ -402,7 +402,7 @@ contract('Rewards Integration Tests', accounts => {
 			);
 		});
 
-		it('should rollover the unclaimed SNX rewards on week over 2 terms', async () => {
+		it('should rollover the unclaimed DEM rewards on week over 2 terms', async () => {
 			for (let i = 0; i <= 2; i++) {
 				await fastForwardAndCloseFeePeriod();
 				// FastForward a bit to be able to mint
@@ -431,7 +431,7 @@ contract('Rewards Integration Tests', accounts => {
 			);
 		});
 
-		it('should rollover the partial unclaimed SNX rewards', async () => {
+		it('should rollover the partial unclaimed DEM rewards', async () => {
 			// await logFeePeriods();
 			for (let i = 0; i <= FEE_PERIOD_LENGTH; i++) {
 				// Get the Rewards to RollOver
@@ -474,7 +474,7 @@ contract('Rewards Integration Tests', accounts => {
 			// await logFeePeriods();
 
 			// Account 1 leaves the system in week 2
-			const burnableTotal = await synthetix.debtBalanceOf(account1, sUSD);
+			const burnableTotal = await synthetix.debtBalanceOf(account1, dUSD);
 			await synthetix.burnSynths(burnableTotal, { from: account1 });
 			// await logFeesByPeriod(account1);
 
@@ -509,7 +509,7 @@ contract('Rewards Integration Tests', accounts => {
 			assert.bnEqual(account1EscrowEntry.escrowAmount, rewardsAmount);
 		});
 
-		it('should allocate correct SNX rewards as others leave the system', async () => {
+		it('should allocate correct DEM rewards as others leave the system', async () => {
 			// Close Fee Period
 			// console.log('Close Fee Period');
 			await fastForwardAndCloseFeePeriod();
@@ -526,13 +526,13 @@ contract('Rewards Integration Tests', accounts => {
 			);
 
 			// Account 1 leaves the system
-			const burnableTotal = await synthetix.debtBalanceOf(account1, sUSD);
+			const burnableTotal = await synthetix.debtBalanceOf(account1, dUSD);
 			await synthetix.burnSynths(burnableTotal, { from: account1 });
 
 			// FastForward into the second mintable week
 			await fastForwardAndUpdateRates(WEEK + MINUTE);
 
-			// Get the SNX mintableSupply for period 2
+			// Get the DEM mintableSupply for period 2
 			const period2MintedRewardsSupply = (await supplySchedule.mintableSupply()).sub(
 				MINTER_SNX_REWARD
 			);
@@ -584,12 +584,12 @@ contract('Rewards Integration Tests', accounts => {
 
 	describe('Exchange Rate Shift tests', async () => {
 		it('should assign accounts (1,2,3) to have (40%,40%,20%) of the debt/rewards', async () => {
-			// Account 1&2 issue 10K USD and exchange in sBTC each, holding 50% of the total debt.
+			// Account 1&2 issue 10K USD and exchange in dBTC each, holding 50% of the total debt.
 			await synthetix.issueSynths(tenK, { from: account1 });
 			await synthetix.issueSynths(tenK, { from: account2 });
 
-			await synthetix.exchange(sUSD, tenK, sBTC, { from: account1 });
-			await synthetix.exchange(sUSD, tenK, sBTC, { from: account2 });
+			await synthetix.exchange(dUSD, tenK, dBTC, { from: account1 });
+			await synthetix.exchange(dUSD, tenK, dBTC, { from: account2 });
 
 			await fastForwardAndCloseFeePeriod();
 			// //////////////////////////////////////////////
@@ -626,19 +626,19 @@ contract('Rewards Integration Tests', accounts => {
 				1
 			);
 
-			// Increase sBTC price by 100%
+			// Increase dBTC price by 100%
 			const timestamp = await currentTime();
-			await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
+			await exchangeRates.updateRates([dBTC], ['10000'].map(toUnit), timestamp, {
 				from: oracle,
 			});
 			await debtCache.takeDebtSnapshot();
 
-			// Account 3 (enters the system and) mints 10K sUSD (minus half of an exchange fee - to balance the fact
-			// that the other two holders have doubled their sBTC holdings) and should have 20% of the debt not 33.33%
+			// Account 3 (enters the system and) mints 10K dUSD (minus half of an exchange fee - to balance the fact
+			// that the other two holders have doubled their dBTC holdings) and should have 20% of the debt not 33.33%
 			const potentialFee = exchangeFeeIncurred(toUnit('10000'));
 			await synthetix.issueSynths(tenK.sub(half(potentialFee)), { from: account3 });
 
-			// Get the SNX mintableSupply for week 2
+			// Get the DEM mintableSupply for week 2
 			const periodTwoMintableSupply = (await supplySchedule.mintableSupply()).sub(
 				MINTER_SNX_REWARD
 			);
@@ -647,9 +647,9 @@ contract('Rewards Integration Tests', accounts => {
 			await synthetix.mint({ from: owner });
 
 			// Do some exchanging to generateFees
-			const { amountReceived } = await exchanger.getAmountsForExchange(tenK, sUSD, sBTC);
-			await synthetix.exchange(sBTC, amountReceived, sUSD, { from: account1 });
-			await synthetix.exchange(sBTC, amountReceived, sUSD, { from: account2 });
+			const { amountReceived } = await exchanger.getAmountsForExchange(tenK, dUSD, dBTC);
+			await synthetix.exchange(dBTC, amountReceived, dUSD, { from: account1 });
+			await synthetix.exchange(dBTC, amountReceived, dUSD, { from: account2 });
 
 			// Close so we can claim
 			await fastForwardAndCloseFeePeriod();
@@ -711,19 +711,19 @@ contract('Rewards Integration Tests', accounts => {
 			// Commenting out this logic for now (v2.14.x) - needs to be relooked at -JJ
 
 			// // now in p3 Acc1 burns all and leaves (-40%) and Acc2 has 67% and Acc3 33% rewards allocated as such
-			// // Account 1 exchanges all sBTC back to sUSD
+			// // Account 1 exchanges all dBTC back to dUSD
 			// const acc1sBTCBalance = await sBTCContract.balanceOf(account1, { from: account1 });
-			// await synthetix.exchange(sBTC, acc1sBTCBalance, sUSD, { from: account1 });
+			// await synthetix.exchange(dBTC, acc1sBTCBalance, dUSD, { from: account1 });
 			// const amountAfterExchange = await feePool.amountReceivedFromExchange(acc1sBTCBalance);
 			// const amountAfterExchangeInUSD = await exchangeRates.effectiveValue(
-			// 	sBTC,
+			// 	dBTC,
 			// 	amountAfterExchange,
-			// 	sUSD
+			// 	dUSD
 			// );
 
 			// await synthetix.burnSynths(amountAfterExchangeInUSD, { from: account1 });
 
-			// // Get the SNX mintableSupply for week 3
+			// // Get the DEM mintableSupply for week 3
 			// // const periodThreeMintableSupply = (await supplySchedule.mintableSupply()).sub(
 			// // 	MINTER_SNX_REWARD
 			// // );
@@ -769,7 +769,7 @@ contract('Rewards Integration Tests', accounts => {
 			// // Acc1 mints 20K (40%) close p (40,40,20)');
 			// await synthetix.issueSynths(twentyK, { from: account1 });
 
-			// // Get the SNX mintableSupply for week 4
+			// // Get the DEM mintableSupply for week 4
 			// const periodFourMintableSupply = (await supplySchedule.mintableSupply()).sub(
 			// 	MINTER_SNX_REWARD
 			// );
@@ -803,7 +803,7 @@ contract('Rewards Integration Tests', accounts => {
 		});
 	});
 
-	describe('3 Accounts issue 10K sUSD each in week 1', async () => {
+	describe('3 Accounts issue 10K dUSD each in week 1', async () => {
 		beforeEach(async () => {
 			await synthetix.issueSynths(tenK, { from: account1 });
 			await synthetix.issueSynths(tenK, { from: account2 });
@@ -811,7 +811,7 @@ contract('Rewards Integration Tests', accounts => {
 		});
 
 		it('Acc1 issues and burns multiple times and should have accounts 1,2,3 rewards 50%,25%,25%', async () => {
-			// Acc 1 Issues 20K sUSD
+			// Acc 1 Issues 20K dUSD
 			await synthetix.issueSynths(tenK, { from: account1 });
 
 			// Close week 2
@@ -859,12 +859,12 @@ contract('Rewards Integration Tests', accounts => {
 
 			// Acc1 Burns all
 			await synthetix.burnSynths(twentyK, { from: account1 });
-			// Acc 1 Issues 10K sUSD
+			// Acc 1 Issues 10K dUSD
 			await synthetix.issueSynths(tenK, { from: account1 });
-			// Acc 1 Issues 10K sUSD again
+			// Acc 1 Issues 10K dUSD again
 			await synthetix.issueSynths(tenK, { from: account1 });
 
-			// Get the SNX mintableSupply for week 2
+			// Get the DEM mintableSupply for week 2
 			const periodTwoMintableSupply = (await supplySchedule.mintableSupply()).sub(
 				MINTER_SNX_REWARD
 			);
@@ -924,12 +924,12 @@ contract('Rewards Integration Tests', accounts => {
 		});
 
 		it('should apply no penalty when users claim rewards above the penalty threshold ratio of 1%', async () => {
-			// Decrease SNX collateral price by .9%
-			const currentRate = await exchangeRates.rateForCurrency(SNX);
+			// Decrease DEM collateral price by .9%
+			const currentRate = await exchangeRates.rateForCurrency(DEM);
 			const newRate = currentRate.sub(multiplyDecimal(currentRate, toUnit('0.009')));
 
 			const timestamp = await currentTime();
-			await exchangeRates.updateRates([SNX], [newRate], timestamp, {
+			await exchangeRates.updateRates([DEM], [newRate], timestamp, {
 				from: oracle,
 			});
 
@@ -951,10 +951,10 @@ contract('Rewards Integration Tests', accounts => {
 			);
 		});
 		it('should block user from claiming fees and rewards when users claim rewards >10% threshold collateralisation ratio', async () => {
-			// But if the price of SNX decreases a lot...
-			const newRate = (await exchangeRates.rateForCurrency(SNX)).sub(toUnit('0.09'));
+			// But if the price of DEM decreases a lot...
+			const newRate = (await exchangeRates.rateForCurrency(DEM)).sub(toUnit('0.09'));
 			const timestamp = await currentTime();
-			await exchangeRates.updateRates([SNX], [newRate], timestamp, {
+			await exchangeRates.updateRates([DEM], [newRate], timestamp, {
 				from: oracle,
 			});
 
@@ -972,8 +972,8 @@ contract('Rewards Integration Tests', accounts => {
 			await synthetix.issueSynths(oneThousand, { from: account2 });
 			await synthetix.issueSynths(oneThousand, { from: account1 });
 
-			await synthetix.exchange(sUSD, oneThousand, sAUD, { from: account2 });
-			await synthetix.exchange(sUSD, oneThousand, sAUD, { from: account1 });
+			await synthetix.exchange(dUSD, oneThousand, sAUD, { from: account2 });
+			await synthetix.exchange(dUSD, oneThousand, sAUD, { from: account1 });
 
 			await fastForwardAndCloseFeePeriod();
 		});
@@ -997,8 +997,8 @@ contract('Rewards Integration Tests', accounts => {
 			const period = await feePool.recentFeePeriods(1);
 			period.index = 1;
 
-			// Simulate rounding on sUSD leaving fraction less for the last claimer.
-			// No need to simulate for SNX as the 1.44M SNX has a 1 wei rounding already
+			// Simulate rounding on dUSD leaving fraction less for the last claimer.
+			// No need to simulate for DEM as the 1.44M DEM has a 1 wei rounding already
 			period.feesClaimed = period.feesClaimed.add(toUnit('0.000000000000000001'));
 			await feePool.importFeePeriod(
 				period.index,
@@ -1015,7 +1015,7 @@ contract('Rewards Integration Tests', accounts => {
 			const feesAvailableUSDAcc1 = await feePool.feesAvailable(account1);
 
 			// last claimer should get the fraction less
-			// is entitled to 721,053.846153846153846154 SNX
+			// is entitled to 721,053.846153846153846154 DEM
 			// however only   721,053.846153846153846153 Claimable after rounding to 18 decimals
 			const transaction = await feePool.claimFees({ from: account1 });
 			assert.eventEqual(transaction, 'FeesClaimed', {

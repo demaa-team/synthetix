@@ -42,7 +42,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 		CollateralShort,
 		DebtCache,
 		ReadProxyAddressResolver,
-		SynthsUSD;
+		SynthdUSD;
 
 	before('prepare', async function() {
 		network = config.targetNetwork;
@@ -74,7 +74,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 			CollateralEth,
 			CollateralShort,
 			DebtCache,
-			SynthsUSD,
+			SynthdUSD,
 			ReadProxyAddressResolver,
 		} = await connectContracts({
 			network,
@@ -86,7 +86,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 				{ contractName: 'CollateralShort' },
 				{ contractName: 'DebtCache' },
 				{ contractName: 'ReadProxyAddressResolver' },
-				{ contractName: 'SynthsUSD', abiName: 'Synth' },
+				{ contractName: 'SynthdUSD', abiName: 'Synth' },
 				{ contractName: 'Issuer' },
 			],
 		}));
@@ -140,7 +140,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 			type: 'CollateralEth',
 			collateralCurrency: 'ETH',
 			amountToDeposit: toUnit('2'),
-			borrowCurrency: 'sUSD',
+			borrowCurrency: 'dUSD',
 			amountToBorrow: toUnit('0.5'),
 			amountToRepay: toUnit('0.25'),
 			oldAddress: oldEthAddress,
@@ -150,7 +150,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 			type: 'CollateralErc20',
 			collateralCurrency: 'renBTC',
 			amountToDeposit: Web3.utils.toBN('1000000000'), // 10 renBTC (renBTC uses 8 decimals)
-			borrowCurrency: 'sUSD',
+			borrowCurrency: 'dUSD',
 			amountToBorrow: toUnit('0.5'),
 			amountToRepay: toUnit('0.25'),
 			oldAddress: oldRenAddress,
@@ -158,9 +158,9 @@ contract('MultiCollateral (prod tests)', accounts => {
 
 		itCorrectlyManagesLoansWith({
 			type: 'CollateralShort',
-			collateralCurrency: 'sUSD',
+			collateralCurrency: 'dUSD',
 			amountToDeposit: toUnit('1000'),
-			borrowCurrency: 'sETH',
+			borrowCurrency: 'dETH',
 			amountToBorrow: toUnit('0.01'),
 			amountToRepay: toUnit('0.005'),
 			oldAddress: oldShortAddress,
@@ -275,7 +275,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 								);
 							}
 						} else if (type === 'CollateralShort') {
-							await SynthsUSD.approve(CollateralContract.address, toUnit('10000'), { from: user1 });
+							await SynthdUSD.approve(CollateralContract.address, toUnit('10000'), { from: user1 });
 
 							tx = await CollateralContract.open(
 								amountToDeposit,
@@ -471,7 +471,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 						if (network === 'mainnet') {
 							const oldEthContract = await artifacts.require('CollateralEth').at(oldEthAddress);
 							const period = await oldEthContract.interactionDelay();
-							// First loan was opened by SNX test account.
+							// First loan was opened by DEM test account.
 							const id = 1;
 							const repayAmount = toUnit(100);
 							let tx = await oldEthContract.repay(loansAccount, id, repayAmount, {

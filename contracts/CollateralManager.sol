@@ -27,7 +27,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
 
     /* ========== CONSTANTS ========== */
 
-    bytes32 private constant sUSD = "sUSD";
+    bytes32 private constant dUSD = "dUSD";
 
     uint private constant SECONDS_IN_A_YEAR = 31556926 * 1e18;
 
@@ -57,7 +57,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
     // The factor that will scale the utilisation ratio.
     uint public utilisationMultiplier = 1e18;
 
-    // The maximum amount of debt in sUSD that can be issued by non snx collateral.
+    // The maximum amount of debt in dUSD that can be issued by non snx collateral.
     uint public maxDebt;
 
     // The base interest rate applied to all borrows.
@@ -171,7 +171,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
         if (synths.length > 0) {
             for (uint i = 0; i < synths.length; i++) {
                 bytes32 synth = _synth(synths[i]).currencyKey();
-                if (synth == sUSD) {
+                if (synth == dUSD) {
                     susdValue = susdValue.add(state.long(synth));
                 } else {
                     (uint rate, bool invalid) = _exchangeRates().rateAndInvalid(synth);
@@ -203,7 +203,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
 
     function getBorrowRate() external view returns (uint borrowRate, bool anyRateIsInvalid) {
         // get the snx backed debt.
-        uint snxDebt = _issuer().totalIssuedSynths(sUSD, true);
+        uint snxDebt = _issuer().totalIssuedSynths(dUSD, true);
 
         // now get the non snx backed debt.
         (uint nonSnxDebt, bool ratesInvalid) = totalLong();
@@ -276,7 +276,7 @@ contract CollateralManager is ICollateralManager, Owned, Pausable, MixinResolver
     }
 
     function exceedsDebtLimit(uint amount, bytes32 currency) external view returns (bool canIssue, bool anyRateIsInvalid) {
-        uint usdAmount = _exchangeRates().effectiveValue(currency, amount, sUSD);
+        uint usdAmount = _exchangeRates().effectiveValue(currency, amount, dUSD);
 
         (uint longValue, bool longInvalid) = totalLong();
         (uint shortValue, bool shortInvalid) = totalShort();

@@ -68,7 +68,7 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
 
     bytes32 internal constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 internal constant CONTRACT_EXRATES = "ExchangeRates";
-    bytes32 internal constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 internal constant CONTRACT_SYNTHSUSD = "SynthdUSD";
     bytes32 internal constant CONTRACT_FEEPOOL = "FeePool";
 
     /* ========== CONSTRUCTOR ========== */
@@ -483,14 +483,14 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
         // Now remit any collected fees.
         // Since the constructor enforces that creatorFee + poolFee < 1, the balance
         // in the contract will be sufficient to cover these transfers.
-        IERC20 sUSD = _sUSD();
+        IERC20 dUSD = _sUSD();
 
         uint _deposited = deposited;
         uint poolFees = _deposited.multiplyDecimalRound(fees.poolFee);
         uint creatorFees = _deposited.multiplyDecimalRound(fees.creatorFee);
         _decrementDeposited(creatorFees.add(poolFees));
-        sUSD.transfer(_feePool().FEE_ADDRESS(), poolFees);
-        sUSD.transfer(creator, creatorFees);
+        dUSD.transfer(_feePool().FEE_ADDRESS(), poolFees);
+        dUSD.transfer(creator, creatorFees);
 
         emit MarketResolved(_result(), price, updatedAt, deposited, poolFees, creatorFees);
     }
@@ -571,10 +571,10 @@ contract BinaryOptionMarket is Owned, MixinResolver, IBinaryOptionMarket {
 
         // Transfer the balance rather than the deposit value in case there are any synths left over
         // from direct transfers.
-        IERC20 sUSD = _sUSD();
-        uint balance = sUSD.balanceOf(address(this));
+        IERC20 dUSD = _sUSD();
+        uint balance = dUSD.balanceOf(address(this));
         if (balance != 0) {
-            sUSD.transfer(beneficiary, balance);
+            dUSD.transfer(beneficiary, balance);
         }
 
         // Destroy the option tokens before destroying the market itself.

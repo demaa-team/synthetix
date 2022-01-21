@@ -15,21 +15,21 @@ contract('SynthUtil', accounts => {
 	const [, ownerAccount, oracle, account2] = accounts;
 	let synthUtil, sUSDContract, synthetix, exchangeRates, timestamp, systemSettings, debtCache;
 
-	const [sUSD, sBTC, iBTC] = ['sUSD', 'sBTC', 'iBTC'].map(toBytes32);
-	const synthKeys = [sUSD, sBTC, iBTC];
+	const [dUSD, dBTC, iBTC] = ['dUSD', 'dBTC', 'iBTC'].map(toBytes32);
+	const synthKeys = [dUSD, dBTC, iBTC];
 	const synthPrices = [toUnit('1'), toUnit('5000'), toUnit('5000')];
 
 	before(async () => {
 		({
 			SynthUtil: synthUtil,
-			SynthsUSD: sUSDContract,
+			SynthdUSD: sUSDContract,
 			Synthetix: synthetix,
 			ExchangeRates: exchangeRates,
 			SystemSettings: systemSettings,
 			DebtCache: debtCache,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sBTC', 'iBTC'],
+			synths: ['dUSD', 'dBTC', 'iBTC'],
 			contracts: [
 				'SynthUtil',
 				'Synthetix',
@@ -51,7 +51,7 @@ contract('SynthUtil', accounts => {
 
 	beforeEach(async () => {
 		timestamp = await currentTime();
-		await exchangeRates.updateRates([sBTC, iBTC], ['5000', '5000'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([dBTC, iBTC], ['5000', '5000'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 		await debtCache.takeDebtSnapshot();
@@ -75,18 +75,18 @@ contract('SynthUtil', accounts => {
 				from: ownerAccount,
 			});
 			await sUSDContract.transfer(account2, sUSDAmount, { from: ownerAccount });
-			await synthetix.exchange(sUSD, amountToExchange, sBTC, { from: account2 });
+			await synthetix.exchange(dUSD, amountToExchange, dBTC, { from: account2 });
 		});
 		describe('totalSynthsInKey', () => {
 			it('should return the total balance of synths into the specified currency key', async () => {
-				assert.bnEqual(await synthUtil.totalSynthsInKey(account2, sUSD), sUSDAmount);
+				assert.bnEqual(await synthUtil.totalSynthsInKey(account2, dUSD), sUSDAmount);
 			});
 		});
 		describe('synthsBalances', () => {
-			it('should return the balance and its value in sUSD for every synth in the wallet', async () => {
-				const effectiveValue = await exchangeRates.effectiveValue(sUSD, amountToExchange, sBTC);
+			it('should return the balance and its value in dUSD for every synth in the wallet', async () => {
+				const effectiveValue = await exchangeRates.effectiveValue(dUSD, amountToExchange, dBTC);
 				assert.deepEqual(await synthUtil.synthsBalances(account2), [
-					[sUSD, sBTC, iBTC],
+					[dUSD, dBTC, iBTC],
 					[toUnit('50'), effectiveValue, 0],
 					[toUnit('50'), toUnit('50'), 0],
 				]);
@@ -124,7 +124,7 @@ contract('SynthUtil', accounts => {
 		});
 		describe('synthsTotalSupplies', () => {
 			it('should return the correct synth total supplies', async () => {
-				const effectiveValue = await exchangeRates.effectiveValue(sUSD, amountToExchange, sBTC);
+				const effectiveValue = await exchangeRates.effectiveValue(dUSD, amountToExchange, dBTC);
 				assert.deepEqual(await synthUtil.synthsTotalSupplies(), [
 					synthKeys,
 					[sUSDMinted.sub(amountToExchange), effectiveValue, 0],

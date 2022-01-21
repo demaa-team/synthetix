@@ -128,10 +128,10 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			FeePool: feePool,
-			SynthsUSD: sUSDSynth,
+			SynthdUSD: sUSDSynth,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD'],
+			synths: ['dUSD'],
 			contracts: [
 				'BinaryOptionMarketManager',
 				'AddressResolver',
@@ -1198,7 +1198,7 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			assert.bnEqual(tx.logs[1].args.shortPrice, currentPrices[1]);
 		});
 
-		it('Bids withdraw the proper amount of sUSD', async () => {
+		it('Bids withdraw the proper amount of dUSD', async () => {
 			await market.bid(Side.Long, initialLongBid, { from: newBidder });
 			await market.bid(Side.Short, initialShortBid, { from: newBidder });
 			assert.bnEqual(
@@ -1207,7 +1207,7 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			);
 		});
 
-		it('Bids fail on insufficient sUSD balance.', async () => {
+		it('Bids fail on insufficient dUSD balance.', async () => {
 			await assert.revert(
 				market.bid(Side.Long, initialLongBid, { from: pauper }),
 				'SafeMath: subtraction overflow'
@@ -1218,7 +1218,7 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			);
 		});
 
-		it('Bids fail on insufficient sUSD allowance.', async () => {
+		it('Bids fail on insufficient dUSD allowance.', async () => {
 			await sUSDSynth.approve(market.address, toBN(0), { from: newBidder });
 			await assert.revert(
 				market.bid(Side.Long, initialLongBid, { from: newBidder }),
@@ -1446,7 +1446,7 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			assert.bnEqual(tx.logs[1].args.shortPrice, currentPrices[1]);
 		});
 
-		it('Refunds remit the proper amount of sUSD', async () => {
+		it('Refunds remit the proper amount of dUSD', async () => {
 			await market.bid(Side.Long, initialLongBid, { from: newBidder });
 			await market.bid(Side.Short, initialShortBid, { from: newBidder });
 			await market.refund(Side.Long, initialLongBid, { from: newBidder });
@@ -1747,7 +1747,7 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			assert.bnClose(logs[3].args.value, shortOptions, 1);
 		});
 
-		it('Can claim when the implicit losing claimable option balance is greater than the deposited sUSD', async () => {
+		it('Can claim when the implicit losing claimable option balance is greater than the deposited dUSD', async () => {
 			await sUSDSynth.issue(pauper, sUSDQty);
 			await sUSDSynth.approve(manager.address, sUSDQty, { from: pauper });
 			await sUSDSynth.approve(market.address, sUSDQty, { from: pauper });
@@ -2371,7 +2371,7 @@ contract('BinaryOptionMarket @gas-skip', accounts => {
 			});
 		});
 
-		it('Expired market remits any unclaimed options and extra sUSD to the caller.', async () => {
+		it('Expired market remits any unclaimed options and extra dUSD to the caller.', async () => {
 			await sUSDSynth.transfer(market.address, toUnit(1));
 			const creatorBalance = await sUSDSynth.balanceOf(initialBidder);
 

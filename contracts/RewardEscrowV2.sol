@@ -12,11 +12,10 @@ import "./interfaces/ISystemStatus.sol";
 contract RewardEscrowV2 is BaseRewardEscrowV2 {
     mapping(address => uint256) public totalBalancePendingMigration;
 
-    uint public migrateEntriesThresholdAmount = SafeDecimalMath.unit() * 1000; // Default 1000 SNX
+    uint public migrateEntriesThresholdAmount = SafeDecimalMath.unit() * 1000; // Default 1000 DEM
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
-    bytes32 private constant CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM = "SynthetixBridgeToOptimism";
     bytes32 private constant CONTRACT_REWARD_ESCROW = "RewardEscrow";
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
 
@@ -28,15 +27,14 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
 
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
         bytes32[] memory existingAddresses = BaseRewardEscrowV2.resolverAddressesRequired();
-        bytes32[] memory newAddresses = new bytes32[](3);
-        newAddresses[0] = CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM;
-        newAddresses[1] = CONTRACT_REWARD_ESCROW;
-        newAddresses[2] = CONTRACT_SYSTEMSTATUS;
+        bytes32[] memory newAddresses = new bytes32[](2);
+        newAddresses[0] = CONTRACT_REWARD_ESCROW;
+        newAddresses[1] = CONTRACT_SYSTEMSTATUS;
         return combineArrays(existingAddresses, newAddresses);
     }
 
     function synthetixBridgeToOptimism() internal view returns (address) {
-        return requireAndGetAddress(CONTRACT_SYNTHETIX_BRIDGE_OPTIMISM);
+        return address(0);
     }
 
     function oldRewardEscrow() internal view returns (IRewardEscrow) {
@@ -67,7 +65,7 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
         require(totalBalancePendingMigration[addressToMigrate] > 0, "No escrow migration pending");
         require(totalEscrowedAccountBalance[addressToMigrate] > 0, "Address escrow balance is 0");
 
-        /* Add a vestable entry for addresses with totalBalancePendingMigration <= migrateEntriesThreshold amount of SNX */
+        /* Add a vestable entry for addresses with totalBalancePendingMigration <= migrateEntriesThreshold amount of DEM */
         if (totalBalancePendingMigration[addressToMigrate] <= migrateEntriesThresholdAmount) {
             _importVestingEntry(
                 addressToMigrate,
@@ -212,7 +210,7 @@ contract RewardEscrowV2 is BaseRewardEscrowV2 {
 
         /**
          *  update account total escrow balances for migration
-         *  transfer the escrowed SNX being migrated to the L2 deposit contract
+         *  transfer the escrowed DEM being migrated to the L2 deposit contract
          */
         if (escrowedAccountBalance > 0) {
             _reduceAccountEscrowBalances(account, escrowedAccountBalance);

@@ -74,7 +74,7 @@
 	"EtherCollateral": {
 		"deploy": true
 	},
-	"EtherCollateralsUSD": {
+	"EtherCollateraldUSD": {
 		"deploy": true
 	},
 	"FeePool": {
@@ -134,7 +134,7 @@
 	"DappMaintenance": {
 		"deploy": true
 	},
-	"SynthsUSD": {
+	"SynthdUSD": {
 		"deploy": true
 	},
 	"SynthsEUR": {
@@ -242,7 +242,7 @@
 	"ProxysETH": {
 		"deploy": true
 	},
-	"SynthsETH": {
+	"SynthdETH": {
 		"deploy": true
 	},
 	"TokenStatesBNB": {

@@ -50,12 +50,12 @@ const createRandomKeysAndRates = quantity => {
 
 contract('Exchange Rates', async accounts => {
 	const [deployerAccount, owner, oracle, accountOne, accountTwo] = accounts;
-	const [SNX, sJPY, sXTZ, sBNB, sUSD, sEUR, sAUD, fastGasPrice] = [
-		'SNX',
+	const [DEM, sJPY, dXTZ, sBNB, dUSD, sEUR, sAUD, fastGasPrice] = [
+		'DEM',
 		'sJPY',
-		'sXTZ',
+		'dXTZ',
 		'sBNB',
-		'sUSD',
+		'dUSD',
 		'sEUR',
 		'sAUD',
 		'fastGasPrice',
@@ -121,22 +121,22 @@ contract('Exchange Rates', async accounts => {
 			assert.equal(await instance.owner(), owner);
 			assert.equal(await instance.oracle(), oracle);
 
-			assert.etherEqual(await instance.rateForCurrency(sUSD), '1');
-			assert.etherEqual(await instance.rateForCurrency(SNX), '0.2');
+			assert.etherEqual(await instance.rateForCurrency(dUSD), '1');
+			assert.etherEqual(await instance.rateForCurrency(DEM), '0.2');
 
 			// Ensure that when the rate isn't found, 0 is returned as the exchange rate.
 			assert.etherEqual(await instance.rateForCurrency(toBytes32('OTHER')), '0');
 
-			const lastUpdatedTimeSUSD = await instance.lastRateUpdateTimes.call(sUSD);
+			const lastUpdatedTimeSUSD = await instance.lastRateUpdateTimes.call(dUSD);
 			assert.isAtLeast(lastUpdatedTimeSUSD.toNumber(), initialTime);
 
 			const lastUpdatedTimeOTHER = await instance.lastRateUpdateTimes.call(toBytes32('OTHER'));
 			assert.equal(lastUpdatedTimeOTHER.toNumber(), 0);
 
-			const lastUpdatedTimeSNX = await instance.lastRateUpdateTimes.call(SNX);
+			const lastUpdatedTimeSNX = await instance.lastRateUpdateTimes.call(DEM);
 			assert.isAtLeast(lastUpdatedTimeSNX.toNumber(), initialTime);
 
-			const sUSDRate = await instance.rateForCurrency(sUSD);
+			const sUSDRate = await instance.rateForCurrency(dUSD);
 			assert.bnEqual(sUSDRate, toUnit('1'));
 		});
 
@@ -172,7 +172,7 @@ contract('Exchange Rates', async accounts => {
 						owner,
 						oracle,
 						resolver.address,
-						[SNX, toBytes32('GOLD')],
+						[DEM, toBytes32('GOLD')],
 						[web3.utils.toWei('0.2', 'ether')],
 					],
 				}),
@@ -215,7 +215,7 @@ contract('Exchange Rates', async accounts => {
 				setupContract({
 					accounts,
 					contract: 'ExchangeRates',
-					args: [owner, oracle, resolver.address, [SNX], ['0']],
+					args: [owner, oracle, resolver.address, [DEM], ['0']],
 				}),
 				'Zero is not a valid rate, please call deleteRate instead'
 			);
@@ -324,14 +324,14 @@ contract('Exchange Rates', async accounts => {
 			assert.equal(lastUpdatedTimeLGHI.toNumber(), updatedTime);
 		});
 
-		it('should revert when trying to set sUSD price', async () => {
+		it('should revert when trying to set dUSD price', async () => {
 			await fastForward(1);
 
 			await assert.revert(
-				instance.updateRates([sUSD], [web3.utils.toWei('1.0', 'ether')], timeSent, {
+				instance.updateRates([dUSD], [web3.utils.toWei('1.0', 'ether')], timeSent, {
 					from: oracle,
 				}),
-				"Rate of sUSD cannot be updated, it's always UNIT"
+				"Rate of dUSD cannot be updated, it's always UNIT"
 			);
 		});
 
@@ -371,7 +371,7 @@ contract('Exchange Rates', async accounts => {
 		it('should revert when currency keys length != new rates length on update', async () => {
 			await assert.revert(
 				instance.updateRates(
-					[sUSD, SNX, toBytes32('GOLD')],
+					[dUSD, DEM, toBytes32('GOLD')],
 					[web3.utils.toWei('1', 'ether'), web3.utils.toWei('0.2', 'ether')],
 					await currentTime(),
 					{ from: oracle }
@@ -619,9 +619,9 @@ contract('Exchange Rates', async accounts => {
 	});
 
 	describe('rateIsStale()', () => {
-		it('should never allow sUSD to go stale via rateIsStale', async () => {
+		it('should never allow dUSD to go stale via rateIsStale', async () => {
 			await fastForward(await instance.rateStalePeriod());
-			const rateIsStale = await instance.rateIsStale(sUSD);
+			const rateIsStale = await instance.rateIsStale(dUSD);
 			assert.equal(rateIsStale, false);
 		});
 
@@ -686,8 +686,8 @@ contract('Exchange Rates', async accounts => {
 
 	describe('anyRateIsInvalid()', () => {
 		describe('stale scenarios', () => {
-			it('should never allow sUSD to go stale via anyRateIsInvalid', async () => {
-				const keysArray = [SNX, toBytes32('GOLD')];
+			it('should never allow dUSD to go stale via anyRateIsInvalid', async () => {
+				const keysArray = [DEM, toBytes32('GOLD')];
 
 				await instance.updateRates(
 					keysArray,
@@ -700,14 +700,14 @@ contract('Exchange Rates', async accounts => {
 				await fastForward(await instance.rateStalePeriod());
 
 				await instance.updateRates(
-					[SNX, toBytes32('GOLD')],
+					[DEM, toBytes32('GOLD')],
 					[web3.utils.toWei('0.1', 'ether'), web3.utils.toWei('0.2', 'ether')],
 					await currentTime(),
 					{ from: oracle }
 				);
 
-				// Even though sUSD hasn't been updated since the stale rate period has expired,
-				// we expect that sUSD remains "not stale"
+				// Even though dUSD hasn't been updated since the stale rate period has expired,
+				// we expect that dUSD remains "not stale"
 				assert.equal(await instance.anyRateIsInvalid(keysArray), false);
 			});
 
@@ -886,7 +886,7 @@ contract('Exchange Rates', async accounts => {
 						await aggregatorJPY.setLatestAnswer(convertToDecimals(100, 8), timestamp);
 					});
 					it('then rateIsInvalid for both is false', async () => {
-						const rateIsInvalid = await instance.anyRateIsInvalid([toBytes32('sGOLD'), sJPY, sUSD]);
+						const rateIsInvalid = await instance.anyRateIsInvalid([toBytes32('sGOLD'), sJPY, dUSD]);
 						assert.equal(rateIsInvalid, false);
 					});
 
@@ -904,7 +904,7 @@ contract('Exchange Rates', async accounts => {
 							const rateIsInvalid = await instance.anyRateIsInvalid([
 								toBytes32('sGOLD'),
 								sJPY,
-								sUSD,
+								dUSD,
 							]);
 							assert.equal(rateIsInvalid, false);
 						});
@@ -917,7 +917,7 @@ contract('Exchange Rates', async accounts => {
 								const rateIsInvalid = await instance.anyRateIsInvalid([
 									toBytes32('sGOLD'),
 									sJPY,
-									sUSD,
+									dUSD,
 								]);
 								assert.equal(rateIsInvalid, true);
 							});
@@ -993,21 +993,21 @@ contract('Exchange Rates', async accounts => {
 			beforeEach(async () => {
 				// Send a price update to guarantee we're not depending on values from outside this test.
 				await instance.updateRates(
-					['sAUD', 'sEUR', 'SNX'].map(toBytes32),
+					['sAUD', 'sEUR', 'DEM'].map(toBytes32),
 					['0.5', '1.25', '0.1'].map(toUnit),
 					timestamp,
 					{ from: oracle }
 				);
 			});
 			it('should correctly calculate an exchange rate in effectiveValue()', async () => {
-				// 1 sUSD should be worth 2 sAUD.
-				assert.bnEqual(await instance.effectiveValue(sUSD, toUnit('1'), sAUD), toUnit('2'));
+				// 1 dUSD should be worth 2 sAUD.
+				assert.bnEqual(await instance.effectiveValue(dUSD, toUnit('1'), sAUD), toUnit('2'));
 
-				// 10 SNX should be worth 1 sUSD.
-				assert.bnEqual(await instance.effectiveValue(SNX, toUnit('10'), sUSD), toUnit('1'));
+				// 10 DEM should be worth 1 dUSD.
+				assert.bnEqual(await instance.effectiveValue(DEM, toUnit('10'), dUSD), toUnit('1'));
 
-				// 2 sEUR should be worth 2.50 sUSD
-				assert.bnEqual(await instance.effectiveValue(sEUR, toUnit('2'), sUSD), toUnit('2.5'));
+				// 2 sEUR should be worth 2.50 dUSD
+				assert.bnEqual(await instance.effectiveValue(sEUR, toUnit('2'), dUSD), toUnit('2.5'));
 			});
 
 			it('should calculate updated rates in effectiveValue()', async () => {
@@ -1016,29 +1016,29 @@ contract('Exchange Rates', async accounts => {
 
 				timestamp = await currentTime();
 
-				// Update all rates except sUSD.
-				await instance.updateRates([sEUR, SNX], ['1.25', '0.1'].map(toUnit), timestamp, {
+				// Update all rates except dUSD.
+				await instance.updateRates([sEUR, DEM], ['1.25', '0.1'].map(toUnit), timestamp, {
 					from: oracle,
 				});
 
 				const amountOfSynthetixs = toUnit('10');
 				const amountOfEur = toUnit('0.8');
 
-				// Should now be able to convert from SNX to sEUR since they are both not stale.
-				assert.bnEqual(await instance.effectiveValue(SNX, amountOfSynthetixs, sEUR), amountOfEur);
+				// Should now be able to convert from DEM to sEUR since they are both not stale.
+				assert.bnEqual(await instance.effectiveValue(DEM, amountOfSynthetixs, sEUR), amountOfEur);
 			});
 
 			it('should return 0 when relying on a non-existant dest exchange rate in effectiveValue()', async () => {
-				assert.equal(await instance.effectiveValue(SNX, toUnit('10'), toBytes32('XYZ')), '0');
+				assert.equal(await instance.effectiveValue(DEM, toUnit('10'), toBytes32('XYZ')), '0');
 			});
 
 			it('should return 0 when relying on a non-existing src rate in effectiveValue', async () => {
-				assert.equal(await instance.effectiveValue(toBytes32('XYZ'), toUnit('10'), SNX), '0');
+				assert.equal(await instance.effectiveValue(toBytes32('XYZ'), toUnit('10'), DEM), '0');
 			});
 
-			it('effectiveValueAndRates() should return rates as well with sUSD on one side', async () => {
+			it('effectiveValueAndRates() should return rates as well with dUSD on one side', async () => {
 				const { value, sourceRate, destinationRate } = await instance.effectiveValueAndRates(
-					sUSD,
+					dUSD,
 					toUnit('1'),
 					sAUD
 				);
@@ -1048,11 +1048,11 @@ contract('Exchange Rates', async accounts => {
 				assert.bnEqual(destinationRate, toUnit('0.5'));
 			});
 
-			it('effectiveValueAndRates() should return rates as well with sUSD on the other side', async () => {
+			it('effectiveValueAndRates() should return rates as well with dUSD on the other side', async () => {
 				const { value, sourceRate, destinationRate } = await instance.effectiveValueAndRates(
 					sAUD,
 					toUnit('1'),
-					sUSD
+					dUSD
 				);
 
 				assert.bnEqual(value, toUnit('0.5'));
@@ -1981,42 +1981,42 @@ contract('Exchange Rates', async accounts => {
 				describe('when the owner tries to remove an invalid aggregator', () => {
 					it('then it reverts', async () => {
 						await assert.revert(
-							instance.removeAggregator(sXTZ, { from: owner }),
+							instance.removeAggregator(dXTZ, { from: owner }),
 							'No aggregator exists for key'
 						);
 					});
 				});
 
-				describe('when the owner adds sXTZ as an aggregator', () => {
+				describe('when the owner adds dXTZ as an aggregator', () => {
 					beforeEach(async () => {
-						txn = await instance.addAggregator(sXTZ, aggregatorXTZ.address, {
+						txn = await instance.addAggregator(dXTZ, aggregatorXTZ.address, {
 							from: owner,
 						});
 					});
 
 					it('then the list of aggregatorKeys lists it also', async () => {
 						assert.equal('sJPY', bytesToString(await instance.aggregatorKeys(0)));
-						assert.equal('sXTZ', bytesToString(await instance.aggregatorKeys(1)));
+						assert.equal('dXTZ', bytesToString(await instance.aggregatorKeys(1)));
 						await assert.invalidOpcode(instance.aggregatorKeys(2));
 					});
 
 					it('and the AggregatorAdded event is emitted', () => {
 						assert.eventEqual(txn, 'AggregatorAdded', {
-							currencyKey: sXTZ,
+							currencyKey: dXTZ,
 							aggregator: aggregatorXTZ.address,
 						});
 					});
 
-					it('and currenciesUsingAggregator for that aggregator returns sXTZ', async () => {
+					it('and currenciesUsingAggregator for that aggregator returns dXTZ', async () => {
 						assert.deepEqual(await instance.currenciesUsingAggregator(aggregatorXTZ.address), [
-							sXTZ,
+							dXTZ,
 						]);
 					});
 
 					describe('when the ratesAndInvalidForCurrencies is queried', () => {
 						let response;
 						beforeEach(async () => {
-							response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ]);
+							response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ]);
 						});
 
 						it('then the rates are invalid', () => {
@@ -2034,7 +2034,7 @@ contract('Exchange Rates', async accounts => {
 						let responseXTZ;
 						beforeEach(async () => {
 							responseJPY = await instance.rateAndInvalid(sJPY);
-							responseXTZ = await instance.rateAndInvalid(sXTZ);
+							responseXTZ = await instance.rateAndInvalid(dXTZ);
 						});
 
 						it('then the rates are invalid', () => {
@@ -2059,7 +2059,7 @@ contract('Exchange Rates', async accounts => {
 						describe('when the ratesAndInvalidForCurrencies is queried', () => {
 							let response;
 							beforeEach(async () => {
-								response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ]);
+								response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ]);
 							});
 
 							it('then the rates are still invalid', () => {
@@ -2077,7 +2077,7 @@ contract('Exchange Rates', async accounts => {
 							let responseXTZ;
 							beforeEach(async () => {
 								responseJPY = await instance.rateAndInvalid(sJPY);
-								responseXTZ = await instance.rateAndInvalid(sXTZ);
+								responseXTZ = await instance.rateAndInvalid(dXTZ);
 							});
 
 							it('then one rate is invalid', () => {
@@ -2091,7 +2091,7 @@ contract('Exchange Rates', async accounts => {
 							});
 						});
 
-						describe('when the aggregator price is set for sXTZ', () => {
+						describe('when the aggregator price is set for dXTZ', () => {
 							const newRateXTZ = 222;
 							let timestampXTZ;
 							beforeEach(async () => {
@@ -2103,7 +2103,7 @@ contract('Exchange Rates', async accounts => {
 							describe('when the ratesAndInvalidForCurrencies is queried', () => {
 								let response;
 								beforeEach(async () => {
-									response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ, sUSD]);
+									response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ, dUSD]);
 								});
 
 								it('then the rates are no longer invalid', () => {
@@ -2123,8 +2123,8 @@ contract('Exchange Rates', async accounts => {
 								let responseUSD;
 								beforeEach(async () => {
 									responseJPY = await instance.rateAndInvalid(sJPY);
-									responseXTZ = await instance.rateAndInvalid(sXTZ);
-									responseUSD = await instance.rateAndInvalid(sUSD);
+									responseXTZ = await instance.rateAndInvalid(dXTZ);
+									responseUSD = await instance.rateAndInvalid(dUSD);
 								});
 
 								it('then both rates are valid', () => {
@@ -2147,7 +2147,7 @@ contract('Exchange Rates', async accounts => {
 								describe('when the ratesAndInvalidForCurrencies is queried', () => {
 									let response;
 									beforeEach(async () => {
-										response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ, sUSD]);
+										response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ, dUSD]);
 									});
 
 									it('then the rates are invalid', () => {
@@ -2179,15 +2179,15 @@ contract('Exchange Rates', async accounts => {
 									});
 								});
 								describe('when a user queries the aggregatorKeys', () => {
-									it('then only sXTZ is left', async () => {
-										assert.equal('sXTZ', bytesToString(await instance.aggregatorKeys(0)));
+									it('then only dXTZ is left', async () => {
+										assert.equal('dXTZ', bytesToString(await instance.aggregatorKeys(0)));
 										await assert.invalidOpcode(instance.aggregatorKeys(1));
 									});
 								});
 								describe('when the ratesAndInvalidForCurrencies is queried', () => {
 									let response;
 									beforeEach(async () => {
-										response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ, sUSD]);
+										response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ, dUSD]);
 									});
 
 									it('then the rates are invalid again', () => {
@@ -2205,8 +2205,8 @@ contract('Exchange Rates', async accounts => {
 									let responseUSD;
 									beforeEach(async () => {
 										responseJPY = await instance.rateAndInvalid(sJPY);
-										responseXTZ = await instance.rateAndInvalid(sXTZ);
-										responseUSD = await instance.rateAndInvalid(sUSD);
+										responseXTZ = await instance.rateAndInvalid(dXTZ);
+										responseUSD = await instance.rateAndInvalid(dUSD);
 									});
 
 									it('then the rates are invalid again', () => {
@@ -2298,7 +2298,7 @@ contract('Exchange Rates', async accounts => {
 				describe('when the ratesAndInvalidForCurrencies is queried with sJPY', () => {
 					let response;
 					beforeEach(async () => {
-						response = await instance.ratesAndInvalidForCurrencies([sJPY, sUSD]);
+						response = await instance.ratesAndInvalidForCurrencies([sJPY, dUSD]);
 					});
 
 					it('then the rates are NOT invalid', () => {
@@ -2417,7 +2417,7 @@ contract('Exchange Rates', async accounts => {
 						describe('when the ratesAndInvalidForCurrencies is queried with sJPY', () => {
 							let response;
 							beforeEach(async () => {
-								response = await instance.ratesAndInvalidForCurrencies([sJPY, sUSD]);
+								response = await instance.ratesAndInvalidForCurrencies([sJPY, dUSD]);
 							});
 
 							it('then the rates are NOT invalid', () => {
@@ -2472,7 +2472,7 @@ contract('Exchange Rates', async accounts => {
 							describe('when the ratesAndInvalidForCurrencies is queried with sJPY', () => {
 								let response;
 								beforeEach(async () => {
-									response = await instance.ratesAndInvalidForCurrencies([sJPY, sUSD]);
+									response = await instance.ratesAndInvalidForCurrencies([sJPY, dUSD]);
 								});
 
 								it('then the rates are NOT invalid', () => {
@@ -2502,33 +2502,33 @@ contract('Exchange Rates', async accounts => {
 					});
 				});
 
-				describe('when sXTZ added as an aggregator', () => {
+				describe('when dXTZ added as an aggregator', () => {
 					beforeEach(async () => {
-						await instance.addAggregator(sXTZ, aggregatorXTZ.address, {
+						await instance.addAggregator(dXTZ, aggregatorXTZ.address, {
 							from: owner,
 						});
 					});
-					describe('when the ratesAndInvalidForCurrencies is queried with sJPY and sXTZ', () => {
+					describe('when the ratesAndInvalidForCurrencies is queried with sJPY and dXTZ', () => {
 						let response;
 						beforeEach(async () => {
-							response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ, sUSD]);
+							response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ, dUSD]);
 						});
 
 						it('then the rates are invalid', () => {
 							assert.equal(response[1], true);
 						});
 
-						it('with sXTZ having no value', () => {
+						it('with dXTZ having no value', () => {
 							assert.bnEqual(response[0][0], web3.utils.toWei(oldPrice.toString()));
 							assert.bnEqual(response[0][1], '0');
 						});
 					});
-					describe('when the rateAndInvalid is queried with sJPY and sXTZ', () => {
+					describe('when the rateAndInvalid is queried with sJPY and dXTZ', () => {
 						let responseJPY;
 						let responseXTZ;
 						beforeEach(async () => {
 							responseJPY = await instance.rateAndInvalid(sJPY);
-							responseXTZ = await instance.rateAndInvalid(sXTZ);
+							responseXTZ = await instance.rateAndInvalid(dXTZ);
 						});
 
 						it('then the XTZ rate is invalid', () => {
@@ -2536,13 +2536,13 @@ contract('Exchange Rates', async accounts => {
 							assert.equal(responseXTZ[1], true);
 						});
 
-						it('with sXTZ having no value', () => {
+						it('with dXTZ having no value', () => {
 							assert.bnEqual(responseJPY[0], web3.utils.toWei(oldPrice.toString()));
 							assert.bnEqual(responseXTZ[0], '0');
 						});
 					});
 
-					describe('when the aggregator price is set to set for sXTZ', () => {
+					describe('when the aggregator price is set to set for dXTZ', () => {
 						const newRate = 99;
 						let timestamp;
 						beforeEach(async () => {
@@ -2551,10 +2551,10 @@ contract('Exchange Rates', async accounts => {
 							await aggregatorXTZ.setLatestAnswer(convertToDecimals(newRate, 8), timestamp);
 						});
 
-						describe('when the ratesAndInvalidForCurrencies is queried with sJPY and sXTZ', () => {
+						describe('when the ratesAndInvalidForCurrencies is queried with sJPY and dXTZ', () => {
 							let response;
 							beforeEach(async () => {
-								response = await instance.ratesAndInvalidForCurrencies([sJPY, sXTZ, sUSD]);
+								response = await instance.ratesAndInvalidForCurrencies([sJPY, dXTZ, dUSD]);
 							});
 
 							it('then the rates are NOT invalid', () => {
@@ -2570,9 +2570,9 @@ contract('Exchange Rates', async accounts => {
 				});
 			});
 			describe('warning flags and invalid rates', () => {
-				it('sUSD is never flagged / invalid.', async () => {
-					assert.isFalse(await instance.rateIsFlagged(sUSD));
-					assert.isFalse(await instance.rateIsInvalid(sUSD));
+				it('dUSD is never flagged / invalid.', async () => {
+					assert.isFalse(await instance.rateIsFlagged(dUSD));
+					assert.isFalse(await instance.rateIsInvalid(dUSD));
 				});
 				describe('when JPY is aggregated', () => {
 					beforeEach(async () => {
@@ -2630,17 +2630,17 @@ contract('Exchange Rates', async accounts => {
 	});
 
 	describe('roundIds for historical rates', () => {
-		it('getCurrentRoundId() by default is 0 for all synths except sUSD which is 1', async () => {
+		it('getCurrentRoundId() by default is 0 for all synths except dUSD which is 1', async () => {
 			// Note: rates that were set in the truffle migration will be at 1, so we need to check
 			// other synths
 			assert.equal(await instance.getCurrentRoundId(sJPY), '0');
 			assert.equal(await instance.getCurrentRoundId(sBNB), '0');
-			assert.equal(await instance.getCurrentRoundId(sUSD), '1');
+			assert.equal(await instance.getCurrentRoundId(dUSD), '1');
 		});
 
-		it('ratesAndUpdatedTimeForCurrencyLastNRounds() shows first entry for sUSD', async () => {
-			const timeOfsUSDRateSetOnInit = await instance.lastRateUpdateTimes(sUSD);
-			assert.deepEqual(await instance.ratesAndUpdatedTimeForCurrencyLastNRounds(sUSD, '3'), [
+		it('ratesAndUpdatedTimeForCurrencyLastNRounds() shows first entry for dUSD', async () => {
+			const timeOfsUSDRateSetOnInit = await instance.lastRateUpdateTimes(dUSD);
+			assert.deepEqual(await instance.ratesAndUpdatedTimeForCurrencyLastNRounds(dUSD, '3'), [
 				[toUnit('1'), '0', '0'],
 				[timeOfsUSDRateSetOnInit, '0', '0'],
 			]);

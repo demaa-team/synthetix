@@ -8,7 +8,7 @@
 
 Synthetix is a crypto-backed synthetic asset platform.
 
-It is a multi-token system, powered by SNX, the Synthetix Network Token. SNX holders can stake SNX to issue Synths, on-chain synthetic assets via the [Mintr dApp](https://mintr.synthetix.io) The network currently supports an ever growing [list of synthetic assets](https://www.synthetix.io/tokens/). Please see the [list of the deployed contracts on MAIN and TESTNETS](https://developer.synthetix.io/api/docs/deployed-contracts.html)
+It is a multi-token system, powered by DEM, the Synthetix Network Token. DEM holders can stake DEM to issue Synths, on-chain synthetic assets via the [Mintr dApp](https://mintr.synthetix.io) The network currently supports an ever growing [list of synthetic assets](https://www.synthetix.io/tokens/). Please see the [list of the deployed contracts on MAIN and TESTNETS](https://developer.synthetix.io/api/docs/deployed-contracts.html)
 Synths can be traded using [synthetix.exchange](https://synthetix.exchange)
 
 Synthetix uses a proxy system so that upgrades will not be disruptive to the functionality of the contract. This smooths user interaction, since new functionality will become available without any interruption in their experience. It is also transparent to the community at large, since each upgrade is accompanied by events announcing those upgrades. New releases are managed via the [Synthetix Improvement Proposal (SIP)](https://sips.synthetix.io/all-sip) system similar to the [EF's EIPs](https://eips.ethereum.org/all)
@@ -67,7 +67,7 @@ This repo may be installed via `npm install` to support both node.js scripting a
 
 All interfaces are available via the path [`synthetix/contracts/interfaces`](./contracts/interfaces/).
 
-:zap: In your code, the key is to use `IAddressResolver` which can be tied to the immutable proxy: [`ReadProxyAddressResolver`](https://contracts.synthetix.io/ReadProxyAddressResolver) ([introduced in SIP-57](https://sips.synthetix.io/sips/sip-57)). You can then fetch `Synthetix`, `FeePool`, `Depot`, et al via `IAddressResolver.getAddress(bytes32 name)` where `name` is the `bytes32` version of the contract name (case-sensitive). Or you can fetch any synth using `IAddressResolver.getSynth(bytes32 synth)` where `synth` is the `bytes32` name of the synth (e.g. `iETH`, `sUSD`, `sDEFI`).
+:zap: In your code, the key is to use `IAddressResolver` which can be tied to the immutable proxy: [`ReadProxyAddressResolver`](https://contracts.synthetix.io/ReadProxyAddressResolver) ([introduced in SIP-57](https://sips.synthetix.io/sips/sip-57)). You can then fetch `Synthetix`, `FeePool`, `Depot`, et al via `IAddressResolver.getAddress(bytes32 name)` where `name` is the `bytes32` version of the contract name (case-sensitive). Or you can fetch any synth using `IAddressResolver.getSynth(bytes32 synth)` where `synth` is the `bytes32` name of the synth (e.g. `iETH`, `dUSD`, `sDEFI`).
 
 E.g.
 
@@ -119,7 +119,7 @@ contract MyContract {
 - `getStakingRewards({ network })` Return the list of staking reward contracts available.
 - `getSynths({ network })` Return the list of synths for a network
 - `getTarget({ network })` Return the information about a contract's `address` and `source` file. The contract names are those specified in [docs.synthetix.io/addresses](https://docs.synthetix.io/addresses)
-- `getTokens({ network })` Return the list of tokens (synths and `SNX`) used in the system, along with their addresses.
+- `getTokens({ network })` Return the list of tokens (synths and `DEM`) used in the system, along with their addresses.
 - `getUsers({ network })` Return the list of user accounts within the Synthetix protocol (e.g. `owner`, `fee`, etc)
 - `getVersions({ network, byContract = false })` Return the list of deployed versions to the network keyed by tagged version. If `byContract` is `true`, it keys by `contract` name.
 - `networks` Return the list of supported networks
@@ -203,7 +203,7 @@ snx.getSuspensionReasons();
 
 // retrieve the array of synths used
 snx.getSynths({ network: 'rinkeby' }).map(({ name }) => name);
-// ['sUSD', 'sEUR', ...]
+// ['dUSD', 'sEUR', ...]
 
 // retrieve an object detailing the contract deployed to the given network.
 snx.getTarget({ network: 'rinkeby', contract: 'ProxySynthetix' });
@@ -253,7 +253,7 @@ snx.getVersions();
 snx.networks;
 // [ 'local', 'kovan', 'rinkeby', 'ropsten', 'mainnet' ]
 
-snx.toBytes32('sUSD');
+snx.toBytes32('dUSD');
 // '0x7355534400000000000000000000000000000000000000000000000000000000'
 ```
 
@@ -279,7 +279,7 @@ $ npx synthetix ast contracts/Synth.sol
   ]
 }
 
-$ npx synthetix bytes32 sUSD
+$ npx synthetix bytes32 dUSD
 0x7355534400000000000000000000000000000000000000000000000000000000
 
 $ npx synthetix networks
@@ -295,7 +295,7 @@ $ npx synthetix suspension-reason --code 2
 Market Closure
 
 $ npx synthetix synths --network rinkeby --key name
-["sUSD", "sEUR", ... ]
+["dUSD", "sEUR", ... ]
 
 $ npx synthetix target --network rinkeby --contract ProxySynthetix
 {

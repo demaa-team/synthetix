@@ -138,7 +138,7 @@ class Deployer {
 		return params;
 	}
 
-	async _deploy({ name, source, args = [], deps = [], force = false, dryRun = this.dryRun }) {
+	async _deploy({ name, source, args = [], deps = [], force = true, dryRun = this.dryRun }) {
 		if (!this.config[name] && !force) {
 			console.log(yellow(`Skipping ${name} as it is NOT in contract flags file for deployment.`));
 			return;
@@ -365,7 +365,7 @@ class Deployer {
 		source = name,
 		args = [],
 		deps = [],
-		force = false,
+		force = true,
 		dryRun = this.dryRun,
 	}) {
 		const forbiddenAddress = (this.deployedContracts['AddressResolver'] || { options: {} }).options
@@ -407,7 +407,7 @@ class Deployer {
 
 	getExistingContract({ contract }) {
 		let address;
-		if (this.network === 'local') {
+		if (this.network === 'local' || this.network === 'mumbai') {
 			address = this.deployment.targets[contract].address;
 		} else {
 			const contractVersion = getVersions({

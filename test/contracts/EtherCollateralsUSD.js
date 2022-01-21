@@ -23,7 +23,7 @@ const {
 	constants: { ZERO_ADDRESS },
 } = require('../..');
 
-contract('EtherCollateralsUSD', async accounts => {
+contract('EtherCollateraldUSD', async accounts => {
 	const MINUTE = 60;
 	const DAY = 86400;
 	const WEEK = 604800;
@@ -125,13 +125,13 @@ contract('EtherCollateralsUSD', async accounts => {
 
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
-		// Mock SNX, sUSD
+		// Mock DEM, dUSD
 		[{ token: sUSDSynth }] = await Promise.all([
-			mockToken({ accounts, synth: 'sUSD', name: 'Synthetic USD', symbol: 'sUSD' }),
+			mockToken({ accounts, synth: 'dUSD', name: 'Synthetic USD', symbol: 'dUSD' }),
 		]);
 
 		({
-			EtherCollateralsUSD: etherCollateral,
+			EtherCollateraldUSD: etherCollateral,
 			FeePool: feePool,
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
@@ -139,14 +139,14 @@ contract('EtherCollateralsUSD', async accounts => {
 		} = await setupAllContracts({
 			accounts,
 			mocks: {
-				SynthsUSD: sUSDSynth,
+				SynthdUSD: sUSDSynth,
 			},
 			contracts: [
 				'FeePool',
 				'AddressResolver',
 				'ExchangeRates',
 				'SystemStatus',
-				'EtherCollateralsUSD',
+				'EtherCollateraldUSD',
 				'CollateralManager',
 				'Synthetix',
 			],
@@ -217,7 +217,7 @@ contract('EtherCollateralsUSD', async accounts => {
 		});
 
 		it('should access its dependencies via the address resolver', async () => {
-			assert.equal(await addressResolver.getAddress(toBytes32('SynthsUSD')), sUSDSynth.address);
+			assert.equal(await addressResolver.getAddress(toBytes32('SynthdUSD')), sUSDSynth.address);
 			assert.equal(await addressResolver.getAddress(toBytes32('FeePool')), feePool.address);
 			assert.equal(
 				await addressResolver.getAddress(toBytes32('ExchangeRates')),
@@ -426,23 +426,23 @@ contract('EtherCollateralsUSD', async accounts => {
 	});
 
 	describe('when accessing the external views then', async () => {
-		it('loanAmountFromCollateral should return 66.66 sUSD when opening a loan with 1 ETH @ 100', async () => {
+		it('loanAmountFromCollateral should return 66.66 dUSD when opening a loan with 1 ETH @ 100', async () => {
 			const loanAmountFromCollateral = await etherCollateral.loanAmountFromCollateral(toUnit('1'));
 			assert.bnEqual(loanAmountFromCollateral, toUnit('66.666666666666666700'));
 		});
-		it('loanAmountFromCollateral should return 10MM sUSD when opening a loan with 150000 ETH @ 100', async () => {
+		it('loanAmountFromCollateral should return 10MM dUSD when opening a loan with 150000 ETH @ 100', async () => {
 			const loanAmountFromCollateral = await etherCollateral.loanAmountFromCollateral(
 				toUnit('150000')
 			);
 			assert.bnEqual(loanAmountFromCollateral, toUnit('10000000.000000000005'));
 		});
-		it('collateralAmountForLoan should return 1 ETH @ 100 required to open 66.66 sUSD', async () => {
+		it('collateralAmountForLoan should return 1 ETH @ 100 required to open 66.66 dUSD', async () => {
 			const ethForLoanAmounnt = await etherCollateral.collateralAmountForLoan(
 				toUnit('66.666666666666666700')
 			);
 			assert.bnClose(ethForLoanAmounnt, toUnit('1'), 1);
 		});
-		it('collateralAmountForLoan should return 150000 ETH @ 100 required to open 10M sUSD', async () => {
+		it('collateralAmountForLoan should return 150000 ETH @ 100 required to open 10M dUSD', async () => {
 			const ethForLoanAmounnt = await etherCollateral.collateralAmountForLoan(toUnit('10000000'));
 			assert.bnEqual(ethForLoanAmounnt, toUnit('150000'));
 		});
@@ -505,16 +505,16 @@ contract('EtherCollateralsUSD', async accounts => {
 				);
 			});
 			it('attempting to issue more than the cap (issueLimit)', async () => {
-				// limit sUSD supply cap to 100
+				// limit dUSD supply cap to 100
 				await etherCollateral.setIssueLimit(toUnit('100'), { from: owner });
-				// 3 ETH will issue up to 200 sUSD
+				// 3 ETH will issue up to 200 dUSD
 				await assert.revert(
 					etherCollateral.openLoan(toUnit(150), { value: toUnit('3'), from: address1 }),
 					'Loan Amount exceeds the supply cap.'
 				);
 			});
 			it('attempting to issue more near the supply cap', async () => {
-				// reduce the supply cap to 100 sUSD
+				// reduce the supply cap to 100 dUSD
 				await etherCollateral.setIssueLimit(toUnit('200'), { from: owner });
 
 				// Issue to under the limit
@@ -530,7 +530,7 @@ contract('EtherCollateralsUSD', async accounts => {
 				await etherCollateral.openLoan(toUnit(100), { value: toUnit('2'), from: address2 });
 			});
 			it('attempting to loan more than the max borrowing power (150%)', async () => {
-				// 3 ETH will issue up to 200 sUSD
+				// 3 ETH will issue up to 200 dUSD
 				const loanAmount = toUnit(201);
 				await assert.revert(
 					etherCollateral.openLoan(loanAmount, { value: toUnit('3'), from: address1 }),
@@ -759,7 +759,7 @@ contract('EtherCollateralsUSD', async accounts => {
 							// Go into the future
 							await fastForwardAndUpdateRates(MONTH * 2);
 							interestRatePerSec = await etherCollateral.interestPerSecond();
-							// Get the total sUSD Issued
+							// Get the total dUSD Issued
 							totalIssuedSynthsBefore = await etherCollateral.totalIssuedSynths();
 							// Close loan
 							closeLoanTransaction = await etherCollateral.closeLoan(loan1ID, { from: address1 });
@@ -813,7 +813,7 @@ contract('EtherCollateralsUSD', async accounts => {
 							let closeLoanTransaction;
 
 							beforeEach(async () => {
-								// Get the total sUSD Issued
+								// Get the total dUSD Issued
 								totalIssuedSynthsBefore = await etherCollateral.totalIssuedSynths();
 
 								closeLoanTransaction = await etherCollateral.closeLoan(loan2ID, { from: address1 });
@@ -1045,7 +1045,7 @@ contract('EtherCollateralsUSD', async accounts => {
 			const tenETH = toUnit('10');
 
 			beforeEach(async () => {
-				// Issue sUSD to pay back interest
+				// Issue dUSD to pay back interest
 				await issuesUSDToAccount(toUnit('1000'), address1);
 				await issuesUSDToAccount(toUnit('1000'), address2);
 				await issuesUSDToAccount(toUnit('1000'), address3);
@@ -1096,7 +1096,7 @@ contract('EtherCollateralsUSD', async accounts => {
 						value: tenETH,
 						from: first10Accounts[i],
 					});
-					// Issue sUSD to pay back interest
+					// Issue dUSD to pay back interest
 					await issuesUSDToAccount(toUnit('1000'), first10Accounts[i]);
 				}
 				assert.bnEqual(await etherCollateral.totalOpenLoanCount(), web3.utils.toBN(10));
@@ -1199,8 +1199,8 @@ contract('EtherCollateralsUSD', async accounts => {
 					await assert.revert(etherCollateral.closeLoan(9999, { from: address1 }));
 				});
 
-				it('when sUSD balance is less than loanAmount, then it reverts', async () => {
-					// "Burn" some of accounts sUSD by sending to the owner
+				it('when dUSD balance is less than loanAmount, then it reverts', async () => {
+					// "Burn" some of accounts dUSD by sending to the owner
 					await sUSDSynth.transfer(owner, toUnit('4'), { from: address1 });
 					await assert.revert(etherCollateral.closeLoan(loanID, { from: address1 }));
 				});
@@ -1248,7 +1248,7 @@ contract('EtherCollateralsUSD', async accounts => {
 								'Blocked as ETH rate is invalid'
 							);
 						});
-						describe('when sUSD gets a rate', () => {
+						describe('when dUSD gets a rate', () => {
 							beforeEach(async () => {
 								await updateRatesWithDefaults();
 							});
@@ -1340,11 +1340,11 @@ contract('EtherCollateralsUSD', async accounts => {
 					assert.ok(synthLoan.timeClosed > synthLoan.timeCreated, true);
 				});
 
-				it('reduce sUSD totalSupply', async () => {
+				it('reduce dUSD totalSupply', async () => {
 					assert.bnEqual(await etherCollateral.totalIssuedSynths(), ZERO_BN);
 				});
 
-				xit('increase the FeePool sUSD balance', async () => {
+				xit('increase the FeePool dUSD balance', async () => {
 					// TODO Need to include the minting fee
 					const feePoolBalance = await sUSDSynth.balanceOf(FEE_ADDRESS);
 					console.log('expectedFeesUSD', expectedFeesUSD.toString());
@@ -1396,7 +1396,7 @@ contract('EtherCollateralsUSD', async accounts => {
 			});
 			loanID = await getLoanID(openLoanTransaction);
 
-			// Chad opens sUSD loan to liquidate Alice
+			// Chad opens dUSD loan to liquidate Alice
 			const chadLoanAmount = await etherCollateral.loanAmountFromCollateral(toUnit('20'));
 			await etherCollateral.openLoan(chadLoanAmount, { value: toUnit('20'), from: chad });
 
@@ -1404,7 +1404,7 @@ contract('EtherCollateralsUSD', async accounts => {
 			await fastForwardAndUpdateRates(DAY * 94);
 			await etherCollateral.setLoanLiquidationOpen(true, { from: owner });
 		});
-		it('when bob attempts to liquidate alices loan and he has no sUSD then it reverts', async () => {
+		it('when bob attempts to liquidate alices loan and he has no dUSD then it reverts', async () => {
 			await assert.revert(
 				etherCollateral.liquidateUnclosedLoan(alice, loanID, { from: bob }),
 				'You do not have the required Synth balance to close this loan.'
@@ -1416,7 +1416,7 @@ contract('EtherCollateralsUSD', async accounts => {
 				'Loans are now being liquidated'
 			);
 		});
-		xit('then alice has a sUSD loan balance', async () => {
+		xit('then alice has a dUSD loan balance', async () => {
 			assert.bnEqual(await sUSDSynth.balanceOf(alice), expectedsUSDLoanAmount);
 		});
 
@@ -1424,11 +1424,11 @@ contract('EtherCollateralsUSD', async accounts => {
 			beforeEach(async () => {
 				await etherCollateral.setLoanLiquidationOpen(true, { from: owner });
 			});
-			describe('when chad has some sUSD and alice has her sUSD still', () => {
+			describe('when chad has some dUSD and alice has her dUSD still', () => {
 				beforeEach(async () => {
-					// Chad has already opened a sUSD loan
+					// Chad has already opened a dUSD loan
 				});
-				describe('and chad liquidates alices sUSD loan for her ETH', async () => {
+				describe('and chad liquidates alices dUSD loan for her ETH', async () => {
 					let liquidateLoanTransaction;
 					beforeEach(async () => {
 						liquidateLoanTransaction = await etherCollateral.liquidateUnclosedLoan(alice, loanID, {
@@ -1439,10 +1439,10 @@ contract('EtherCollateralsUSD', async accounts => {
 						const synthLoan = await etherCollateral.getLoan(alice, loanID);
 						assert.ok(synthLoan.timeClosed > synthLoan.timeCreated, true);
 					});
-					it('then alice sUSD balance is still intact', async () => {
+					it('then alice dUSD balance is still intact', async () => {
 						assert.ok(await sUSDSynth.balanceOf(alice), expectedsUSDLoanAmount);
 					});
-					it('then chads sUSD balance is 0 as it was burnt to repay the loan', async () => {
+					it('then chads dUSD balance is 0 as it was burnt to repay the loan', async () => {
 						assert.ok(await sUSDSynth.balanceOf(chad), 0);
 					});
 					it('then emits a LoanLiquidated event', async () => {
@@ -1470,12 +1470,12 @@ contract('EtherCollateralsUSD', async accounts => {
 				});
 			});
 
-			describe('when bob has some sUSD', () => {
+			describe('when bob has some dUSD', () => {
 				beforeEach(async () => {
 					await sUSDSynth.transfer(bob, await sUSDSynth.balanceOf(alice), { from: alice });
 					await issuesUSDToAccount(toUnit('100'), bob);
 				});
-				describe('and bob liquidates alices sUSD loan for her ETH', async () => {
+				describe('and bob liquidates alices dUSD loan for her ETH', async () => {
 					let liquidateLoanTransaction;
 					beforeEach(async () => {
 						liquidateLoanTransaction = await etherCollateral.liquidateUnclosedLoan(alice, loanID, {
@@ -1486,10 +1486,10 @@ contract('EtherCollateralsUSD', async accounts => {
 						const synthLoan = await etherCollateral.getLoan(alice, loanID);
 						assert.ok(synthLoan.timeClosed > synthLoan.timeCreated, true);
 					});
-					it('then alice sUSD balance is 0 (because she transfered it to bob)', async () => {
+					it('then alice dUSD balance is 0 (because she transfered it to bob)', async () => {
 						assert.ok(await sUSDSynth.balanceOf(alice), 0);
 					});
-					it('then bobs sUSD balance is 0 as it was burnt to repay the loan', async () => {
+					it('then bobs dUSD balance is 0 as it was burnt to repay the loan', async () => {
 						assert.ok(await sUSDSynth.balanceOf(bob), 0);
 					});
 					it('then emits a LoanLiquidated event', async () => {
@@ -1557,7 +1557,7 @@ contract('EtherCollateralsUSD', async accounts => {
 								'Blocked as ETH rate is invalid'
 							);
 						});
-						describe('when sUSD gets a rate', () => {
+						describe('when dUSD gets a rate', () => {
 							beforeEach(async () => {
 								await updateRatesWithDefaults();
 							});
@@ -1718,11 +1718,11 @@ contract('EtherCollateralsUSD', async accounts => {
 			loanID = await getLoanID(openLoanTransaction);
 		});
 
-		it('should revert if the sender does not have enough sUSD to repay the amount requested', async () => {
+		it('should revert if the sender does not have enough dUSD to repay the amount requested', async () => {
 			sUSDSynth.transfer(bob, await sUSDSynth.balanceOf(alice), { from: alice });
 			await assert.revert(
 				etherCollateral.repayLoan(alice, loanID, openLoanAmount, { from: alice }),
-				'Not enough sUSD balance'
+				'Not enough dUSD balance'
 			);
 		});
 

@@ -15,7 +15,7 @@ import "./interfaces/IExchanger.sol";
 import "./interfaces/IExchangeRates.sol";
 import "./interfaces/ISystemStatus.sol";
 import "./interfaces/IEtherCollateral.sol";
-import "./interfaces/IEtherCollateralsUSD.sol";
+import "./interfaces/IEtherCollateraldUSD.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ICollateralManager.sol";
 import "./interfaces/IEtherWrapper.sol";
@@ -32,8 +32,8 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
 
     /* ========== ENCODED NAMES ========== */
 
-    bytes32 internal constant sUSD = "sUSD";
-    bytes32 internal constant sETH = "sETH";
+    bytes32 internal constant dUSD = "dUSD";
+    bytes32 internal constant dETH = "dETH";
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
@@ -42,7 +42,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
     bytes32 private constant CONTRACT_ETHERCOLLATERAL = "EtherCollateral";
-    bytes32 private constant CONTRACT_ETHERCOLLATERAL_SUSD = "EtherCollateralsUSD";
+    bytes32 private constant CONTRACT_ETHERCOLLATERAL_SUSD = "EtherCollateraldUSD";
     bytes32 private constant CONTRACT_COLLATERALMANAGER = "CollateralManager";
     bytes32 private constant CONTRACT_ETHER_WRAPPER = "EtherWrapper";
 
@@ -84,8 +84,8 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
         return IEtherCollateral(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL));
     }
 
-    function etherCollateralsUSD() internal view returns (IEtherCollateralsUSD) {
-        return IEtherCollateralsUSD(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL_SUSD));
+    function etherCollateralsUSD() internal view returns (IEtherCollateraldUSD) {
+        return IEtherCollateraldUSD(requireAndGetAddress(CONTRACT_ETHERCOLLATERAL_SUSD));
     }
 
     function collateralManager() internal view returns (ICollateralManager) {
@@ -186,7 +186,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
         return _cachedSynthDebts(currencyKeys);
     }
 
-    // Returns the total sUSD debt backed by non-SNX collateral.
+    // Returns the total dUSD debt backed by non-DEM collateral.
     function totalNonSnxBackedDebt() external view returns (uint excludedDebt, bool isInvalid) {
         return _totalNonSnxBackedDebt();
     }
@@ -194,14 +194,14 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
     function _totalNonSnxBackedDebt() internal view returns (uint excludedDebt, bool isInvalid) {
         // Calculate excluded debt.
         // 1. Ether Collateral.
-        excludedDebt = excludedDebt.add(etherCollateralsUSD().totalIssuedSynths()); // Ether-backed sUSD
+        excludedDebt = excludedDebt.add(etherCollateralsUSD().totalIssuedSynths()); // Ether-backed dUSD
 
         uint etherCollateralTotalIssuedSynths = etherCollateral().totalIssuedSynths();
-        // We check the supply > 0 as on L2, we may not yet have up-to-date rates for sETH.
+        // We check the supply > 0 as on L2, we may not yet have up-to-date rates for dETH.
         if (etherCollateralTotalIssuedSynths > 0) {
-            (uint sETHRate, bool sETHRateIsInvalid) = exchangeRates().rateAndInvalid(sETH);
+            (uint sETHRate, bool sETHRateIsInvalid) = exchangeRates().rateAndInvalid(dETH);
             isInvalid = isInvalid || sETHRateIsInvalid;
-            excludedDebt = excludedDebt.add(etherCollateralTotalIssuedSynths.multiplyDecimalRound(sETHRate)); // Ether-backed sETH
+            excludedDebt = excludedDebt.add(etherCollateralTotalIssuedSynths.multiplyDecimalRound(sETHRate)); // Ether-backed dETH
         }
 
         // 2. MultiCollateral long debt + short debt.
@@ -211,7 +211,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
         excludedDebt = excludedDebt.add(longValue).add(shortValue);
 
         // 3. EtherWrapper.
-        // Subtract sETH and sUSD issued by EtherWrapper.
+        // Subtract dETH and dUSD issued by EtherWrapper.
         excludedDebt = excludedDebt.add(etherWrapper().totalIssuedSynths());
 
         return (excludedDebt, isInvalid);

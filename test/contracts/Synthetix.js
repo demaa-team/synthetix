@@ -50,7 +50,7 @@ contract('Synthetix', async accounts => {
 			SupplySchedule: supplySchedule,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sETH', 'sEUR', 'sAUD'],
+			synths: ['dUSD', 'dETH', 'sEUR', 'sAUD'],
 			contracts: [
 				'Synthetix',
 				'SynthetixState',
@@ -368,7 +368,7 @@ contract('Synthetix', async accounts => {
 	describe('migration - transfer escrow balances to reward escrow v2', () => {
 		let rewardEscrowBalanceBefore;
 		beforeEach(async () => {
-			// transfer SNX to rewardEscrow
+			// transfer DEM to rewardEscrow
 			await synthetix.transfer(rewardEscrow.address, toUnit('100'), { from: owner });
 
 			rewardEscrowBalanceBefore = await synthetix.balanceOf(rewardEscrow.address);

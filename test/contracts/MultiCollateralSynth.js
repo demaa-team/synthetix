@@ -21,7 +21,7 @@ const { setupAllContracts, setupContract } = require('./setup');
 contract('MultiCollateralSynth @gas-skip', accounts => {
 	const [deployerAccount, owner, oracle, , account1] = accounts;
 
-	const sETH = toBytes32('sETH');
+	const dETH = toBytes32('dETH');
 
 	let issuer,
 		resolver,
@@ -65,13 +65,13 @@ contract('MultiCollateralSynth @gas-skip', accounts => {
 	const updateRatesWithDefaults = async () => {
 		const timestamp = await currentTime();
 
-		await exchangeRates.updateRates([sETH], ['100'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([dETH], ['100'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 
-		const sBTC = toBytes32('sBTC');
+		const dBTC = toBytes32('dBTC');
 
-		await exchangeRates.updateRates([sBTC], ['10000'].map(toUnit), timestamp, {
+		await exchangeRates.updateRates([dBTC], ['10000'].map(toUnit), timestamp, {
 			from: oracle,
 		});
 	};
@@ -84,11 +84,11 @@ contract('MultiCollateralSynth @gas-skip', accounts => {
 	});
 
 	before(async () => {
-		synths = ['sUSD'];
+		synths = ['dUSD'];
 		({
 			AddressResolver: resolver,
 			Issuer: issuer,
-			SynthsUSD: sUSDSynth,
+			SynthdUSD: sUSDSynth,
 			ExchangeRates: exchangeRates,
 			DebtCache: debtCache,
 			FeePool: feePool,
@@ -130,7 +130,7 @@ contract('MultiCollateralSynth @gas-skip', accounts => {
 			owner: owner,
 			manager: manager.address,
 			resolver: resolver.address,
-			collatKey: toBytes32('sETH'),
+			collatKey: toBytes32('dETH'),
 			minColat: toUnit(1.5),
 			minSize: toUnit(1),
 		});

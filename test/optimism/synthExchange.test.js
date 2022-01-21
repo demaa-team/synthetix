@@ -8,7 +8,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 	describe('[SYNTEXCHANGE] when exchanging synths on L2', () => {
 		const amountToDeposit = ethers.utils.parseEther('100');
 
-		const [sUSD, sETH] = ['sUSD', 'sETH'].map(toBytes32);
+		const [dUSD, dETH] = ['dUSD', 'dETH'].map(toBytes32);
 		let user1L1, user1L2;
 
 		let SynthetixL1, SynthetixBridgeToOptimismL1;
@@ -55,7 +55,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 			describe('When checking ExhangeState', () => {
 				it(`${numEntries} exchange state entries should have been created`, async () => {
 					assert.bnEqual(
-						await ExchangeStateL2.getLengthOfEntries(user1L2.address, sETH),
+						await ExchangeStateL2.getLengthOfEntries(user1L2.address, dETH),
 						numEntries
 					);
 				});
@@ -77,7 +77,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 		};
 
 		const itCanExchangeUsdToEthL2 = async sUSDtoBeExchanged => {
-			describe('when the user exchanges sUSD for sETH', () => {
+			describe('when the user exchanges dUSD for dETH', () => {
 				let received;
 				let normalizedFee;
 				let feeAddresssUSDBalanceL2;
@@ -97,25 +97,25 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 					SynthetixL2 = SynthetixL2.connect(user1L2);
 				});
 
-				before('sUSD to sETH exchange', async () => {
-					const tx = await SynthetixL2.exchange(sUSD, sUSDtoBeExchanged, sETH);
+				before('dUSD to dETH exchange', async () => {
+					const tx = await SynthetixL2.exchange(dUSD, sUSDtoBeExchanged, dETH);
 					await tx.wait();
 					const { amountReceived, fee } = await ExchangerL2.getAmountsForExchange(
 						sUSDtoBeExchanged,
-						sUSD,
-						sETH
+						dUSD,
+						dETH
 					);
 					received = amountReceived;
-					normalizedFee = await ExchangeRatesL2.effectiveValue(sETH, fee, sUSD);
+					normalizedFee = await ExchangeRatesL2.effectiveValue(dETH, fee, dUSD);
 				});
 
-				it('shows that the user L2 sUSD balance has decreased', async () => {
+				it('shows that the user L2 dUSD balance has decreased', async () => {
 					assert.bnEqual(
 						await SynthsUSDL2.balanceOf(user1L2.address),
 						user1sUSDBalanceL2.sub(sUSDtoBeExchanged)
 					);
 				});
-				it('shows that the user L2 sETH balance has increased', async () => {
+				it('shows that the user L2 dETH balance has increased', async () => {
 					assert.bnEqual(
 						await SynthsETHL2.balanceOf(user1L2.address),
 						user1sETHBalanceL2.add(received)
@@ -139,7 +139,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 		};
 
 		const itCanIssueL2 = async sUSDIssued => {
-			describe('When the user issues sUSD', () => {
+			describe('When the user issues dUSD', () => {
 				let user1sETHBalanceL2, user1sUSDBalanceL2;
 				before('connect user to contract', async () => {
 					SynthetixL2 = SynthetixL2.connect(user1L2);
@@ -149,12 +149,12 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 					user1sUSDBalanceL2 = await SynthsUSDL2.balanceOf(user1L2.address);
 				});
 
-				before(`issue ${sUSDIssued} sUSD`, async () => {
+				before(`issue ${sUSDIssued} dUSD`, async () => {
 					const tx = await SynthetixL2.issueSynths(sUSDIssued);
 					await tx.wait();
 				});
 
-				it('shows that the user L2 sUSD balance has increased (while all other synth balacnes remain the same)', async () => {
+				it('shows that the user L2 dUSD balance has increased (while all other synth balacnes remain the same)', async () => {
 					assert.bnEqual(
 						await SynthsUSDL2.balanceOf(user1L2.address),
 						user1sUSDBalanceL2.add(sUSDIssued)
@@ -232,24 +232,24 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 		});
 
 		// --------------------------
-		// Get SNX
+		// Get DEM
 		// --------------------------
 
-		describe('when a user has the expected amount of SNX in L1', () => {
+		describe('when a user has the expected amount of DEM in L1', () => {
 			let user1BalanceL1;
 
 			before('record current values', async () => {
 				user1BalanceL1 = await SynthetixL1.balanceOf(user1L1.address);
 			});
 
-			before('ensure that the user has the expected SNX balance', async () => {
+			before('ensure that the user has the expected DEM balance', async () => {
 				SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
 
 				const tx = await SynthetixL1.transfer(user1L1.address, amountToDeposit);
 				await tx.wait();
 			});
 
-			it('shows the user has SNX', async () => {
+			it('shows the user has DEM', async () => {
 				assert.bnEqual(
 					await SynthetixL1.balanceOf(user1L1.address),
 					user1BalanceL1.add(amountToDeposit)
@@ -260,7 +260,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 			// Approval
 			// --------------------------
 
-			describe('when a user approves the L1 bridge to transfer its SNX', () => {
+			describe('when a user approves the L1 bridge to transfer its DEM', () => {
 				before('approve', async () => {
 					SynthetixL1 = SynthetixL1.connect(user1L1);
 
@@ -278,7 +278,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 				describe('when a user doesnt have debt in L1', () => {
 					let depositReceipt;
 
-					describe('when a user deposits SNX in the L1 bridge', () => {
+					describe('when a user deposits DEM in the L1 bridge', () => {
 						let user1BalanceL2;
 						let depositFinalizedEvent;
 
@@ -337,7 +337,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 								assert.equal(depositFinalizedEvent.args._to, user1L1.address);
 							});
 
-							it('shows that the users L2 SNX balance increased', async () => {
+							it('shows that the users L2 DEM balance increased', async () => {
 								assert.bnEqual(
 									await SynthetixL2.balanceOf(user1L1.address),
 									user1BalanceL2.add(amountToDeposit)
@@ -352,7 +352,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 								// since the waiting period is 0 is should skip creating exchange entries (SIP-118)
 								itHasExchangeEntriesL2('0');
 								// since the waiting period is 0 it settle should not fail, it just has no effect
-								itCanSettleL2(true, sETH);
+								itCanSettleL2(true, dETH);
 							});
 
 							describe('When the waiting period is greater than 0', () => {
@@ -363,13 +363,13 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 								// since the waiting period is gt 0 it should have created exchange entries
 								itHasExchangeEntriesL2('1');
 								// since the waiting period is gt 0 it should not be possible to settle immediately, hence the fist argument is false
-								itCanSettleL2(false, sETH);
+								itCanSettleL2(false, dETH);
 								// since settlement fails, the entries should persist
 								itHasExchangeEntriesL2('1');
 								// set the waiting period to 0
 								itCanSetTheWaitingPeriodL2('0');
 								// it should be able to settle now!
-								itCanSettleL2(true, sETH);
+								itCanSettleL2(true, dETH);
 							});
 						});
 					});

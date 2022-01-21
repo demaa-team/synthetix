@@ -39,16 +39,16 @@ const {
 } = require('../../../.');
 
 const DEFAULTS = {
-	gasPrice: '1',
-	methodCallGasLimit: 250e3, // 250k
-	contractDeploymentGasLimit: 6.9e6, // TODO split out into separate limits for different contracts, Proxys, Synths, Synthetix
+	gasPrice: '8',
+	methodCallGasLimit: 8e5, // 250k
+	contractDeploymentGasLimit: 20e6, // TODO split out into separate limits for different contracts, Proxys, Synths, Synthetix
 	debtSnapshotMaxDeviation: 0.01, // a 1 percent deviation will trigger a snapshot
-	network: 'kovan',
+	network: 'mumbai',
 	buildPath: path.join(__dirname, '..', '..', '..', BUILD_FOLDER),
 };
 
 const deploy = async ({
-	addNewSynths,
+	addNewSynths = true,
 	gasPrice = DEFAULTS.gasPrice,
 	methodCallGasLimit = DEFAULTS.methodCallGasLimit,
 	contractDeploymentGasLimit = DEFAULTS.contractDeploymentGasLimit,
@@ -114,11 +114,12 @@ const deploy = async ({
 		});
 	}
 
+	/*
 	if (freshDeploy) {
 		deployment.targets = {};
 		deployment.sources = {};
 	}
-
+*/
 	if (!ignoreSafetyChecks) {
 		// Using Goerli without manageNonces?
 		if (network.toLowerCase() === 'goerli' && !useOvm && !manageNonces) {
@@ -990,6 +991,19 @@ const deploy = async ({
 		});
 	}
 
+	// deploy otc module
+	await deployer.deployContract({
+		name: 'OTCDao',
+		deps: ['AddressResolver'],
+		args: [account, addressOf(readProxyForResolver)],
+	});
+
+	await deployer.deployContract({
+		name: 'OTC',
+		deps: ['AddressResolver'],
+		args: [account, addressOf(readProxyForResolver)],
+	});
+
 	// ----------------
 	// Setting proxyERC20 Synthetix for synthetixEscrow
 	// ----------------
@@ -1040,8 +1054,8 @@ const deploy = async ({
 		// Legacy proxy will be around until May 30, 2020
 		// https://docs.synthetix.io/integrations/guide/#proxy-deprecation
 		// Until this time, on mainnet we will still deploy ProxyERC20sUSD and ensure that
-		// SynthsUSD.proxy is ProxyERC20sUSD, SynthsUSD.integrationProxy is ProxysUSD
-		const synthProxyIsLegacy = currencyKey === 'sUSD' && network === 'mainnet';
+		// SynthdUSD.proxy is ProxyERC20sUSD, SynthdUSD.integrationProxy is ProxysUSD
+		const synthProxyIsLegacy = currencyKey === 'dUSD' && network === 'mainnet';
 
 		const proxyForSynth = await deployer.deployContract({
 			name: `Proxy${currencyKey}`,
@@ -1050,9 +1064,9 @@ const deploy = async ({
 			force: addNewSynths,
 		});
 
-		// additionally deploy an ERC20 proxy for the synth if it's legacy (sUSD)
+		// additionally deploy an ERC20 proxy for the synth if it's legacy (dUSD)
 		let proxyERC20ForSynth;
-		if (currencyKey === 'sUSD') {
+		if (currencyKey === 'dUSD') {
 			proxyERC20ForSynth = await deployer.deployContract({
 				name: `ProxyERC20${currencyKey}`,
 				source: `ProxyERC20`,
@@ -1188,7 +1202,7 @@ const deploy = async ({
 
 	await deployer.deployContract({
 		name: 'Depot',
-		deps: ['ProxySynthetix', 'SynthsUSD', 'FeePool'],
+		deps: ['ProxySynthetix', 'SynthdUSD', 'FeePool'],
 		args: [account, account, addressOf(readProxyForResolver)],
 	});
 
@@ -1202,7 +1216,7 @@ const deploy = async ({
 			args: [],
 		});
 		await deployer.deployContract({
-			name: 'EtherCollateralsUSD',
+			name: 'EtherCollateraldUSD',
 			source: 'EmptyEtherCollateral',
 			args: [],
 		});
@@ -1211,11 +1225,6 @@ const deploy = async ({
 			source: 'EmptyCollateralManager',
 			args: [],
 		});
-		await deployer.deployContract({
-			name: 'SynthetixBridgeToBase',
-			deps: ['AddressResolver'],
-			args: [account, addressOf(readProxyForResolver)],
-		});
 	} else {
 		await deployer.deployContract({
 			name: 'EtherCollateral',
@@ -1223,36 +1232,10 @@ const deploy = async ({
 			args: [account, addressOf(readProxyForResolver)],
 		});
 		await deployer.deployContract({
-			name: 'EtherCollateralsUSD',
+			name: 'EtherCollateraldUSD',
 			deps: ['AddressResolver'],
 			args: [account, addressOf(readProxyForResolver)],
 		});
-		const SynthetixBridgeToOptimism = await deployer.deployContract({
-			name: 'SynthetixBridgeToOptimism',
-			deps: ['AddressResolver'],
-			args: [account, addressOf(readProxyForResolver)],
-		});
-		const SynthetixBridgeEscrow = await deployer.deployContract({
-			name: 'SynthetixBridgeEscrow',
-			deps: ['AddressResolver'],
-			args: [account],
-		});
-
-		const allowance = await proxyERC20Synthetix.methods
-			.allowance(addressOf(SynthetixBridgeEscrow), addressOf(SynthetixBridgeToOptimism))
-			.call();
-		if (allowance.toString() === '0') {
-			await runStep({
-				contract: `SynthetixBridgeEscrow`,
-				target: SynthetixBridgeEscrow,
-				write: 'approveBridge',
-				writeArg: [
-					addressOf(proxyERC20Synthetix),
-					addressOf(SynthetixBridgeToOptimism),
-					w3utils.toWei('100000000'),
-				],
-			});
-		}
 	}
 
 	let WETH_ADDRESS = (await getDeployParameter('WETH_ERC20_ADDRESSES'))[network];
@@ -1287,44 +1270,6 @@ const deploy = async ({
 		});
 	}
 
-	// ----------------
-	// Binary option market factory and manager setup
-	// ----------------
-
-	console.log(gray(`\n------ DEPLOY BINARY OPTIONS ------\n`));
-
-	await deployer.deployContract({
-		name: 'BinaryOptionMarketFactory',
-		args: [account, addressOf(readProxyForResolver)],
-		deps: ['AddressResolver'],
-	});
-
-	const day = 24 * 60 * 60;
-	const maxOraclePriceAge = 120 * 60; // Price updates are accepted from up to two hours before maturity to allow for delayed chainlink heartbeats.
-	const expiryDuration = 26 * 7 * day; // Six months to exercise options before the market is destructible.
-	const maxTimeToMaturity = 730 * day; // Markets may not be deployed more than two years in the future.
-	const creatorCapitalRequirement = w3utils.toWei('1000'); // 1000 sUSD is required to create a new market.
-	const creatorSkewLimit = w3utils.toWei('0.05'); // Market creators must leave 5% or more of their position on either side.
-	const poolFee = w3utils.toWei('0.008'); // 0.8% of the market's value goes to the pool in the end.
-	const creatorFee = w3utils.toWei('0.002'); // 0.2% of the market's value goes to the creator.
-	const refundFee = w3utils.toWei('0.05'); // 5% of a bid stays in the pot if it is refunded.
-	const binaryOptionMarketManager = await deployer.deployContract({
-		name: 'BinaryOptionMarketManager',
-		args: [
-			account,
-			addressOf(readProxyForResolver),
-			maxOraclePriceAge,
-			expiryDuration,
-			maxTimeToMaturity,
-			creatorCapitalRequirement,
-			creatorSkewLimit,
-			poolFee,
-			creatorFee,
-			refundFee,
-		],
-		deps: ['AddressResolver'],
-	});
-
 	console.log(gray(`\n------ DEPLOY DAPP UTILITIES ------\n`));
 
 	await deployer.deployContract({
@@ -1336,10 +1281,6 @@ const deploy = async ({
 	await deployer.deployContract({
 		name: 'DappMaintenance',
 		args: [account],
-	});
-
-	await deployer.deployContract({
-		name: 'BinaryOptionMarketData',
 	});
 
 	console.log(gray(`\n------ CONFIGURE STANDLONE FEEDS ------\n`));
@@ -1363,7 +1304,7 @@ const deploy = async ({
 	// ----------------
 	// Multi Collateral System
 	// ----------------
-	let collateralManager, collateralEth, collateralErc20, collateralShort;
+	let collateralManager, collateralEth, collateralShort;
 
 	const collateralManagerDefaults = await getDeployParameter('COLLATERAL_MANAGER');
 
@@ -1411,7 +1352,7 @@ const deploy = async ({
 				account,
 				addressOf(collateralManager),
 				addressOf(readProxyForResolver),
-				toBytes32('sETH'),
+				toBytes32('dETH'),
 				(await getDeployParameter('COLLATERAL_ETH'))['MIN_CRATIO'],
 				(await getDeployParameter('COLLATERAL_ETH'))['MIN_COLLATERAL'],
 			],
@@ -1428,54 +1369,6 @@ const deploy = async ({
 			});
 		}
 
-		const collateralStateErc20 = await deployer.deployContract({
-			name: 'CollateralStateErc20',
-			source: 'CollateralState',
-			args: [account, account],
-		});
-
-		let RENBTC_ADDRESS = (await getDeployParameter('RENBTC_ERC20_ADDRESSES'))[network];
-		if (!RENBTC_ADDRESS) {
-			if (network !== 'local') {
-				throw new Error('renBTC address is not known');
-			}
-
-			// On local, deploy a mock renBTC token to use as the underlying in CollateralErc20
-			const renBTC = await deployer.deployContract({
-				name: 'MockToken',
-				args: ['renBTC', 'renBTC', 8],
-			});
-
-			RENBTC_ADDRESS = renBTC.options.address;
-		}
-
-		collateralErc20 = await deployer.deployContract({
-			name: 'CollateralErc20',
-			source: 'CollateralErc20',
-			args: [
-				addressOf(collateralStateErc20),
-				account,
-				addressOf(collateralManager),
-				addressOf(readProxyForResolver),
-				toBytes32('sBTC'),
-				(await getDeployParameter('COLLATERAL_RENBTC'))['MIN_CRATIO'],
-				(await getDeployParameter('COLLATERAL_RENBTC'))['MIN_COLLATERAL'],
-				RENBTC_ADDRESS,
-				8,
-			],
-		});
-
-		if (collateralStateErc20 && collateralErc20) {
-			await runStep({
-				contract: 'CollateralStateErc20',
-				target: collateralStateErc20,
-				read: 'associatedContract',
-				expected: input => input === addressOf(collateralErc20),
-				write: 'setAssociatedContract',
-				writeArg: addressOf(collateralErc20),
-			});
-		}
-
 		const collateralStateShort = await deployer.deployContract({
 			name: 'CollateralStateShort',
 			source: 'CollateralState',
@@ -1489,7 +1382,7 @@ const deploy = async ({
 				account,
 				addressOf(collateralManager),
 				addressOf(readProxyForResolver),
-				toBytes32('sUSD'),
+				toBytes32('dUSD'),
 				(await getDeployParameter('COLLATERAL_SHORT'))['MIN_CRATIO'],
 				(await getDeployParameter('COLLATERAL_SHORT'))['MIN_COLLATERAL'],
 			],
@@ -1567,40 +1460,6 @@ const deploy = async ({
 	}
 
 	console.log(gray('Addresses are correctly set up, continuing...'));
-
-	// Legacy contracts.
-	if (network === 'mainnet') {
-		// v2.35.2 contracts.
-		const CollateralEth = '0x3FF5c0A14121Ca39211C95f6cEB221b86A90729E';
-		const CollateralErc20REN = '0x3B3812BB9f6151bEb6fa10783F1ae848a77a0d46';
-		const CollateralShort = '0x188C2274B04Ea392B21487b5De299e382Ff84246';
-
-		const legacyContracts = Object.entries({
-			CollateralEth,
-			CollateralErc20REN,
-			CollateralShort,
-		}).map(([name, address]) => {
-			const contract = new deployer.web3.eth.Contract(
-				[...compiled['MixinResolver'].abi, ...compiled['Owned'].abi],
-				address
-			);
-			return [`legacy:${name}`, contract];
-		});
-
-		await Promise.all(
-			legacyContracts.map(async ([name, contract]) => {
-				return runStep({
-					gasLimit: 7e6,
-					contract: name,
-					target: contract,
-					read: 'isResolverCached',
-					expected: input => input,
-					publiclyCallable: true, // does not require owner
-					write: 'rebuildCache',
-				});
-			})
-		);
-	}
 
 	const filterTargetsWith = ({ prop }) =>
 		Object.entries(deployer.deployedContracts).filter(([, target]) =>
@@ -1680,7 +1539,7 @@ const deploy = async ({
 	for (const [contract, target] of contractsWithRebuildableCache) {
 		if (contractsToRebuildCache.includes(target.options.address)) {
 			await runStep({
-				gasLimit: 500e3, // higher gas required
+				gasLimit: 2e6, // higher gas required
 				contract,
 				target,
 				read: 'isResolverCached',
@@ -1691,140 +1550,15 @@ const deploy = async ({
 		}
 	}
 
-	// Now do binary option market cache rebuilding
-	if (binaryOptionMarketManager) {
-		console.log(gray('Checking all binary option markets have rebuilt caches'));
-		let binaryOptionMarkets = [];
-		// now grab all possible binary option markets to rebuild caches as well
-		const binaryOptionsFetchPageSize = 100;
-		for (const marketType of ['Active', 'Matured']) {
-			const numBinaryOptionMarkets = Number(
-				await binaryOptionMarketManager.methods[`num${marketType}Markets`]().call()
-			);
-			console.log(
-				gray('Found'),
-				yellow(numBinaryOptionMarkets),
-				gray(marketType, 'binary option markets')
-			);
-
-			if (numBinaryOptionMarkets > binaryOptionsFetchPageSize) {
-				console.log(
-					redBright(
-						'⚠⚠⚠ Warning: cannot fetch all',
-						marketType,
-						'binary option markets as there are',
-						numBinaryOptionMarkets,
-						'which is more than page size of',
-						binaryOptionsFetchPageSize
-					)
-				);
-			} else {
-				// fetch the list of markets
-				const marketAddresses = await binaryOptionMarketManager.methods[
-					`${marketType.toLowerCase()}Markets`
-				](0, binaryOptionsFetchPageSize).call();
-
-				// wrap them in a contract via the deployer
-				const markets = marketAddresses.map(
-					binaryOptionMarket =>
-						new deployer.web3.eth.Contract(compiled['BinaryOptionMarket'].abi, binaryOptionMarket)
-				);
-
-				binaryOptionMarkets = binaryOptionMarkets.concat(markets);
-			}
-		}
-
-		// now figure out which binary option markets need their caches rebuilt
-		const binaryOptionMarketsToRebuildCacheOn = [];
-		for (const market of binaryOptionMarkets) {
-			try {
-				const isCached = await market.methods.isResolverCached().call();
-				if (!isCached) {
-					binaryOptionMarketsToRebuildCacheOn.push(addressOf(market));
-				}
-				console.log(
-					gray('Binary option market'),
-					yellow(addressOf(market)),
-					gray('is newer and cache status'),
-					yellow(isCached)
-				);
-			} catch (err) {
-				// the challenge being that some used an older MixinResolver API
-				const oldBinaryOptionMarketABI = [
-					{
-						constant: true,
-						inputs: [
-							{
-								internalType: 'contract AddressResolver',
-								name: '_resolver',
-								type: 'address',
-							},
-						],
-						name: 'isResolverCached',
-						outputs: [
-							{
-								internalType: 'bool',
-								name: '',
-								type: 'bool',
-							},
-						],
-						payable: false,
-						stateMutability: 'view',
-						type: 'function',
-						signature: '0x631e1444',
-					},
-				];
-
-				const oldBinaryOptionMarket = new deployer.web3.eth.Contract(
-					oldBinaryOptionMarketABI,
-					addressOf(market)
-				);
-
-				const isCached = await oldBinaryOptionMarket.methods
-					.isResolverCached(addressOf(readProxyForResolver))
-					.call();
-				if (!isCached) {
-					binaryOptionMarketsToRebuildCacheOn.push(addressOf(market));
-				}
-
-				console.log(
-					gray('Binary option market'),
-					yellow(addressOf(market)),
-					gray('is older and cache status'),
-					yellow(isCached)
-				);
-			}
-		}
-
-		console.log(
-			gray('In total'),
-			yellow(binaryOptionMarketsToRebuildCacheOn.length),
-			gray('binary option markets need their caches rebuilt')
-		);
-
-		const addressesChunkSize = useOvm ? 7 : 20;
-		for (let i = 0; i < binaryOptionMarketsToRebuildCacheOn.length; i += addressesChunkSize) {
-			const chunk = binaryOptionMarketsToRebuildCacheOn.slice(i, i + addressesChunkSize);
-			await runStep({
-				gasLimit: useOvm ? OVM_MAX_GAS_LIMIT : 7e6,
-				contract: `BinaryOptionMarketManager`,
-				target: binaryOptionMarketManager,
-				publiclyCallable: true, // does not require owner
-				write: 'rebuildMarketCaches',
-				writeArg: [chunk],
-			});
-		}
-	}
-
 	// Now perform a sync of legacy contracts that have not been replaced in Shaula (v2.35.x)
-	// EtherCollateral, EtherCollateralsUSD
+	// EtherCollateral, EtherCollateraldUSD
 	console.log(gray('Checking all legacy contracts with setResolverAndSyncCache() are rebuilt...'));
 	const contractsWithLegacyResolverCaching = filterTargetsWith({
 		prop: 'setResolverAndSyncCache',
 	});
 	for (const [contract, target] of contractsWithLegacyResolverCaching) {
 		await runStep({
-			gasLimit: 500e3, // higher gas required
+			gasLimit: 2e6, // higher gas required
 			contract,
 			target,
 			read: 'isResolverCached',
@@ -1842,7 +1576,7 @@ const deploy = async ({
 	});
 	for (const [contract, target] of contractsWithLegacyResolverNoCache) {
 		await runStep({
-			gasLimit: 500e3, // higher gas required
+			gasLimit: 2e6, // higher gas required
 			contract,
 			target,
 			read: 'resolver',
@@ -2044,20 +1778,20 @@ const deploy = async ({
 
 		// override individual currencyKey / synths exchange rates
 		const synthExchangeRateOverride = {
-			sETH: w3utils.toWei('0.0025'),
+			dETH: w3utils.toWei('0.0025'),
 			iETH: w3utils.toWei('0.004'),
-			sBTC: w3utils.toWei('0.003'),
+			dBTC: w3utils.toWei('0.003'),
 			iBTC: w3utils.toWei('0.003'),
 			iBNB: w3utils.toWei('0.021'),
-			sXTZ: w3utils.toWei('0.0085'),
+			dXTZ: w3utils.toWei('0.0085'),
 			iXTZ: w3utils.toWei('0.0085'),
-			sEOS: w3utils.toWei('0.0085'),
+			dEOS: w3utils.toWei('0.0085'),
 			iEOS: w3utils.toWei('0.009'),
-			sETC: w3utils.toWei('0.0085'),
-			sLINK: w3utils.toWei('0.0085'),
-			sDASH: w3utils.toWei('0.009'),
+			dETC: w3utils.toWei('0.0085'),
+			dLINK: w3utils.toWei('0.0085'),
+			dDASH: w3utils.toWei('0.009'),
 			iDASH: w3utils.toWei('0.009'),
-			sXRP: w3utils.toWei('0.009'),
+			dXRP: w3utils.toWei('0.009'),
 		};
 
 		const synthsRatesToUpdate = synths
@@ -2294,7 +2028,7 @@ const deploy = async ({
 
 	if (!useOvm) {
 		console.log(gray(`\n------ INITIALISING MULTI COLLATERAL ------\n`));
-		const collateralsArg = [collateralEth, collateralErc20, collateralShort].map(addressOf);
+		const collateralsArg = [collateralEth, collateralShort].map(addressOf);
 		await runStep({
 			contract: 'CollateralManager',
 			target: collateralManager,
@@ -2314,7 +2048,7 @@ const deploy = async ({
 			writeArg: addressOf(collateralManager),
 		});
 
-		const collateralEthSynths = (await getDeployParameter('COLLATERAL_ETH'))['SYNTHS']; // COLLATERAL_ETH synths - ['sUSD', 'sETH']
+		const collateralEthSynths = (await getDeployParameter('COLLATERAL_ETH'))['SYNTHS']; // COLLATERAL_ETH synths - ['dUSD', 'dETH']
 		await runStep({
 			contract: 'CollateralEth',
 			gasLimit: 1e6,
@@ -2333,33 +2067,6 @@ const deploy = async ({
 		});
 
 		await runStep({
-			contract: 'CollateralErc20',
-			target: collateralErc20,
-			read: 'manager',
-			expected: input => input === addressOf(collateralManager),
-			write: 'setManager',
-			writeArg: addressOf(collateralManager),
-		});
-
-		const collateralErc20Synths = (await getDeployParameter('COLLATERAL_RENBTC'))['SYNTHS']; // COLLATERAL_RENBTC synths - ['sUSD', 'sBTC']
-		await runStep({
-			contract: 'CollateralErc20',
-			gasLimit: 1e6,
-			target: collateralErc20,
-			read: 'areSynthsAndCurrenciesSet',
-			readArg: [
-				collateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
-				collateralErc20Synths.map(toBytes32),
-			],
-			expected: input => input,
-			write: 'addSynths',
-			writeArg: [
-				collateralErc20Synths.map(key => toBytes32(`Synth${key}`)),
-				collateralErc20Synths.map(toBytes32),
-			],
-		});
-
-		await runStep({
 			contract: 'CollateralShort',
 			target: collateralShort,
 			read: 'manager',
@@ -2368,7 +2075,7 @@ const deploy = async ({
 			writeArg: addressOf(collateralManager),
 		});
 
-		const collateralShortSynths = (await getDeployParameter('COLLATERAL_SHORT'))['SYNTHS']; // COLLATERAL_SHORT synths - ['sBTC', 'sETH']
+		const collateralShortSynths = (await getDeployParameter('COLLATERAL_SHORT'))['SYNTHS']; // COLLATERAL_SHORT synths - ['dBTC', 'dETH']
 		await runStep({
 			contract: 'CollateralShort',
 			gasLimit: 1e6,
@@ -2472,15 +2179,6 @@ const deploy = async ({
 			expected: input => input !== '0', // only change if zero
 			write: 'setIssueFeeRate',
 			writeArg: (await getDeployParameter('COLLATERAL_ETH'))['ISSUE_FEE_RATE'],
-		});
-
-		await runStep({
-			contract: 'CollateralErc20',
-			target: collateralErc20,
-			read: 'issueFeeRate',
-			expected: input => input !== '0', // only change if zero
-			write: 'setIssueFeeRate',
-			writeArg: (await getDeployParameter('COLLATERAL_RENBTC'))['ISSUE_FEE_RATE'],
 		});
 
 		await runStep({

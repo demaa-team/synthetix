@@ -14,7 +14,7 @@ contract SystemSettings is Owned, MixinSystemSettings, ISystemSettings {
     using SafeMath for uint;
     using SafeDecimalMath for uint;
 
-    // No more synths may be issued than the value of SNX backing them.
+    // No more synths may be issued than the value of DEM backing them.
     uint public constant MAX_ISSUANCE_RATIO = 1e18;
 
     // The fee period must be between 1 day and 60 days.
@@ -146,7 +146,7 @@ contract SystemSettings is Owned, MixinSystemSettings, ISystemSettings {
     }
 
     // SIP 112: ETH Wrappr
-    // The fee for burning sETH and releasing ETH from the EtherWrapper.
+    // The fee for burning dETH and releasing ETH from the EtherWrapper.
     function etherWrapperBurnFeeRate() external view returns (uint) {
         return getEtherWrapperBurnFeeRate();
     }

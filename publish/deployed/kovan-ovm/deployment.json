@@ -306,8 +306,8 @@
 			"txn": "",
 			"network": "kovan"
 		},
-		"SynthsUSD": {
-			"name": "SynthsUSD",
+		"SynthdUSD": {
+			"name": "SynthdUSD",
 			"address": "0x4305B0485aD00548a17473ada5b3bA8be98d283F",
 			"source": "Synth",
 			"link": "https://kovan.etherscan.io/address/0x4305B0485aD00548a17473ada5b3bA8be98d283F",
@@ -324,8 +324,8 @@
 			"txn": "",
 			"network": "kovan"
 		},
-		"EtherCollateralsUSD": {
-			"name": "EtherCollateralsUSD",
+		"EtherCollateraldUSD": {
+			"name": "EtherCollateraldUSD",
 			"address": "0x4c22BC6FC957efb8D6737982e522950e77F0F47f",
 			"source": "EmptyEtherCollateral",
 			"link": "https://kovan.etherscan.io/address/0x4c22BC6FC957efb8D6737982e522950e77F0F47f",
@@ -387,8 +387,8 @@
 			"txn": "",
 			"network": "kovan"
 		},
-		"SynthsETH": {
-			"name": "SynthsETH",
+		"SynthdETH": {
+			"name": "SynthdETH",
 			"address": "0x41B7BE5A411e73Baf5B2C82dCD1C110b0c177335",
 			"source": "Synth",
 			"link": "https://kovan.etherscan.io/address/0x41B7BE5A411e73Baf5B2C82dCD1C110b0c177335",

@@ -61,7 +61,7 @@ contract BinaryOptionMarketManager is Owned, Pausable, MixinResolver, IBinaryOpt
     /* ---------- Address Resolver Configuration ---------- */
 
     bytes32 internal constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 internal constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 internal constant CONTRACT_SYNTHSUSD = "SynthdUSD";
     bytes32 internal constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 internal constant CONTRACT_BINARYOPTIONMARKETFACTORY = "BinaryOptionMarketFactory";
 
@@ -147,8 +147,8 @@ contract BinaryOptionMarketManager is Owned, Pausable, MixinResolver, IBinaryOpt
 
         // If it has a rate, then it's possibly a valid key
         if (exchangeRates.rateForCurrency(oracleKey) != 0) {
-            // But not sUSD
-            if (oracleKey == "sUSD") {
+            // But not dUSD
+            if (oracleKey == "dUSD") {
                 return false;
             }
 

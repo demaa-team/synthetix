@@ -25,8 +25,8 @@ const {
 const { setupAllContracts } = require('./setup');
 
 contract('PurgeableSynth', accounts => {
-	const [sUSD, SNX, sAUD, iETH] = ['sUSD', 'SNX', 'sAUD', 'iETH'].map(toBytes32);
-	const synthKeys = [sUSD, sAUD, iETH];
+	const [dUSD, DEM, sAUD, iETH] = ['dUSD', 'DEM', 'sAUD', 'iETH'].map(toBytes32);
+	const synthKeys = [dUSD, sAUD, iETH];
 	const [deployerAccount, owner, oracle, , account1, account2] = accounts;
 
 	let exchangeRates,
@@ -48,7 +48,7 @@ contract('PurgeableSynth', accounts => {
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
 			Exchanger: exchanger,
-			SynthsUSD: sUSDContract,
+			SynthdUSD: sUSDContract,
 			SynthsAUD: sAUDContract,
 			SystemStatus: systemStatus,
 			SystemSettings: systemSettings,
@@ -56,7 +56,7 @@ contract('PurgeableSynth', accounts => {
 			Issuer: issuer,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD', 'sAUD'],
+			synths: ['dUSD', 'sAUD'],
 			contracts: [
 				'ExchangeRates',
 				'Exchanger',
@@ -156,7 +156,7 @@ contract('PurgeableSynth', accounts => {
 		describe("when there's a price for the purgeable synth", () => {
 			beforeEach(async () => {
 				await exchangeRates.updateRates(
-					[sAUD, SNX, iETH],
+					[sAUD, DEM, iETH],
 					['0.5', '1', '170'].map(toUnit),
 					timestamp,
 					{
@@ -173,7 +173,7 @@ contract('PurgeableSynth', accounts => {
 				beforeEach(async () => {
 					// issue the user 100K USD worth of iETH
 					amountToExchange = toUnit(1e5);
-					const iETHAmount = await exchangeRates.effectiveValue(sUSD, amountToExchange, iETH);
+					const iETHAmount = await exchangeRates.effectiveValue(dUSD, amountToExchange, iETH);
 					await issueSynthsToUser({
 						owner,
 						issuer,
@@ -231,19 +231,19 @@ contract('PurgeableSynth', accounts => {
 							'The user must no longer have a balance after the purge'
 						);
 					});
-					it('and they have the value added back to sUSD (with fees taken out)', async () => {
+					it('and they have the value added back to dUSD (with fees taken out)', async () => {
 						const userBalance = await sUSDContract.balanceOf(account1);
 
 						const {
 							amountReceived,
 							// exchangeFee,
 							// exchangeFeeRate,
-						} = await exchanger.getAmountsForExchange(balanceBeforePurge, iETH, sUSD);
+						} = await exchanger.getAmountsForExchange(balanceBeforePurge, iETH, dUSD);
 
 						assert.bnEqual(
 							userBalance,
 							amountReceived.add(usersUSDBalance),
-							'User must be credited back in sUSD from the purge'
+							'User must be credited back in dUSD from the purge'
 						);
 					});
 					it('then the synth has totalSupply back at 0', async () => {
@@ -295,7 +295,7 @@ contract('PurgeableSynth', accounts => {
 						// Note: 5000 is chosen to be large enough to accommodate exchange fees which
 						// ultimately limit the total supply of that synth
 						const amountToExchange = toUnit(5000);
-						const iETHAmount = await exchangeRates.effectiveValue(sUSD, amountToExchange, iETH);
+						const iETHAmount = await exchangeRates.effectiveValue(dUSD, amountToExchange, iETH);
 						await issueSynthsToUser({
 							owner,
 							issuer,
@@ -484,19 +484,19 @@ contract('PurgeableSynth', accounts => {
 											const balance = await this.replacement.balanceOf(account1);
 											assert.bnEqual(balance, toUnit('0'), 'The balance after purge must be 0');
 										});
-										it('and their balance must have gone back into sUSD', async () => {
+										it('and their balance must have gone back into dUSD', async () => {
 											const balance = await sUSDContract.balanceOf(account1);
 
 											const { amountReceived } = await exchanger.getAmountsForExchange(
 												userBalanceOfOldSynth,
 												sAUD,
-												sUSD
+												dUSD
 											);
 
 											assert.bnEqual(
 												balance,
 												amountReceived.add(usersUSDBalance),
-												'The sUSD balance after purge must return to the initial amount, less fees'
+												'The dUSD balance after purge must return to the initial amount, less fees'
 											);
 										});
 										it('and the purge event is issued', async () => {
@@ -517,13 +517,13 @@ contract('PurgeableSynth', accounts => {
 												const { amountReceived } = await exchanger.getAmountsForExchange(
 													userBalanceOfOldSynth,
 													sAUD,
-													sUSD
+													dUSD
 												);
 
 												assert.bnEqual(
 													balance,
 													amountReceived.add(usersUSDBalance),
-													'The sUSD balance after purge must return to the initial amount, less fees'
+													'The dUSD balance after purge must return to the initial amount, less fees'
 												);
 											});
 										});

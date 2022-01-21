@@ -42,12 +42,12 @@ async function ensureAccountHasEther({ network, deploymentPath, amount, account 
 }
 
 async function ensureAccountHasSNX({ network, deploymentPath, amount, account }) {
-	const SNX = await connectContract({ network, deploymentPath, contractName: 'ProxyERC20' });
-	if ((await SNX.balanceOf(account)).gte(amount)) {
+	const DEM = await connectContract({ network, deploymentPath, contractName: 'ProxyERC20' });
+	if ((await DEM.balanceOf(account)).gte(amount)) {
 		return;
 	}
 
-	console.log(gray(`    > Ensuring ${account} has SNX...`));
+	console.log(gray(`    > Ensuring ${account} has DEM...`));
 
 	const fromAccount =
 		network === 'mainnet'
@@ -58,30 +58,30 @@ async function ensureAccountHasSNX({ network, deploymentPath, amount, account })
 					user: 'owner',
 			  });
 
-	const balance = toBN(await SNX.balanceOf(fromAccount));
+	const balance = toBN(await DEM.balanceOf(fromAccount));
 	if (balance.lt(amount)) {
 		throw new Error(
-			`Account ${fromAccount} only has ${balance} SNX and cannot transfer ${amount} SNX to ${account} `
+			`Account ${fromAccount} only has ${balance} DEM and cannot transfer ${amount} DEM to ${account} `
 		);
 	}
 
-	await SNX.transfer(account, amount, {
+	await DEM.transfer(account, amount, {
 		from: fromAccount,
 	});
 }
 
 async function ensureAccountHassUSD({ network, deploymentPath, amount, account }) {
-	const sUSD = await connectContract({
+	const dUSD = await connectContract({
 		network,
 		deploymentPath,
-		contractName: 'SynthsUSD',
+		contractName: 'SynthdUSD',
 		abiName: 'Synth',
 	});
-	if ((await sUSD.balanceOf(account)).gte(amount)) {
+	if ((await dUSD.balanceOf(account)).gte(amount)) {
 		return;
 	}
 
-	console.log(gray(`    > Ensuring ${account} has sUSD...`));
+	console.log(gray(`    > Ensuring ${account} has dUSD...`));
 
 	const fromAccount =
 		network === 'mainnet'
@@ -92,7 +92,7 @@ async function ensureAccountHassUSD({ network, deploymentPath, amount, account }
 					user: 'owner',
 			  });
 
-	const balance = toBN(await sUSD.transferableSynths(fromAccount));
+	const balance = toBN(await dUSD.transferableSynths(fromAccount));
 	const snxToTransfer = amount.mul(toBN(30));
 	if (balance.lt(amount)) {
 		await ensureAccountHasSNX({
@@ -113,22 +113,22 @@ async function ensureAccountHassUSD({ network, deploymentPath, amount, account }
 			from: account,
 		});
 	} else {
-		await sUSD.transferAndSettle(account, amount, { from: fromAccount });
+		await dUSD.transferAndSettle(account, amount, { from: fromAccount });
 	}
 }
 
 async function ensureAccountHassETH({ network, deploymentPath, amount, account }) {
-	const sETH = await connectContract({
+	const dETH = await connectContract({
 		network,
 		deploymentPath,
-		contractName: 'SynthsETH',
+		contractName: 'SynthdETH',
 		abiName: 'Synth',
 	});
-	if ((await sETH.balanceOf(account)).gte(amount)) {
+	if ((await dETH.balanceOf(account)).gte(amount)) {
 		return;
 	}
 
-	console.log(gray(`    > Ensuring ${account} has sETH...`));
+	console.log(gray(`    > Ensuring ${account} has dETH...`));
 
 	const sUSDAmount = amount.mul(toBN('50'));
 	await ensureAccountHassUSD({ network, deploymentPath, amount: sUSDAmount, account });
@@ -140,7 +140,7 @@ async function ensureAccountHassETH({ network, deploymentPath, amount, account }
 		abiName: 'Synthetix',
 	});
 
-	await Synthetix.exchange(toBytes32('sUSD'), sUSDAmount, toBytes32('sETH'), {
+	await Synthetix.exchange(toBytes32('dUSD'), sUSDAmount, toBytes32('dETH'), {
 		from: account,
 	});
 }

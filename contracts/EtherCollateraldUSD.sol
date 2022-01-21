@@ -5,7 +5,7 @@ import "./Owned.sol";
 import "./Pausable.sol";
 import "openzeppelin-solidity-2.3.0/contracts/utils/ReentrancyGuard.sol";
 import "./MixinResolver.sol";
-import "./interfaces/IEtherCollateralsUSD.sol";
+import "./interfaces/IEtherCollateraldUSD.sol";
 
 // Libraries
 import "./SafeDecimalMath.sol";
@@ -19,7 +19,7 @@ import "./interfaces/IExchangeRates.sol";
 
 // ETH Collateral v0.3 (sUSD)
 // https://docs.synthetix.io/contracts/source/contracts/ethercollateralsusd
-contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver, IEtherCollateralsUSD {
+contract EtherCollateraldUSD is Owned, Pausable, ReentrancyGuard, MixinResolver, IEtherCollateraldUSD {
     using SafeMath for uint256;
     using SafeDecimalMath for uint256;
 
@@ -115,7 +115,7 @@ contract EtherCollateralsUSD is Owned, Pausable, ReentrancyGuard, MixinResolver,
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
 
     bytes32 private constant CONTRACT_SYSTEMSTATUS = "SystemStatus";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthdUSD";
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_FEEPOOL = "FeePool";
 

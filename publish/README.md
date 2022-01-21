@@ -116,7 +116,7 @@ node publish remove-synths # "--help" for options
 ### Example
 
 ```bash
-node publish remove-synths -n rinkeby -d publish/deployed/rinkeby -g 3 -s sRUB -s sETH
+node publish remove-synths -n rinkeby -d publish/deployed/rinkeby -g 3 -s sRUB -s dETH
 ```
 
 ## 7. Replace Synths

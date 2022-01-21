@@ -81,10 +81,10 @@ contract('BinaryOptionMarketManager @gas-skip', accounts => {
 			SystemStatus: systemStatus,
 			AddressResolver: addressResolver,
 			ExchangeRates: exchangeRates,
-			SynthsUSD: sUSDSynth,
+			SynthdUSD: sUSDSynth,
 		} = await setupAllContracts({
 			accounts,
-			synths: ['sUSD'],
+			synths: ['dUSD'],
 			contracts: [
 				'SystemStatus',
 				'BinaryOptionMarketManager',
@@ -463,7 +463,7 @@ contract('BinaryOptionMarketManager @gas-skip', accounts => {
 		it('Cannot create markets for invalid keys.', async () => {
 			const now = await currentTime();
 
-			const sUSDKey = toBytes32('sUSD');
+			const sUSDKey = toBytes32('dUSD');
 			const nonRate = toBytes32('nonExistent');
 
 			await assert.revert(

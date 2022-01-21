@@ -28,7 +28,7 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
 
     /* ========== CONSTANTS ========== */
 
-    bytes32 private constant sUSD = "sUSD";
+    bytes32 private constant dUSD = "dUSD";
 
     // ========== STATE VARIABLES ==========
 
@@ -75,7 +75,7 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
     bytes32 private constant CONTRACT_EXRATES = "ExchangeRates";
     bytes32 private constant CONTRACT_EXCHANGER = "Exchanger";
     bytes32 private constant CONTRACT_FEEPOOL = "FeePool";
-    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthsUSD";
+    bytes32 private constant CONTRACT_SYNTHSUSD = "SynthdUSD";
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -144,8 +144,8 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
     /* ---------- Public Views ---------- */
 
     function collateralRatio(Loan memory loan) public view returns (uint cratio) {
-        uint cvalue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, sUSD);
-        uint dvalue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), sUSD);
+        uint cvalue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, dUSD);
+        uint dvalue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), dUSD);
         cratio = cvalue.divideDecimal(dvalue);
     }
 
@@ -156,8 +156,8 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
 
     /**
      * r = target issuance ratio
-     * D = debt value in sUSD
-     * V = collateral value in sUSD
+     * D = debt value in dUSD
+     * V = collateral value in dUSD
      * P = liquidation penalty
      * Calculates amount of synths = (D - V * r) / (1 - (1 + P) * r)
      * Note: if you pass a loan in here that is not eligible for liquidation it will revert.
@@ -165,8 +165,8 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
      */
     function liquidationAmount(Loan memory loan) public view returns (uint amount) {
         uint liquidationPenalty = getLiquidationPenalty();
-        uint debtValue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), sUSD);
-        uint collateralValue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, sUSD);
+        uint debtValue = _exchangeRates().effectiveValue(loan.currency, loan.amount.add(loan.accruedInterest), dUSD);
+        uint collateralValue = _exchangeRates().effectiveValue(collateralKey, loan.collateral, dUSD);
         uint unit = SafeDecimalMath.unit();
 
         uint dividend = debtValue.sub(collateralValue.divideDecimal(minCratio));
@@ -174,7 +174,7 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
 
         uint sUSDamount = dividend.divideDecimal(divisor);
 
-        return _exchangeRates().effectiveValue(sUSD, sUSDamount, loan.currency);
+        return _exchangeRates().effectiveValue(dUSD, sUSDamount, loan.currency);
     }
 
     // amount is the amount of synths we are liquidating
@@ -345,9 +345,9 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
         // 13. Pay the minting fees to the fee pool
         _payFees(issueFee, currency);
 
-        // 14. If its short, convert back to sUSD, otherwise issue the loan.
+        // 14. If its short, convert back to dUSD, otherwise issue the loan.
         if (short) {
-            _synthsUSD().issue(msg.sender, _exchangeRates().effectiveValue(currency, loanAmountMinusFee, sUSD));
+            _synthsUSD().issue(msg.sender, _exchangeRates().effectiveValue(currency, loanAmountMinusFee, dUSD));
             _manager().incrementShorts(currency, amount);
 
             if (shortingRewards[currency] != address(0)) {
@@ -656,7 +656,7 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
         // 8. If its short, let the child handle it, otherwise issue the synths.
         if (loan.short) {
             _manager().incrementShorts(loan.currency, amount);
-            _synthsUSD().issue(msg.sender, _exchangeRates().effectiveValue(loan.currency, amountMinusFee, sUSD));
+            _synthsUSD().issue(msg.sender, _exchangeRates().effectiveValue(loan.currency, amountMinusFee, dUSD));
 
             if (shortingRewards[loan.currency] != address(0)) {
                 IShortingRewards(shortingRewards[loan.currency]).enrol(msg.sender, amount);
@@ -744,11 +744,11 @@ contract Collateral is ICollateralLoan, Owned, MixinSystemSettings {
         }
     }
 
-    // Take an amount of fees in a certain synth and convert it to sUSD before paying the fee pool.
+    // Take an amount of fees in a certain synth and convert it to dUSD before paying the fee pool.
     function _payFees(uint amount, bytes32 synth) internal {
         if (amount > 0) {
-            if (synth != sUSD) {
-                amount = _exchangeRates().effectiveValue(synth, amount, sUSD);
+            if (synth != dUSD) {
+                amount = _exchangeRates().effectiveValue(synth, amount, dUSD);
             }
             _synthsUSD().issue(_feePool().FEE_ADDRESS(), amount);
             _feePool().recordFeePaid(amount);

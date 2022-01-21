@@ -119,7 +119,7 @@
 	"DappMaintenance": {
 		"deploy": false
 	},
-	"SynthsUSD": {
+	"SynthdUSD": {
 		"deploy": false
 	},
 	"SynthsEUR": {
@@ -224,7 +224,7 @@
 	"ProxysETH": {
 		"deploy": false
 	},
-	"SynthsETH": {
+	"SynthdETH": {
 		"deploy": false
 	},
 	"TokenStatesBNB": {
@@ -509,7 +509,7 @@
 	"TradingRewards": {
 		"deploy": false
 	},
-	"EtherCollateralsUSD": {
+	"EtherCollateraldUSD": {
 		"deploy": false
 	},
 	"TokenStatesOIL": {

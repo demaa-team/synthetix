@@ -5,14 +5,10 @@ const abiDecoder = require('abi-decoder');
 
 // load the data in explicitly (not programmatically) so webpack knows what to bundle
 const data = {
-	kovan: require('./publish/deployed/kovan'),
-	rinkeby: require('./publish/deployed/rinkeby'),
-	ropsten: require('./publish/deployed/ropsten'),
 	mainnet: require('./publish/deployed/mainnet'),
-	goerli: require('./publish/deployed/goerli'),
-	'goerli-ovm': require('./publish/deployed/goerli-ovm'),
 	'kovan-ovm': require('./publish/deployed/kovan-ovm'),
 	'mainnet-ovm': require('./publish/deployed/mainnet-ovm'),
+	mumbai: require('./publish/deployed/mumbai'),
 };
 
 const assets = require('./publish/assets.json');
@@ -20,7 +16,13 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'kovan', 'rinkeby', 'ropsten', 'mainnet', 'goerli'];
+const networks = ['local', 'mumbai', 'kovan', 'mainnet'];
+
+/**
+ * Converts a string into a hex representation of bytes32, with right padding
+ */
+const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
+const fromBytes32 = key => w3utils.hexToAscii(key);
 
 const chainIdMapping = Object.entries({
 	1: {
@@ -59,6 +61,12 @@ const chainIdMapping = Object.entries({
 		network: 'goerli',
 		useOvm: true,
 	},
+	// polygon-mumbai test networks: see https://mumbai.polygonscan.com/
+	80001: {
+		network: 'mumbai',
+		fork: false,
+	},
+
 	// now append any defaults
 }).reduce((memo, [id, body]) => {
 	memo[id] = Object.assign({ useOvm: false, fork: false }, body);
@@ -164,6 +172,7 @@ const defaults = {
 		goerli: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 		'mainnet-ovm': '0x4200000000000000000000000000000000000006',
 		'kovan-ovm': '0x4200000000000000000000000000000000000006',
+		mumbai: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 	CROSS_DOMAIN_DEPOSIT_GAS_LIMIT: `${3e6}`,
@@ -172,29 +181,26 @@ const defaults = {
 	CROSS_DOMAIN_WITHDRAWAL_GAS_LIMIT: `${3e6}`,
 
 	COLLATERAL_MANAGER: {
-		SYNTHS: ['sUSD', 'sBTC', 'sETH'],
-		SHORTS: [
-			{ long: 'sBTC', short: 'iBTC' },
-			{ long: 'sETH', short: 'iETH' },
-		],
-		MAX_DEBT: w3utils.toWei('75000000'), // 75 million sUSD
+		SYNTHS: ['dUSD', 'dETH'],
+		SHORTS: [{ long: 'dETH', short: 'iETH' }],
+		MAX_DEBT: w3utils.toWei('75000000'), // 75 million dUSD
 		BASE_BORROW_RATE: Math.round((0.005 * 1e18) / 31556926).toString(), // 31556926 is CollateralManager seconds per year
 		BASE_SHORT_RATE: Math.round((0.005 * 1e18) / 31556926).toString(),
 	},
 	COLLATERAL_ETH: {
-		SYNTHS: ['sUSD', 'sETH'],
+		SYNTHS: ['dUSD', 'dETH'],
 		MIN_CRATIO: w3utils.toWei('1.3'),
 		MIN_COLLATERAL: w3utils.toWei('2'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
 	},
 	COLLATERAL_RENBTC: {
-		SYNTHS: ['sUSD', 'sBTC'],
+		SYNTHS: ['dUSD', 'dBTC'],
 		MIN_CRATIO: w3utils.toWei('1.3'),
 		MIN_COLLATERAL: w3utils.toWei('0.05'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.001'),
 	},
 	COLLATERAL_SHORT: {
-		SYNTHS: ['sBTC', 'sETH'],
+		SYNTHS: ['dETH'],
 		MIN_CRATIO: w3utils.toWei('1.2'),
 		MIN_COLLATERAL: w3utils.toWei('1000'),
 		ISSUE_FEE_RATE: w3utils.toWei('0.005'),
@@ -204,13 +210,15 @@ const defaults = {
 	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.02'), // 200 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0.0005'), // 5 bps
-};
 
-/**
- * Converts a string into a hex representation of bytes32, with right padding
- */
-const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
-const fromBytes32 = key => w3utils.hexToAscii(key);
+	OTC_ASSETS: {
+		mumbai: [
+			[toBytes32('USDT'), '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65'],
+			[toBytes32('DEM'), '0xe2f45DF412e4dE94FB9faFaAC35DBE88d23d338A'],
+			[toBytes32('dUSD'), '0x29c160e8F9E35Fd529a75e9e57247bAaAA5381C9'],
+		],
+	},
+};
 
 const getFolderNameForNetwork = ({ network, useOvm = false }) => {
 	if (network.includes('ovm')) {
@@ -347,7 +355,7 @@ const getFeeds = ({ network, path, fs, deploymentPath, useOvm = false } = {}) =>
 	return Object.entries(feeds).reduce((memo, [asset, entry]) => {
 		memo[asset] = Object.assign(
 			// standalone feeds are those without a synth using them
-			// Note: ETH still used as a rate for Depot, can remove the below once the Depot uses sETH rate or is
+			// Note: ETH still used as a rate for Depot, can remove the below once the Depot uses dETH rate or is
 			// removed from the system
 			{ standalone: !synths.find(synth => synth.asset === asset) || asset === 'ETH' },
 			assets[asset],
@@ -507,6 +515,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			owner: '0xDe910777C787903F78C89e7a0bf7F4C435cBB1Fe',
 		}),
 		rinkeby: Object.assign({}, base),
+		mumbai: Object.assign({}, base),
 		ropsten: Object.assign({}, base),
 		goerli: Object.assign({}, base),
 		'goerli-ovm': Object.assign({}, base),
@@ -580,18 +589,17 @@ const getSuspensionReasons = ({ code = undefined } = {}) => {
 const getTokens = ({ network = 'mainnet', path, fs, useOvm = false } = {}) => {
 	const synths = getSynths({ network, useOvm, path, fs });
 	const targets = getTarget({ network, useOvm, path, fs });
-	const feeds = getFeeds({ network, useOvm, path, fs });
 
 	return [
 		Object.assign(
 			{
-				symbol: 'SNX',
-				asset: 'SNX',
-				name: 'Synthetix',
+				symbol: 'DEM',
+				asset: 'DEM',
+				name: 'Demaa',
 				address: targets.ProxyERC20.address,
 				decimals: 18,
 			},
-			feeds['SNX'].feed ? { feed: feeds['SNX'].feed } : {}
+			{}
 		),
 	].concat(
 		synths
@@ -600,7 +608,7 @@ const getTokens = ({ network = 'mainnet', path, fs, useOvm = false } = {}) => {
 				symbol: synth.name,
 				asset: synth.asset,
 				name: synth.description,
-				address: (targets[`Proxy${synth.name === 'sUSD' ? 'ERC20sUSD' : synth.name}`] || {})
+				address: (targets[`Proxy${synth.name === 'dUSD' ? 'ERC20sUSD' : synth.name}`] || {})
 					.address,
 				index: synth.index,
 				inverted: synth.inverted,

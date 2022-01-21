@@ -65,7 +65,7 @@ const removeSynths = async ({
 			console.error(red(`Synth ${synth} not found!`));
 			process.exitCode = 1;
 			return;
-		} else if (['sUSD'].indexOf(synth) >= 0) {
+		} else if (['dUSD'].indexOf(synth) >= 0) {
 			console.error(red(`Synth ${synth} cannot be removed`));
 			process.exitCode = 1;
 			return;
