@@ -29,7 +29,7 @@ contract('EtherCollateral', async accounts => {
 
 	const TEST_TIMEOUT = 160e3;
 
-	const [sETH, ETH, SNX] = ['sETH', 'ETH', 'SNX'].map(toBytes32);
+	const [sETH, ETH, DEM] = ['sETH', 'ETH', 'DEM'].map(toBytes32);
 
 	const ISSUACE_RATIO = toUnit('0.8');
 	const ZERO_BN = toUnit('0');
@@ -114,9 +114,9 @@ contract('EtherCollateral', async accounts => {
 	const updateRatesWithDefaults = async () => {
 		const timestamp = await currentTime();
 
-		// Depot requires SNX and ETH rates
+		// Depot requires DEM and ETH rates
 		await exchangeRates.updateRates(
-			[SNX, sETH, ETH],
+			[DEM, sETH, ETH],
 			['0.1', '172', '172'].map(toUnit),
 			timestamp,
 			{
@@ -132,9 +132,9 @@ contract('EtherCollateral', async accounts => {
 
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
-		// Mock SNX, sUSD and sETH
+		// Mock DEM, sUSD and sETH
 		[{ token: synthetix }, { token: sUSDSynth }, { token: sETHSynth }] = await Promise.all([
-			mockToken({ accounts, name: 'Synthetix', symbol: 'SNX' }),
+			mockToken({ accounts, name: 'Synthetix', symbol: 'DEM' }),
 			mockToken({ accounts, synth: 'sUSD', name: 'Synthetic USD', symbol: 'sUSD' }),
 			mockToken({ accounts, synth: 'sETH', name: 'Synthetic ETH', symbol: 'sETH' }),
 		]);

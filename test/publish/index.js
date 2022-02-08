@@ -834,7 +834,7 @@ describe('publish scripts', () => {
 				});
 			});
 
-			describe('when ExchangeRates has prices SNX $0.30 and all synths $1', () => {
+			describe('when ExchangeRates has prices DEM $0.30 and all synths $1', () => {
 				beforeEach(async () => {
 					// set default issuance of 0.2
 					await SystemSettings.methods.setIssuanceRatio(web3.utils.toWei('0.2')).send({
@@ -845,7 +845,7 @@ describe('publish scripts', () => {
 
 					// make sure exchange rates has prices for specific assets
 
-					const answersToSet = [{ asset: 'SNX', rate: 0.3 }].concat(
+					const answersToSet = [{ asset: 'DEM', rate: 0.3 }].concat(
 						synths.map(({ inverted, asset }) => {
 							// as the same assets are used for long and shorts, search by asset rather than
 							// name (currencyKey) here so that we don't accidentially override an inverse with
@@ -896,9 +896,9 @@ describe('publish scripts', () => {
 					}
 				});
 
-				describe('when transferring 100k SNX to user1', () => {
+				describe('when transferring 100k DEM to user1', () => {
 					beforeEach(async () => {
-						// transfer SNX to first account
+						// transfer DEM to first account
 						await Synthetix.methods
 							.transfer(accounts.first.public, web3.utils.toWei('100000'))
 							.send({
@@ -1418,7 +1418,7 @@ describe('publish scripts', () => {
 								// update rates
 								const synthsToUpdate = synths
 									.filter(({ name }) => name !== 'sEUR')
-									.concat({ asset: 'SNX', rate: 1 });
+									.concat({ asset: 'DEM', rate: 1 });
 
 								for (const { asset } of synthsToUpdate) {
 									await setAggregatorAnswer({ asset, rate: 1 });

@@ -125,6 +125,10 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network }) => {
 };
 
 const getEtherscanLinkPrefix = network => {
+	if (network === 'mumbai') {
+			  return 'https://mumbai.polygonscan.com';
+	}
+		
 	return `https://${network !== 'mainnet' ? network + '.' : ''}etherscan.io`;
 };
 
@@ -145,11 +149,14 @@ const loadConnections = ({ network, useFork }) => {
 	const privateKey =
 		network === 'mainnet' ? process.env.DEPLOY_PRIVATE_KEY : process.env.TESTNET_DEPLOY_PRIVATE_KEY;
 
-	const etherscanUrl =
+	let etherscanUrl =
 		network === 'mainnet'
 			? 'https://api.etherscan.io/api'
 			: `https://api-${network}.etherscan.io/api`;
-
+	if (network === 'mumbai') {
+		etherscanUrl = 'https://api-testnet.polygonscan.com/api';
+	}
+	
 	const etherscanLinkPrefix = getEtherscanLinkPrefix(network);
 
 	return { providerUrl, privateKey, etherscanUrl, etherscanLinkPrefix };

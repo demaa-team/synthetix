@@ -39,11 +39,11 @@ const {
 } = require('../../../.');
 
 const DEFAULTS = {
-	gasPrice: '1',
-	methodCallGasLimit: 250e3, // 250k
-	contractDeploymentGasLimit: 6.9e6, // TODO split out into separate limits for different contracts, Proxys, Synths, Synthetix
+	gasPrice: '2',
+	methodCallGasLimit: 1e6, // 250k
+	contractDeploymentGasLimit: 2e7, // TODO split out into separate limits for different contracts, Proxys, Synths, Synthetix
 	debtSnapshotMaxDeviation: 0.01, // a 1 percent deviation will trigger a snapshot
-	network: 'kovan',
+	network: 'mumbai',
 	buildPath: path.join(__dirname, '..', '..', '..', BUILD_FOLDER),
 };
 
@@ -114,10 +114,12 @@ const deploy = async ({
 		});
 	}
 
+	/*
 	if (freshDeploy) {
 		deployment.targets = {};
 		deployment.sources = {};
 	}
+	*/
 
 	if (!ignoreSafetyChecks) {
 		// Using Goerli without manageNonces?
@@ -1227,32 +1229,16 @@ const deploy = async ({
 			deps: ['AddressResolver'],
 			args: [account, addressOf(readProxyForResolver)],
 		});
-		const SynthetixBridgeToOptimism = await deployer.deployContract({
-			name: 'SynthetixBridgeToOptimism',
+		await deployer.deployContract({
+			name: 'OTC',
 			deps: ['AddressResolver'],
 			args: [account, addressOf(readProxyForResolver)],
 		});
-		const SynthetixBridgeEscrow = await deployer.deployContract({
-			name: 'SynthetixBridgeEscrow',
+		await deployer.deployContract({
+			name: 'OTCDao',
 			deps: ['AddressResolver'],
-			args: [account],
+			args: [account, addressOf(readProxyForResolver)],
 		});
-
-		const allowance = await proxyERC20Synthetix.methods
-			.allowance(addressOf(SynthetixBridgeEscrow), addressOf(SynthetixBridgeToOptimism))
-			.call();
-		if (allowance.toString() === '0') {
-			await runStep({
-				contract: `SynthetixBridgeEscrow`,
-				target: SynthetixBridgeEscrow,
-				write: 'approveBridge',
-				writeArg: [
-					addressOf(proxyERC20Synthetix),
-					addressOf(SynthetixBridgeToOptimism),
-					w3utils.toWei('100000000'),
-				],
-			});
-		}
 	}
 
 	let WETH_ADDRESS = (await getDeployParameter('WETH_ERC20_ADDRESSES'))[network];

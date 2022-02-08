@@ -186,7 +186,7 @@ contract BaseDebtCache is Owned, MixinSystemSettings, IDebtCache {
         return _cachedSynthDebts(currencyKeys);
     }
 
-    // Returns the total sUSD debt backed by non-SNX collateral.
+    // Returns the total sUSD debt backed by non-DEM collateral.
     function totalNonSnxBackedDebt() external view returns (uint excludedDebt, bool isInvalid) {
         return _totalNonSnxBackedDebt();
     }

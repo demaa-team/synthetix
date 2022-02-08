@@ -10,13 +10,18 @@ const { stringify, loadAndCheckRequiredSources } = require('../util');
 
 const { networks, getPathToNetwork } = require('../../..');
 
-const versionsUpdate = async ({ versionTag, release, useOvm }) => {
+const versionsUpdate = async ({ versionTag, release, useOvm, onlyNetwork }) => {
 	console.log(gray('Checking deployments for version:', versionTag));
 
 	// prefix a "v" to the tag
 	versionTag = /^v/.test(versionTag) ? versionTag : 'v' + versionTag;
 
 	for (const network of networks.filter(n => n !== 'local')) {
+		if (network !== onlyNetwork) {
+					console.log(`skip network ${network}`);
+					continue;
+		}
+			
 		const deploymentPath = getPathToNetwork({ network, path, useOvm });
 		if (!fs.existsSync(deploymentPath)) {
 			continue;
@@ -134,5 +139,6 @@ module.exports = {
 			.option('-v, --version-tag <value>', `The current version being updated`)
 			.option('-r, --release <value>', `The name of the release`)
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')
+			.option('-o, --only-network <value>', 'allow the specific network been handled')
 			.action(versionsUpdate),
 };

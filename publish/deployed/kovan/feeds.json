@@ -1,6 +1,6 @@
 {
-	"SNX": {
-		"asset": "SNX",
+	"DEM": {
+		"asset": "DEM",
 		"feed": "0x31f93DA9823d737b7E44bdee0DF389Fe62Fd1AcD"
 	},
 	"ETH": {

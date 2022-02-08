@@ -32,16 +32,10 @@ module.exports = {
 		);
 
 		return `/*
-   ____            __   __        __   _
-  / __/__ __ ___  / /_ / /  ___  / /_ (_)__ __
- _\\ \\ / // // _ \\/ __// _ \\/ -_)/ __// / \\ \\ /
-/___/ \\_, //_//_/\\__//_//_/\\__/ \\__//_/ /_\\_\\
-     /___/
-
-* Synthetix: ${contract}
+* Demaa: ${contract}
 *
-* Latest source (may be newer): https://github.com/Synthetixio/synthetix/blob/master/contracts/${contract}
-* Docs: https://docs.synthetix.io/contracts/${contract.split(/\./)[0]}
+* Latest source (may be newer): https://github.com/demaa-team/synthetix/blob/master/contracts/${contract}
+* Docs: https://docs.demaa.io/contracts/${contract.split(/\./)[0]}
 *
 * Contract Dependencies: ${deps.length ? '\n*\t- ' + deps.join('\n*\t- ') : '(none)'}
 * Libraries: ${libraries.length ? '\n*\t- ' + libraries.join('\n*\t- ') : '(none)'}
@@ -49,7 +43,7 @@ module.exports = {
 * MIT License
 * ===========
 *
-* Copyright (c) ${new Date().getFullYear()} Synthetix
+* Copyright (c) ${new Date().getFullYear()} Demaa
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal

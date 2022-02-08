@@ -13,6 +13,7 @@ const data = {
 	'goerli-ovm': require('./publish/deployed/goerli-ovm'),
 	'kovan-ovm': require('./publish/deployed/kovan-ovm'),
 	'mainnet-ovm': require('./publish/deployed/mainnet-ovm'),
+	mumbai: require('./publish/deployed/mumbai'),
 };
 
 const assets = require('./publish/assets.json');
@@ -20,7 +21,7 @@ const ovmIgnored = require('./publish/ovm-ignore.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'kovan', 'rinkeby', 'ropsten', 'mainnet', 'goerli'];
+const networks = ['local', 'kovan', 'rinkeby', 'ropsten', 'mainnet', 'goerli', 'mumbai'];
 
 const chainIdMapping = Object.entries({
 	1: {
@@ -58,6 +59,10 @@ const chainIdMapping = Object.entries({
 		// no chain ID for this currently
 		network: 'goerli',
 		useOvm: true,
+	},
+	80001: {
+				network: 'mumbai',
+				fork: false,
 	},
 	// now append any defaults
 }).reduce((memo, [id, body]) => {
@@ -121,6 +126,12 @@ const knownAccounts = {
 	kovan: [],
 };
 
+/**
+ * Converts a string into a hex representation of bytes32, with right padding
+ */
+const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
+const fromBytes32 = key => w3utils.hexToAscii(key);
+
 // The solidity defaults are managed here in the same format they will be stored, hence all
 // numbers are converted to strings and those with 18 decimals are also converted to wei amounts
 const defaults = {
@@ -155,6 +166,7 @@ const defaults = {
 		mainnet: '0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D',
 		kovan: '0x9B2fE385cEDea62D839E4dE89B0A23EF4eacC717',
 		rinkeby: '0xEDC0C23864B041607D624E2d9a67916B6cf40F7a',
+		mumbai: '0x8cB56983Bb3892cBbeb345cc75F530498BFf5a55',
 	},
 	WETH_ERC20_ADDRESSES: {
 		mainnet: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
@@ -164,6 +176,7 @@ const defaults = {
 		goerli: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
 		'mainnet-ovm': '0x4200000000000000000000000000000000000006',
 		'kovan-ovm': '0x4200000000000000000000000000000000000006',
+		mumbai: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
 	},
 	INITIAL_ISSUANCE: w3utils.toWei(`${100e6}`),
 	CROSS_DOMAIN_DEPOSIT_GAS_LIMIT: `${3e6}`,
@@ -200,17 +213,17 @@ const defaults = {
 		ISSUE_FEE_RATE: w3utils.toWei('0.005'),
 		INTERACTION_DELAY: '3600', // 1 hour in secs
 	},
-
+	OTC_ASSETS: {
+			mumbai: [
+					[toBytes32('USDT'), '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65'],
+					[toBytes32('DEM'), '0xe2f45DF412e4dE94FB9faFaAC35DBE88d23d338A'],
+					[toBytes32('sUSD'), '0x29c160e8F9E35Fd529a75e9e57247bAaAA5381C9'],
+			],
+	},
 	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
 	ETHER_WRAPPER_MINT_FEE_RATE: w3utils.toWei('0.02'), // 200 bps
 	ETHER_WRAPPER_BURN_FEE_RATE: w3utils.toWei('0.0005'), // 5 bps
 };
-
-/**
- * Converts a string into a hex representation of bytes32, with right padding
- */
-const toBytes32 = key => w3utils.rightPad(w3utils.asciiToHex(key), 64);
-const fromBytes32 = key => w3utils.hexToAscii(key);
 
 const getFolderNameForNetwork = ({ network, useOvm = false }) => {
 	if (network.includes('ovm')) {
@@ -242,7 +255,7 @@ const loadDeploymentFile = ({ network, path, fs, deploymentPath, useOvm = false 
  * Retrieve the list of targets for the network - returning the name, address, source file and link to etherscan
  */
 const getTarget = ({
-	network = 'mainnet',
+	network = 'mumbai',
 	useOvm = false,
 	contract,
 	path,
@@ -258,7 +271,7 @@ const getTarget = ({
  * Retrieve the list of solidity sources for the network - returning the abi and bytecode
  */
 const getSource = ({
-	network = 'mainnet',
+	network = 'mumbai',
 	useOvm = false,
 	contract,
 	path,
@@ -362,7 +375,7 @@ const getFeeds = ({ network, path, fs, deploymentPath, useOvm = false } = {}) =>
  * optional index and inverse properties
  */
 const getSynths = ({
-	network = 'mainnet',
+	network = 'mumbai',
 	path,
 	fs,
 	deploymentPath,
@@ -428,7 +441,7 @@ const getSynths = ({
  * Retrieve the list of staking rewards for the network - returning this names, stakingToken, and rewardToken
  */
 const getStakingRewards = ({
-	network = 'mainnet',
+	network = 'mumbai',
 	useOvm = false,
 	path,
 	fs,
@@ -456,7 +469,7 @@ const getStakingRewards = ({
  * Retrieve the list of shorting rewards for the network - returning the names and rewardTokens
  */
 const getShortingRewards = ({
-	network = 'mainnet',
+	network = 'mumbai',
 	useOvm = false,
 	path,
 	fs,
@@ -507,6 +520,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			owner: '0xDe910777C787903F78C89e7a0bf7F4C435cBB1Fe',
 		}),
 		rinkeby: Object.assign({}, base),
+		mumbai: Object.assign({}, base),
 		ropsten: Object.assign({}, base),
 		goerli: Object.assign({}, base),
 		'goerli-ovm': Object.assign({}, base),
@@ -524,7 +538,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 };
 
 const getVersions = ({
-	network = 'mainnet',
+	network = 'mumbai',
 	path,
 	fs,
 	deploymentPath,
@@ -585,13 +599,13 @@ const getTokens = ({ network = 'mainnet', path, fs, useOvm = false } = {}) => {
 	return [
 		Object.assign(
 			{
-				symbol: 'SNX',
-				asset: 'SNX',
-				name: 'Synthetix',
+				symbol: 'DEM',
+				asset: 'DEMAA',
+				name: 'Demaa',
 				address: targets.ProxyERC20.address,
 				decimals: 18,
 			},
-			feeds['SNX'].feed ? { feed: feeds['SNX'].feed } : {}
+			{}
 		),
 	].concat(
 		synths

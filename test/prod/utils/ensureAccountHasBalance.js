@@ -42,12 +42,12 @@ async function ensureAccountHasEther({ network, deploymentPath, amount, account 
 }
 
 async function ensureAccountHasSNX({ network, deploymentPath, amount, account }) {
-	const SNX = await connectContract({ network, deploymentPath, contractName: 'ProxyERC20' });
-	if ((await SNX.balanceOf(account)).gte(amount)) {
+	const DEM = await connectContract({ network, deploymentPath, contractName: 'ProxyERC20' });
+	if ((await DEM.balanceOf(account)).gte(amount)) {
 		return;
 	}
 
-	console.log(gray(`    > Ensuring ${account} has SNX...`));
+	console.log(gray(`    > Ensuring ${account} has DEM...`));
 
 	const fromAccount =
 		network === 'mainnet'
@@ -58,14 +58,14 @@ async function ensureAccountHasSNX({ network, deploymentPath, amount, account })
 					user: 'owner',
 			  });
 
-	const balance = toBN(await SNX.balanceOf(fromAccount));
+	const balance = toBN(await DEM.balanceOf(fromAccount));
 	if (balance.lt(amount)) {
 		throw new Error(
-			`Account ${fromAccount} only has ${balance} SNX and cannot transfer ${amount} SNX to ${account} `
+			`Account ${fromAccount} only has ${balance} DEM and cannot transfer ${amount} DEM to ${account} `
 		);
 	}
 
-	await SNX.transfer(account, amount, {
+	await DEM.transfer(account, amount, {
 		from: fromAccount,
 	});
 }

@@ -6,9 +6,6 @@ import "./BaseRewardEscrowV2.sol";
 
 // https://docs.synthetix.io/contracts/RewardEscrow
 contract ImportableRewardEscrowV2 is BaseRewardEscrowV2 {
-    /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
-    bytes32 private constant CONTRACT_SYNTHETIX_BRIDGE_BASE = "SynthetixBridgeToBase";
-
     /* ========== CONSTRUCTOR ========== */
 
     constructor(address _owner, address _resolver) public BaseRewardEscrowV2(_owner, _resolver) {}
@@ -16,14 +13,11 @@ contract ImportableRewardEscrowV2 is BaseRewardEscrowV2 {
     /* ========== VIEWS ======================= */
 
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
-        bytes32[] memory existingAddresses = BaseRewardEscrowV2.resolverAddressesRequired();
-        bytes32[] memory newAddresses = new bytes32[](1);
-        newAddresses[0] = CONTRACT_SYNTHETIX_BRIDGE_BASE;
-        return combineArrays(existingAddresses, newAddresses);
+        return BaseRewardEscrowV2.resolverAddressesRequired();
     }
 
     function synthetixBridgeToBase() internal view returns (address) {
-        return requireAndGetAddress(CONTRACT_SYNTHETIX_BRIDGE_BASE);
+        return address(0);
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */

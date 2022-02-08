@@ -23,7 +23,7 @@ const {
 const CONTRACT_OVERRIDES = require('../contract-overrides');
 const { optimizerRuns } = require('./build').DEFAULTS;
 
-const verify = async ({ buildPath, network, deploymentPath }) => {
+const verify = async ({ buildPath, network, deploymentPath, specifyContract }) => {
 	// Note: require this here as silent error is detected on require that impacts pretty-error
 	const solc = require('solc');
 
@@ -56,6 +56,11 @@ const verify = async ({ buildPath, network, deploymentPath }) => {
 	const tableData = [];
 
 	for (const name of Object.keys(config)) {
+		if (!specifyContract.startsWith(name)) {
+					console.log(`skip contract ${name}`);
+					continue;
+		}
+			
 		const { address } = deployment.targets[name];
 		// Check if this contract already has been verified.
 
@@ -263,5 +268,6 @@ module.exports = {
 				'-d, --deployment-path <value>',
 				`Path to a folder that has your input configuration file ${CONFIG_FILENAME} and where your ${DEPLOYMENT_FILENAME} files will go`
 			)
+			.option('-s, --specify-contract <value>', 'specify contract to verify', 'OTC')
 			.action(verify),
 };

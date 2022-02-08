@@ -14,7 +14,6 @@ import "@eth-optimism/contracts/iOVM/bridge/messaging/iAbs_BaseCrossDomainMessen
 
 contract BaseSynthetixBridge is Owned, MixinSystemSettings, IBaseSynthetixBridge {
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
-    bytes32 private constant CONTRACT_EXT_MESSENGER = "ext:Messenger";
     bytes32 internal constant CONTRACT_SYNTHETIX = "Synthetix";
     bytes32 private constant CONTRACT_REWARDESCROW = "RewardEscrowV2";
 
@@ -29,7 +28,7 @@ contract BaseSynthetixBridge is Owned, MixinSystemSettings, IBaseSynthetixBridge
     // ========== INTERNALS ============
 
     function messenger() internal view returns (iAbs_BaseCrossDomainMessenger) {
-        return iAbs_BaseCrossDomainMessenger(requireAndGetAddress(CONTRACT_EXT_MESSENGER));
+        return iAbs_BaseCrossDomainMessenger(address(0));
     }
 
     function synthetix() internal view returns (ISynthetix) {
@@ -49,9 +48,8 @@ contract BaseSynthetixBridge is Owned, MixinSystemSettings, IBaseSynthetixBridge
     function resolverAddressesRequired() public view returns (bytes32[] memory addresses) {
         bytes32[] memory existingAddresses = MixinSystemSettings.resolverAddressesRequired();
         bytes32[] memory newAddresses = new bytes32[](3);
-        newAddresses[0] = CONTRACT_EXT_MESSENGER;
-        newAddresses[1] = CONTRACT_SYNTHETIX;
-        newAddresses[2] = CONTRACT_REWARDESCROW;
+        newAddresses[0] = CONTRACT_SYNTHETIX;
+        newAddresses[1] = CONTRACT_REWARDESCROW;
         addresses = combineArrays(existingAddresses, newAddresses);
     }
 

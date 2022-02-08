@@ -96,7 +96,7 @@ contract Synthetix is BaseSynthetix {
         // record minting event before mutation to token supply
         _supplySchedule.recordMintEvent(supplyToMint);
 
-        // Set minted SNX balance to RewardEscrow's balance
+        // Set minted DEM balance to RewardEscrow's balance
         // Minus the minterReward and set balance of minter to add reward
         uint minterReward = _supplySchedule.minterReward();
         // Get the remainder
@@ -132,12 +132,12 @@ contract Synthetix is BaseSynthetix {
 
         emitAccountLiquidated(account, totalRedeemed, amountLiquidated, messageSender);
 
-        // Transfer SNX redeemed to messageSender
+        // Transfer DEM redeemed to messageSender
         // Reverts if amount to redeem is more than balanceOf account, ie due to escrowed balance
         return _transferByProxy(account, messageSender, totalRedeemed);
     }
 
-    /* Once off function for SIP-60 to migrate SNX balances in the RewardEscrow contract
+    /* Once off function for SIP-60 to migrate DEM balances in the RewardEscrow contract
      * To the new RewardEscrowV2 contract
      */
     function migrateEscrowBalanceToRewardEscrowV2() external onlyOwner {

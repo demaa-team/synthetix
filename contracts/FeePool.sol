@@ -210,7 +210,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
      * @param account Message.Senders account address
      * @param debtRatio Debt percentage this account has locked after minting or burning their synth
      * @param debtEntryIndex The index in the global debt ledger. synthetixState.issuanceData(account)
-     * @dev onlyIssuer to call me on synthetix.issue() & synthetix.burn() calls to store the locked SNX
+     * @dev onlyIssuer to call me on synthetix.issue() & synthetix.burn() calls to store the locked DEM
      * per fee period so we know to allocate the correct proportions of fees and rewards per period
      */
     function appendAccountIssuanceRecord(
@@ -238,12 +238,12 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
     }
 
     /**
-     * @notice The RewardsDistribution contract informs us how many SNX rewards are sent to RewardEscrow to be claimed.
+     * @notice The RewardsDistribution contract informs us how many DEM rewards are sent to RewardEscrow to be claimed.
      */
     function setRewardsToDistribute(uint amount) external {
         address rewardsAuthority = address(rewardsDistribution());
         require(messageSender == rewardsAuthority || msg.sender == rewardsAuthority, "Caller is not rewardsAuthority");
-        // Add the amount of SNX rewards to distribute on top of any rolling unclaimed amount
+        // Add the amount of DEM rewards to distribute on top of any rolling unclaimed amount
         _recentFeePeriodsStorage(0).rewardsToDistribute = _recentFeePeriodsStorage(0).rewardsToDistribute.add(amount);
     }
 
@@ -320,7 +320,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
 
         require(feesClaimable, "C-Ratio below penalty threshold");
 
-        require(!anyRateIsInvalid, "A synth or SNX rate is invalid");
+        require(!anyRateIsInvalid, "A synth or DEM rate is invalid");
 
         // Get the claimingAddress available fees and rewards
         (availableFees, availableRewards) = feesAvailable(claimingAddress);
@@ -420,7 +420,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
 
     /**
      * @notice Record the reward payment in our recentFeePeriods.
-     * @param snxAmount The amount of SNX tokens.
+     * @param snxAmount The amount of DEM tokens.
      */
     function _recordRewardPayment(uint snxAmount) internal returns (uint) {
         // Don't assign to the parameter
@@ -480,14 +480,14 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
     /**
      * @notice Send the rewards to claiming address - will be locked in rewardEscrow.
      * @param account The address to send the fees to.
-     * @param snxAmount The amount of SNX.
+     * @param snxAmount The amount of DEM.
      */
     function _payRewards(address account, uint snxAmount) internal notFeeAddress(account) {
         /* Escrow the tokens for 1 year. */
         uint escrowDuration = 52 weeks;
 
         // Record vesting entry for claiming address and amount
-        // SNX already minted to rewardEscrow balance
+        // DEM already minted to rewardEscrow balance
         rewardEscrowV2().appendVestingEntry(account, snxAmount, escrowDuration);
     }
 
@@ -507,7 +507,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
     }
 
     /**
-     * @notice The total SNX rewards available in the system to be withdrawn
+     * @notice The total DEM rewards available in the system to be withdrawn
      */
     function totalRewardsAvailable() external view returns (uint) {
         uint totalRewards = 0;
@@ -523,7 +523,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
 
     /**
      * @notice The fees available to be withdrawn by a specific account, priced in sUSD
-     * @dev Returns two amounts, one for fees and one for SNX rewards
+     * @dev Returns two amounts, one for fees and one for DEM rewards
      */
     function feesAvailable(address account) public view returns (uint, uint) {
         // Add up the fees
@@ -539,7 +539,7 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         }
 
         // And convert totalFees to sUSD
-        // Return totalRewards as is in SNX amount
+        // Return totalRewards as is in DEM amount
         return (totalFees, totalRewards);
     }
 

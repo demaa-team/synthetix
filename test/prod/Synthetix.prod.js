@@ -118,7 +118,7 @@ contract('Synthetix (prod tests)', accounts => {
 		describe('erc20 functionality', () => {
 			addSnapshotBeforeRestoreAfter();
 
-			it('can transfer SNX', async () => {
+			it('can transfer DEM', async () => {
 				const user1BalanceBefore = await Synthetix.balanceOf(user1);
 				const user2BalanceBefore = await Synthetix.balanceOf(user2);
 

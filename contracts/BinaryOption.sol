@@ -19,7 +19,7 @@ contract BinaryOption is IERC20, IBinaryOption {
 
     /* ========== STATE VARIABLES ========== */
 
-    string public constant name = "SNX Binary Option";
+    string public constant name = "DEM Binary Option";
     string public constant symbol = "sOPT";
     uint8 public constant decimals = 18;
 

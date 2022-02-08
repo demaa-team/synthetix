@@ -149,7 +149,7 @@ const setupContract = async ({
 			owner,
 			oracle,
 			tryGetAddressOf('AddressResolver'),
-			[toBytes32('SNX')],
+			[toBytes32('DEM')],
 			[toWei('0.2', 'ether')],
 		],
 		SynthetixState: [owner, ZERO_ADDRESS],
@@ -157,6 +157,8 @@ const setupContract = async ({
 		Proxy: [owner],
 		ProxyERC20: [owner],
 		Depot: [owner, fundsWallet, tryGetAddressOf('AddressResolver')],
+		OTC: [owner, tryGetAddressOf('AddressResolver')],
+		OTCDao: [owner, tryGetAddressOf('AddressResolver')],		
 		SynthUtil: [tryGetAddressOf('AddressResolver')],
 		DappMaintenance: [owner],
 		DebtCache: [owner, tryGetAddressOf('AddressResolver')],
@@ -282,7 +284,7 @@ const setupContract = async ({
 			);
 		},
 		async Synthetix() {
-			// first give all SNX supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
+			// first give all DEM supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
 			// the constructor args)
 			await cache['TokenStateSynthetix'].setBalanceOf(owner, SUPPLY_100M, {
 				from: deployerAccount,
@@ -340,7 +342,7 @@ const setupContract = async ({
 			);
 		},
 		async BaseSynthetix() {
-			// first give all SNX supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
+			// first give all DEM supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
 			// the constructor args)
 			await cache['TokenStateBaseSynthetix'].setBalanceOf(owner, SUPPLY_100M, {
 				from: deployerAccount,
@@ -376,7 +378,7 @@ const setupContract = async ({
 			);
 		},
 		async MintableSynthetix() {
-			// first give all SNX supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
+			// first give all DEM supply to the owner (using the hack that the deployerAccount was setup as the associatedContract via
 			// the constructor args)
 			await cache['TokenStateMintableSynthetix'].setBalanceOf(owner, SUPPLY_100M, {
 				from: deployerAccount,
@@ -630,6 +632,8 @@ const setupAllContracts = async ({
 			mocks: ['Synthetix', 'FeePool', 'RewardEscrow', 'RewardEscrowV2', 'ProxyFeePool'],
 		},
 		{ contract: 'Depot', deps: ['AddressResolver', 'SystemStatus'] },
+		{ contract: 'OTC', deps: ['AddressResolver', 'SystemStatus'] },
+        { contract: 'OTCDao', deps: ['AddressResolver', 'SystemStatus'] },
 		{ contract: 'SynthUtil', deps: ['AddressResolver'] },
 		{ contract: 'DappMaintenance' },
 		{

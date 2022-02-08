@@ -365,7 +365,7 @@ class Deployer {
 		source = name,
 		args = [],
 		deps = [],
-		force = false,
+		force = true,
 		dryRun = this.dryRun,
 	}) {
 		const forbiddenAddress = (this.deployedContracts['AddressResolver'] || { options: {} }).options
@@ -407,8 +407,12 @@ class Deployer {
 
 	getExistingContract({ contract }) {
 		let address;
-		if (this.network === 'local') {
-			address = this.deployment.targets[contract].address;
+		if (this.network === 'local' || this.network === 'mumbai' || this.network === 'polygon') {
+			if(this.deployment.targets[contract]){
+				address = this.deployment.targets[contract].address;
+			} else {
+				address = null;
+			}
 		} else {
 			const contractVersion = getVersions({
 				network: this.network,

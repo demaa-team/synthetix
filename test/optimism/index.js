@@ -107,7 +107,7 @@ describe('Layer 2 production tests', () => {
 
 				let currencyKeys = await Issuer.availableCurrencyKeys();
 				currencyKeys = currencyKeys.filter(key => key !== toBytes32('sUSD'));
-				const additionalKeys = ['SNX', 'ETH'].map(toBytes32); // The Depot uses the key "ETH" as opposed to "sETH" for its ether price
+				const additionalKeys = ['DEM', 'ETH'].map(toBytes32); // The Depot uses the key "ETH" as opposed to "sETH" for its ether price
 				currencyKeys.push(...additionalKeys);
 
 				const { timestamp } = await provider.getBlock();

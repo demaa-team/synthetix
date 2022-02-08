@@ -50,8 +50,8 @@ const createRandomKeysAndRates = quantity => {
 
 contract('Exchange Rates', async accounts => {
 	const [deployerAccount, owner, oracle, accountOne, accountTwo] = accounts;
-	const [SNX, sJPY, sXTZ, sBNB, sUSD, sEUR, sAUD, fastGasPrice] = [
-		'SNX',
+	const [DEM, sJPY, sXTZ, sBNB, sUSD, sEUR, sAUD, fastGasPrice] = [
+		'DEM',
 		'sJPY',
 		'sXTZ',
 		'sBNB',
@@ -122,7 +122,7 @@ contract('Exchange Rates', async accounts => {
 			assert.equal(await instance.oracle(), oracle);
 
 			assert.etherEqual(await instance.rateForCurrency(sUSD), '1');
-			assert.etherEqual(await instance.rateForCurrency(SNX), '0.2');
+			assert.etherEqual(await instance.rateForCurrency(DEM), '0.2');
 
 			// Ensure that when the rate isn't found, 0 is returned as the exchange rate.
 			assert.etherEqual(await instance.rateForCurrency(toBytes32('OTHER')), '0');
@@ -133,7 +133,7 @@ contract('Exchange Rates', async accounts => {
 			const lastUpdatedTimeOTHER = await instance.lastRateUpdateTimes.call(toBytes32('OTHER'));
 			assert.equal(lastUpdatedTimeOTHER.toNumber(), 0);
 
-			const lastUpdatedTimeSNX = await instance.lastRateUpdateTimes.call(SNX);
+			const lastUpdatedTimeSNX = await instance.lastRateUpdateTimes.call(DEM);
 			assert.isAtLeast(lastUpdatedTimeSNX.toNumber(), initialTime);
 
 			const sUSDRate = await instance.rateForCurrency(sUSD);
@@ -172,7 +172,7 @@ contract('Exchange Rates', async accounts => {
 						owner,
 						oracle,
 						resolver.address,
-						[SNX, toBytes32('GOLD')],
+						[DEM, toBytes32('GOLD')],
 						[web3.utils.toWei('0.2', 'ether')],
 					],
 				}),
@@ -215,7 +215,7 @@ contract('Exchange Rates', async accounts => {
 				setupContract({
 					accounts,
 					contract: 'ExchangeRates',
-					args: [owner, oracle, resolver.address, [SNX], ['0']],
+					args: [owner, oracle, resolver.address, [DEM], ['0']],
 				}),
 				'Zero is not a valid rate, please call deleteRate instead'
 			);
@@ -371,7 +371,7 @@ contract('Exchange Rates', async accounts => {
 		it('should revert when currency keys length != new rates length on update', async () => {
 			await assert.revert(
 				instance.updateRates(
-					[sUSD, SNX, toBytes32('GOLD')],
+					[sUSD, DEM, toBytes32('GOLD')],
 					[web3.utils.toWei('1', 'ether'), web3.utils.toWei('0.2', 'ether')],
 					await currentTime(),
 					{ from: oracle }
@@ -687,7 +687,7 @@ contract('Exchange Rates', async accounts => {
 	describe('anyRateIsInvalid()', () => {
 		describe('stale scenarios', () => {
 			it('should never allow sUSD to go stale via anyRateIsInvalid', async () => {
-				const keysArray = [SNX, toBytes32('GOLD')];
+				const keysArray = [DEM, toBytes32('GOLD')];
 
 				await instance.updateRates(
 					keysArray,
@@ -700,7 +700,7 @@ contract('Exchange Rates', async accounts => {
 				await fastForward(await instance.rateStalePeriod());
 
 				await instance.updateRates(
-					[SNX, toBytes32('GOLD')],
+					[DEM, toBytes32('GOLD')],
 					[web3.utils.toWei('0.1', 'ether'), web3.utils.toWei('0.2', 'ether')],
 					await currentTime(),
 					{ from: oracle }
@@ -993,7 +993,7 @@ contract('Exchange Rates', async accounts => {
 			beforeEach(async () => {
 				// Send a price update to guarantee we're not depending on values from outside this test.
 				await instance.updateRates(
-					['sAUD', 'sEUR', 'SNX'].map(toBytes32),
+					['sAUD', 'sEUR', 'DEM'].map(toBytes32),
 					['0.5', '1.25', '0.1'].map(toUnit),
 					timestamp,
 					{ from: oracle }
@@ -1003,8 +1003,8 @@ contract('Exchange Rates', async accounts => {
 				// 1 sUSD should be worth 2 sAUD.
 				assert.bnEqual(await instance.effectiveValue(sUSD, toUnit('1'), sAUD), toUnit('2'));
 
-				// 10 SNX should be worth 1 sUSD.
-				assert.bnEqual(await instance.effectiveValue(SNX, toUnit('10'), sUSD), toUnit('1'));
+				// 10 DEM should be worth 1 sUSD.
+				assert.bnEqual(await instance.effectiveValue(DEM, toUnit('10'), sUSD), toUnit('1'));
 
 				// 2 sEUR should be worth 2.50 sUSD
 				assert.bnEqual(await instance.effectiveValue(sEUR, toUnit('2'), sUSD), toUnit('2.5'));
@@ -1017,23 +1017,23 @@ contract('Exchange Rates', async accounts => {
 				timestamp = await currentTime();
 
 				// Update all rates except sUSD.
-				await instance.updateRates([sEUR, SNX], ['1.25', '0.1'].map(toUnit), timestamp, {
+				await instance.updateRates([sEUR, DEM], ['1.25', '0.1'].map(toUnit), timestamp, {
 					from: oracle,
 				});
 
 				const amountOfSynthetixs = toUnit('10');
 				const amountOfEur = toUnit('0.8');
 
-				// Should now be able to convert from SNX to sEUR since they are both not stale.
-				assert.bnEqual(await instance.effectiveValue(SNX, amountOfSynthetixs, sEUR), amountOfEur);
+				// Should now be able to convert from DEM to sEUR since they are both not stale.
+				assert.bnEqual(await instance.effectiveValue(DEM, amountOfSynthetixs, sEUR), amountOfEur);
 			});
 
 			it('should return 0 when relying on a non-existant dest exchange rate in effectiveValue()', async () => {
-				assert.equal(await instance.effectiveValue(SNX, toUnit('10'), toBytes32('XYZ')), '0');
+				assert.equal(await instance.effectiveValue(DEM, toUnit('10'), toBytes32('XYZ')), '0');
 			});
 
 			it('should return 0 when relying on a non-existing src rate in effectiveValue', async () => {
-				assert.equal(await instance.effectiveValue(toBytes32('XYZ'), toUnit('10'), SNX), '0');
+				assert.equal(await instance.effectiveValue(toBytes32('XYZ'), toUnit('10'), DEM), '0');
 			});
 
 			it('effectiveValueAndRates() should return rates as well with sUSD on one side', async () => {

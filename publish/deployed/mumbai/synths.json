@@ -1,0 +1,42 @@
+[
+	{
+		"name": "sUSD",
+		"asset": "USD",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "sBTC",
+		"asset": "BTC",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "sETH",
+		"asset": "ETH",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "sCN",
+		"asset": "CN",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "iETH",
+		"asset": "ETH",
+		"subclass": "PurgeableSynth",
+		"inverted": {
+			"entryPoint": 1548,
+			"upperLimit": 2322,
+			"lowerLimit": 774
+		}
+	},
+	{
+		"name": "iBTC",
+		"asset": "BTC",
+		"subclass": "PurgeableSynth",
+		"inverted": {
+			"entryPoint": 10600,
+			"upperLimit": 15900,
+			"lowerLimit": 5300
+		}
+	}
+]

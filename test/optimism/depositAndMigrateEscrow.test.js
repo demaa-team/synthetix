@@ -49,7 +49,7 @@ const itCanPerformDepositAndEscrowMigration = ({ ctx }) => {
 			});
 		});
 
-		describe('when a user owns enough SNX', () => {
+		describe('when a user owns enough DEM', () => {
 			const snxAmount = ethers.utils.parseEther('100');
 
 			let user1BalanceL1;
@@ -58,7 +58,7 @@ const itCanPerformDepositAndEscrowMigration = ({ ctx }) => {
 				user1BalanceL1 = await SynthetixL1.balanceOf(user1L1.address);
 			});
 
-			before('transfer SNX to the L1 user', async () => {
+			before('transfer DEM to the L1 user', async () => {
 				SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
 
 				const tx = await SynthetixL1.transfer(user1L1.address, snxAmount);
@@ -69,7 +69,7 @@ const itCanPerformDepositAndEscrowMigration = ({ ctx }) => {
 				assert.bnEqual(await SynthetixL1.balanceOf(user1L1.address), user1BalanceL1.add(snxAmount));
 			});
 
-			describe('when the user approves the reward escrow to transfer their SNX', () => {
+			describe('when the user approves the reward escrow to transfer their DEM', () => {
 				before('approve reward escrow ', async () => {
 					SynthetixL1 = SynthetixL1.connect(user1L1);
 
@@ -157,7 +157,7 @@ const itCanPerformDepositAndEscrowMigration = ({ ctx }) => {
 					});
 
 					describe('when the user has no outstanding debt on L1', () => {
-						describe('when the user wants to migrate their escrow and deposit SNX', () => {
+						describe('when the user wants to migrate their escrow and deposit DEM', () => {
 							let totalSupplyL2;
 							let rewardEscrowBalanceL2;
 							let user1BalanceL2;
@@ -168,7 +168,7 @@ const itCanPerformDepositAndEscrowMigration = ({ ctx }) => {
 								rewardEscrowBalanceL2 = await SynthetixL2.balanceOf(RewardEscrowV2L2.address);
 							});
 
-							describe('when the user has approved the L1 bridge to transfer their SNX', () => {
+							describe('when the user has approved the L1 bridge to transfer their DEM', () => {
 								let depositAndMigrateReceipt;
 								const depositAmount = ethers.utils.parseEther('20');
 								before('approve L1 bridge', async () => {
@@ -180,7 +180,7 @@ const itCanPerformDepositAndEscrowMigration = ({ ctx }) => {
 									await tx.wait();
 								});
 
-								describe('when the user deposits SNX along with the migration', () => {
+								describe('when the user deposits DEM along with the migration', () => {
 									const depositFinalizedEvents = [];
 									const importedVestingEntriesEvents = [];
 

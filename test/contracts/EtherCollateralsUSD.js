@@ -125,7 +125,7 @@ contract('EtherCollateralsUSD', async accounts => {
 
 	// Run once at beginning - snapshots will take care of resetting this before each test
 	before(async () => {
-		// Mock SNX, sUSD
+		// Mock DEM, sUSD
 		[{ token: sUSDSynth }] = await Promise.all([
 			mockToken({ accounts, synth: 'sUSD', name: 'Synthetic USD', symbol: 'sUSD' }),
 		]);

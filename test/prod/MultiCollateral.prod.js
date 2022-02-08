@@ -471,7 +471,7 @@ contract('MultiCollateral (prod tests)', accounts => {
 						if (network === 'mainnet') {
 							const oldEthContract = await artifacts.require('CollateralEth').at(oldEthAddress);
 							const period = await oldEthContract.interactionDelay();
-							// First loan was opened by SNX test account.
+							// First loan was opened by DEM test account.
 							const id = 1;
 							const repayAmount = toUnit(100);
 							let tx = await oldEthContract.repay(loansAccount, id, repayAmount, {

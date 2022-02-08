@@ -18,7 +18,6 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
     bytes32 private constant CONTRACT_ISSUER = "Issuer";
     bytes32 private constant CONTRACT_REWARDSDISTRIBUTION = "RewardsDistribution";
-    bytes32 private constant CONTRACT_OVM_SYNTHETIXBRIDGETOBASE = "ovm:SynthetixBridgeToBase";
     bytes32 private constant CONTRACT_SYNTHETIXBRIDGEESCROW = "SynthetixBridgeEscrow";
 
     uint8 private constant MAX_ENTRIES_MIGRATED_PER_MESSAGE = 26;
@@ -42,7 +41,7 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
     }
 
     function synthetixBridgeToBase() internal view returns (address) {
-        return requireAndGetAddress(CONTRACT_OVM_SYNTHETIXBRIDGETOBASE);
+        return address(0);
     }
 
     function synthetixBridgeEscrow() internal view returns (address) {
@@ -60,8 +59,7 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
         bytes32[] memory newAddresses = new bytes32[](4);
         newAddresses[0] = CONTRACT_ISSUER;
         newAddresses[1] = CONTRACT_REWARDSDISTRIBUTION;
-        newAddresses[2] = CONTRACT_OVM_SYNTHETIXBRIDGETOBASE;
-        newAddresses[3] = CONTRACT_SYNTHETIXBRIDGEESCROW;
+        newAddresses[2] = CONTRACT_SYNTHETIXBRIDGEESCROW;
         addresses = combineArrays(existingAddresses, newAddresses);
     }
 
@@ -88,7 +86,7 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
 
     // invoked by a generous user on L1
     function depositReward(uint amount) external requireInitiationActive {
-        // move the SNX into the deposit escrow
+        // move the DEM into the deposit escrow
         synthetixERC20().transferFrom(msg.sender, synthetixBridgeEscrow(), amount);
 
         _depositReward(msg.sender, amount);
@@ -115,14 +113,14 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
         emit iOVM_L1TokenGateway.WithdrawalFinalized(to, amount);
     }
 
-    // invoked by RewardsDistribution on L1 (takes SNX)
+    // invoked by RewardsDistribution on L1 (takes DEM)
     function notifyRewardAmount(uint256 amount) external {
         require(msg.sender == address(rewardsDistribution()), "Caller is not RewardsDistribution contract");
 
-        // NOTE: transfer SNX to synthetixBridgeEscrow because RewardsDistribution transfers them initially to this contract.
+        // NOTE: transfer DEM to synthetixBridgeEscrow because RewardsDistribution transfers them initially to this contract.
         synthetixERC20().transfer(synthetixBridgeEscrow(), amount);
 
-        // to be here means I've been given an amount of SNX to distribute onto L2
+        // to be here means I've been given an amount of DEM to distribute onto L2
         _depositReward(msg.sender, amount);
     }
 
@@ -158,8 +156,8 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
     }
 
     function _initiateDeposit(address _to, uint256 _depositAmount) private {
-        // Transfer SNX to L2
-        // First, move the SNX into the deposit escrow
+        // Transfer DEM to L2
+        // First, move the DEM into the deposit escrow
         synthetixERC20().transferFrom(msg.sender, synthetixBridgeEscrow(), _depositAmount);
         // create message payload for L2
         iOVM_L2DepositedToken bridgeToBase;
@@ -188,7 +186,7 @@ contract SynthetixBridgeToOptimism is BaseSynthetixBridge, ISynthetixBridgeToOpt
 
             // if there is an escrow amount to be migrated
             if (escrowedAccountBalance > 0) {
-                // NOTE: transfer SNX to synthetixBridgeEscrow because burnForMigration() transfers them to this contract.
+                // NOTE: transfer DEM to synthetixBridgeEscrow because burnForMigration() transfers them to this contract.
                 synthetixERC20().transfer(synthetixBridgeEscrow(), escrowedAccountBalance);
                 // create message payload for L2
                 ISynthetixBridgeToBase bridgeToBase;

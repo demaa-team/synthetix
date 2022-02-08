@@ -61,7 +61,7 @@ const persistTokens = async ({
 
 	const output = {
 		name: 'Synthetix',
-		logoURI: `${baseURI}/snx/SNX.svg`,
+		logoURI: `${baseURI}/snx/DEM.svg`,
 		keywords: ['synthetix', 'defi', 'derivatives', 'synths', 'isynths', 'synthetics'],
 		timestamp: new Date().toISOString(),
 		tags: {
@@ -92,13 +92,13 @@ const persistTokens = async ({
 			chainId,
 			address,
 			symbol,
-			name: symbol === 'SNX' ? 'Synthetix Network Token' : `Synth ${name}`,
+			name: symbol === 'DEM' ? 'Synthetix Network Token' : `Synth ${name}`,
 			decimals,
-			logoURI: baseURI + (symbol === 'SNX' ? '/snx/SNX.svg' : `/synths/${symbol}.svg`),
+			logoURI: baseURI + (symbol === 'DEM' ? '/snx/DEM.svg' : `/synths/${symbol}.svg`),
 			tags: []
 				.concat(index ? 'index' : [])
 				.concat(inverted ? 'inverse' : [])
-				.concat(symbol !== 'SNX' ? 'synth' : []),
+				.concat(symbol !== 'DEM' ? 'synth' : []),
 		})),
 	};
 

@@ -28,10 +28,10 @@ const {
 } = require('../../../.');
 
 const DEFAULTS = {
-	gasPrice: '1',
-	methodCallGasLimit: 250e3, // 250k
-	contractDeploymentGasLimit: 6.9e6, // TODO split out into seperate limits for different contracts, Proxys, Synths, Synthetix
-	network: 'kovan',
+	gasPrice: '2',
+	methodCallGasLimit: 1e6, // 250k
+	contractDeploymentGasLimit: 2e7, // TODO split out into seperate limits for different contracts, Proxys, Synths, Synthetix
+	network: 'mumbai',
 	buildPath: path.join(__dirname, '..', '..', '..', BUILD_FOLDER),
 	rewardsToDeploy: [],
 };

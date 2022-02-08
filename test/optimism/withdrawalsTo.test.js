@@ -4,7 +4,7 @@ const { assertRevertOptimism } = require('./utils/revertOptimism');
 const { connectContract } = require('./utils/connectContract');
 
 const itCanPerformWithdrawalsTo = ({ ctx }) => {
-	describe('[WITHDRAW TO] when withdrawing SNX from L2 to another account on L1', () => {
+	describe('[WITHDRAW TO] when withdrawing DEM from L2 to another account on L1', () => {
 		const amountToWithdraw = ethers.utils.parseEther('100');
 
 		let user1L2;
@@ -51,7 +51,7 @@ const itCanPerformWithdrawalsTo = ({ ctx }) => {
 
 		before('make a deposit', async () => {
 			// Make a deposit so that
-			// 1. There is SNX in the bridge for withdrawals,
+			// 1. There is DEM in the bridge for withdrawals,
 			// 2. Counter a known bug in Optimism, where "now" is always 0 unless a message has been relayed
 
 			SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
@@ -66,7 +66,7 @@ const itCanPerformWithdrawalsTo = ({ ctx }) => {
 		});
 
 		// --------------------------
-		// Get SNX
+		// Get DEM
 		// --------------------------
 
 		describe('when waiting for the tx to complete on L2', () => {
@@ -76,20 +76,20 @@ const itCanPerformWithdrawalsTo = ({ ctx }) => {
 				);
 				await ctx.watcher.getL2TransactionReceipt(transactionHashL2);
 			});
-			describe('when a user has the expected amount of SNX in L2', () => {
+			describe('when a user has the expected amount of DEM in L2', () => {
 				let user1BalanceL2;
 
 				before('record current values', async () => {
 					user1BalanceL2 = await SynthetixL2.balanceOf(user1L2.address);
 				});
 
-				before('ensure that the user has the expected SNX balance', async () => {
+				before('ensure that the user has the expected DEM balance', async () => {
 					SynthetixL2 = SynthetixL2.connect(ctx.ownerL2);
 					const tx = await SynthetixL2.transfer(user1L2.address, amountToWithdraw);
 					await tx.wait();
 				});
 
-				it('shows the user has SNX', async () => {
+				it('shows the user has DEM', async () => {
 					assert.bnEqual(
 						await SynthetixL2.balanceOf(user1L2.address),
 						user1BalanceL2.add(amountToWithdraw)
@@ -100,7 +100,7 @@ const itCanPerformWithdrawalsTo = ({ ctx }) => {
 				// At least one issuance
 				// --------------------------
 
-				describe('when the SNX rate has been updated', () => {
+				describe('when the DEM rate has been updated', () => {
 					// --------------------------
 					// Suspended
 					// --------------------------

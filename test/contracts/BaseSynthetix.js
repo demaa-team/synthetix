@@ -22,7 +22,7 @@ const {
 const { toBytes32 } = require('../..');
 
 contract('BaseSynthetix', async accounts => {
-	const [sUSD, sAUD, sEUR, SNX, sETH] = ['sUSD', 'sAUD', 'sEUR', 'SNX', 'sETH'].map(toBytes32);
+	const [sUSD, sAUD, sEUR, DEM, sETH] = ['sUSD', 'sAUD', 'sEUR', 'DEM', 'sETH'].map(toBytes32);
 
 	const [, owner, account1, account2, account3] = accounts;
 
@@ -406,7 +406,7 @@ contract('BaseSynthetix', async accounts => {
 		});
 		describe('when synth rates set', () => {
 			beforeEach(async () => {
-				// fast forward to get past initial SNX setting
+				// fast forward to get past initial DEM setting
 				await fastForward((await exchangeRates.rateStalePeriod()).add(web3.utils.toBN('300')));
 
 				timestamp = await currentTime();
@@ -422,11 +422,11 @@ contract('BaseSynthetix', async accounts => {
 			it('should still have stale rates', async () => {
 				assert.equal(await baseSynthetix.anySynthOrSNXRateIsInvalid(), true);
 			});
-			describe('when SNX is also set', () => {
+			describe('when DEM is also set', () => {
 				beforeEach(async () => {
 					timestamp = await currentTime();
 
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, { from: oracle });
+					await exchangeRates.updateRates([DEM], ['1'].map(toUnit), timestamp, { from: oracle });
 				});
 				it('then no stale rates', async () => {
 					assert.equal(await baseSynthetix.anySynthOrSNXRateIsInvalid(), false);
@@ -438,7 +438,7 @@ contract('BaseSynthetix', async accounts => {
 
 						timestamp = await currentTime();
 
-						await exchangeRates.updateRates([SNX, sAUD], ['0.1', '0.78'].map(toUnit), timestamp, {
+						await exchangeRates.updateRates([DEM, sAUD], ['0.1', '0.78'].map(toUnit), timestamp, {
 							from: oracle,
 						});
 					});
@@ -502,7 +502,7 @@ contract('BaseSynthetix', async accounts => {
 
 		it('should transfer using the ERC20 transfer function @gasprofile', async () => {
 			// Ensure our environment is set up correctly for our assumptions
-			// e.g. owner owns all SNX.
+			// e.g. owner owns all DEM.
 
 			assert.bnEqual(await baseSynthetix.totalSupply(), await baseSynthetix.balanceOf(owner));
 
@@ -519,26 +519,26 @@ contract('BaseSynthetix', async accounts => {
 
 		it('should revert when exceeding locked synthetix and calling the ERC20 transfer function', async () => {
 			// Ensure our environment is set up correctly for our assumptions
-			// e.g. owner owns all SNX.
+			// e.g. owner owns all DEM.
 			assert.bnEqual(await baseSynthetix.totalSupply(), await baseSynthetix.balanceOf(owner));
 
 			// Issue max synths.
 			await baseSynthetix.issueMaxSynths({ from: owner });
 
-			// Try to transfer 0.000000000000000001 SNX
+			// Try to transfer 0.000000000000000001 DEM
 			await assert.revert(
 				baseSynthetix.transfer(account1, '1', { from: owner }),
-				'Cannot transfer staked or escrowed SNX'
+				'Cannot transfer staked or escrowed DEM'
 			);
 		});
 
 		it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
 			// Ensure our environment is set up correctly for our assumptions
-			// e.g. owner owns all SNX.
+			// e.g. owner owns all DEM.
 			const previousOwnerBalance = await baseSynthetix.balanceOf(owner);
 			assert.bnEqual(await baseSynthetix.totalSupply(), previousOwnerBalance);
 
-			// Approve account1 to act on our behalf for 10 SNX.
+			// Approve account1 to act on our behalf for 10 DEM.
 			let transaction = await baseSynthetix.approve(account1, toUnit('10'), { from: owner });
 			assert.eventEqual(transaction, 'Approval', {
 				owner: owner,
@@ -557,7 +557,7 @@ contract('BaseSynthetix', async accounts => {
 				value: toUnit('10'),
 			});
 
-			// Assert that account2 has 10 SNX and owner has 10 less SNX
+			// Assert that account2 has 10 DEM and owner has 10 less DEM
 			assert.bnEqual(await baseSynthetix.balanceOf(account2), toUnit('10'));
 			assert.bnEqual(await baseSynthetix.balanceOf(owner), previousOwnerBalance.sub(toUnit('10')));
 
@@ -571,10 +571,10 @@ contract('BaseSynthetix', async accounts => {
 
 		it('should revert when exceeding locked synthetix and calling the ERC20 transferFrom function', async () => {
 			// Ensure our environment is set up correctly for our assumptions
-			// e.g. owner owns all SNX.
+			// e.g. owner owns all DEM.
 			assert.bnEqual(await baseSynthetix.totalSupply(), await baseSynthetix.balanceOf(owner));
 
-			// Approve account1 to act on our behalf for 10 SNX.
+			// Approve account1 to act on our behalf for 10 DEM.
 			const transaction = await baseSynthetix.approve(account1, toUnit('10'), { from: owner });
 			assert.eventEqual(transaction, 'Approval', {
 				owner: owner,
@@ -585,12 +585,12 @@ contract('BaseSynthetix', async accounts => {
 			// Issue max synths
 			await baseSynthetix.issueMaxSynths({ from: owner });
 
-			// Assert that transferFrom fails even for the smallest amount of SNX.
+			// Assert that transferFrom fails even for the smallest amount of DEM.
 			await assert.revert(
 				baseSynthetix.transferFrom(owner, account2, '1', {
 					from: account1,
 				}),
-				'Cannot transfer staked or escrowed SNX'
+				'Cannot transfer staked or escrowed DEM'
 			);
 		});
 
@@ -610,7 +610,7 @@ contract('BaseSynthetix', async accounts => {
 			it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
 				const previousOwnerBalance = await baseSynthetix.balanceOf(owner);
 
-				// Approve account1 to act on our behalf for 10 SNX.
+				// Approve account1 to act on our behalf for 10 DEM.
 				await baseSynthetix.approve(account1, toUnit('10'), { from: owner });
 
 				// Assert that transferFrom works.
@@ -618,7 +618,7 @@ contract('BaseSynthetix', async accounts => {
 					from: account1,
 				});
 
-				// Assert that account2 has 10 SNX and owner has 10 less SNX
+				// Assert that account2 has 10 DEM and owner has 10 less DEM
 				assert.bnEqual(await baseSynthetix.balanceOf(account2), toUnit('10'));
 				assert.bnEqual(
 					await baseSynthetix.balanceOf(owner),
@@ -639,18 +639,18 @@ contract('BaseSynthetix', async accounts => {
 			const ensureTransferReverts = async () => {
 				await assert.revert(
 					baseSynthetix.transfer(account2, value, { from: account1 }),
-					'A synth or SNX rate is invalid'
+					'A synth or DEM rate is invalid'
 				);
 				await assert.revert(
 					baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
 					}),
-					'A synth or SNX rate is invalid'
+					'A synth or DEM rate is invalid'
 				);
 			};
 
 			beforeEach(async () => {
-				// Give some SNX to account1 & account2
+				// Give some DEM to account1 & account2
 				await baseSynthetix.transfer(account1, toUnit('10000'), {
 					from: owner,
 				});
@@ -679,7 +679,7 @@ contract('BaseSynthetix', async accounts => {
 					// Now jump forward in time so the rates are stale
 					await fastForward((await exchangeRates.rateStalePeriod()) + 1);
 				});
-				it('should not allow transfer if the exchange rate for SNX is stale', async () => {
+				it('should not allow transfer if the exchange rate for DEM is stale', async () => {
 					await ensureTransferReverts();
 
 					const timestamp = await currentTime();
@@ -700,12 +700,12 @@ contract('BaseSynthetix', async accounts => {
 
 					await ensureTransferReverts();
 
-					// now give SNX rate
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, {
+					// now give DEM rate
+					await exchangeRates.updateRates([DEM], ['1'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 
-					// now SNX transfer should work
+					// now DEM transfer should work
 					await baseSynthetix.transfer(account2, value, { from: account1 });
 					await baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
@@ -717,8 +717,8 @@ contract('BaseSynthetix', async accounts => {
 
 					const timestamp = await currentTime();
 
-					// now give SNX rate
-					await exchangeRates.updateRates([SNX], ['1'].map(toUnit), timestamp, {
+					// now give DEM rate
+					await exchangeRates.updateRates([DEM], ['1'].map(toUnit), timestamp, {
 						from: oracle,
 					});
 					await debtCache.takeDebtSnapshot();
@@ -739,7 +739,7 @@ contract('BaseSynthetix', async accounts => {
 					});
 					await debtCache.takeDebtSnapshot();
 
-					// now SNX transfer should work
+					// now DEM transfer should work
 					await baseSynthetix.transfer(account2, value, { from: account1 });
 					await baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
@@ -748,8 +748,8 @@ contract('BaseSynthetix', async accounts => {
 			});
 
 			describe('when the user has no debt', () => {
-				it('should allow transfer if the exchange rate for SNX is stale', async () => {
-					// SNX transfer should work
+				it('should allow transfer if the exchange rate for DEM is stale', async () => {
+					// DEM transfer should work
 					await baseSynthetix.transfer(account2, value, { from: account1 });
 					await baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
@@ -757,7 +757,7 @@ contract('BaseSynthetix', async accounts => {
 				});
 
 				it('should allow transfer if the exchange rate for any synth is stale', async () => {
-					// now SNX transfer should work
+					// now DEM transfer should work
 					await baseSynthetix.transfer(account2, value, { from: account1 });
 					await baseSynthetix.transferFrom(account2, account1, value, {
 						from: account3,
@@ -766,7 +766,7 @@ contract('BaseSynthetix', async accounts => {
 			});
 		});
 
-		describe('when the user holds SNX', () => {
+		describe('when the user holds DEM', () => {
 			beforeEach(async () => {
 				await baseSynthetix.transfer(account1, toUnit('1000'), {
 					from: owner,
@@ -795,7 +795,7 @@ contract('BaseSynthetix', async accounts => {
 						// Ensure the transfer fails as all the synthetix are in escrow
 						await assert.revert(
 							baseSynthetix.transfer(account2, toUnit('990'), { from: account1 }),
-							'Cannot transfer staked or escrowed SNX'
+							'Cannot transfer staked or escrowed DEM'
 						);
 					});
 				});
@@ -816,7 +816,7 @@ contract('BaseSynthetix', async accounts => {
 				baseSynthetix.transfer(account2, toUnit(issuedSynthetixs), {
 					from: account1,
 				}),
-				'Cannot transfer staked or escrowed SNX'
+				'Cannot transfer staked or escrowed DEM'
 			);
 		});
 
@@ -917,7 +917,7 @@ contract('BaseSynthetix', async accounts => {
 			it('should transfer using the ERC20 transferFrom function @gasprofile', async () => {
 				const previousOwnerBalance = await baseSynthetix.balanceOf(owner);
 
-				// Approve account1 to act on our behalf for 10 SNX.
+				// Approve account1 to act on our behalf for 10 DEM.
 				await baseSynthetix.approve(account1, toUnit('10'), { from: owner });
 
 				// Assert that transferFrom works.
@@ -925,7 +925,7 @@ contract('BaseSynthetix', async accounts => {
 					from: account1,
 				});
 
-				// Assert that account2 has 10 SNX and owner has 10 less SNX
+				// Assert that account2 has 10 DEM and owner has 10 less DEM
 				assert.bnEqual(await baseSynthetix.balanceOf(account2), toUnit('10'));
 				assert.bnEqual(
 					await baseSynthetix.balanceOf(owner),

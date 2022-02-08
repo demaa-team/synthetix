@@ -5,11 +5,11 @@
 		"sign": "$",
 		"description": "US Dollars"
 	},
-	"SNX": {
-		"asset": "SNX",
+	"DEM": {
+		"asset": "DEM",
 		"category": "crypto",
 		"sign": "",
-		"description": "Synthetix Network Token"
+		"description": "Demaa Network Token"
 	},
 	"ETH": {
 		"asset": "ETH",
@@ -380,5 +380,11 @@
 		"sign": "",
 		"exchange": "NASDAQ",
 		"description": "Microsoft"
-	}
+	},
+	"CN": {
+		"asset": "CN",
+		"category": "index",
+		"sign": "",
+		"description": "CN Weekly contract"
+	}	
 }

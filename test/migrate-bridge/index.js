@@ -18,7 +18,7 @@ const {
 
 /*
  * Tests a migration of bridges with ongoing withdrawals and deposits
- * while the migration occurs. SNX is only migrated from the original L1 bridge
+ * while the migration occurs. DEM is only migrated from the original L1 bridge
  * to the new L1 bridge once all withdrawals that target it are finalized.
  *
  * How to run:
@@ -164,7 +164,7 @@ describe('Layer 2 bridge migration tests', () => {
 
 				let currencyKeys = await Issuer.availableCurrencyKeys();
 				currencyKeys = currencyKeys.filter(key => key !== toBytes32('sUSD'));
-				const additionalKeys = ['SNX', 'ETH'].map(toBytes32); // The Depot uses the key "ETH" as opposed to "sETH" for its ether price
+				const additionalKeys = ['DEM', 'ETH'].map(toBytes32); // The Depot uses the key "ETH" as opposed to "sETH" for its ether price
 				currencyKeys.push(...additionalKeys);
 
 				const { timestamp } = await provider.getBlock();
@@ -420,7 +420,7 @@ describe('Layer 2 bridge migration tests', () => {
 							});
 
 							// ------------------------------
-							// Migrate SNX to the new bridge
+							// Migrate DEM to the new bridge
 							// ------------------------------
 
 							describe('when the bridge is migrated', () => {
@@ -432,7 +432,7 @@ describe('Layer 2 bridge migration tests', () => {
 									);
 								});
 
-								before('migrate bridge SNX', async () => {
+								before('migrate bridge DEM', async () => {
 									const tx = await SynthetixBridgeToOptimismL1.migrateBridge(
 										SynthetixBridgeToOptimismL1New.address
 									);

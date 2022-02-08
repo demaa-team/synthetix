@@ -232,24 +232,24 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 		});
 
 		// --------------------------
-		// Get SNX
+		// Get DEM
 		// --------------------------
 
-		describe('when a user has the expected amount of SNX in L1', () => {
+		describe('when a user has the expected amount of DEM in L1', () => {
 			let user1BalanceL1;
 
 			before('record current values', async () => {
 				user1BalanceL1 = await SynthetixL1.balanceOf(user1L1.address);
 			});
 
-			before('ensure that the user has the expected SNX balance', async () => {
+			before('ensure that the user has the expected DEM balance', async () => {
 				SynthetixL1 = SynthetixL1.connect(ctx.ownerL1);
 
 				const tx = await SynthetixL1.transfer(user1L1.address, amountToDeposit);
 				await tx.wait();
 			});
 
-			it('shows the user has SNX', async () => {
+			it('shows the user has DEM', async () => {
 				assert.bnEqual(
 					await SynthetixL1.balanceOf(user1L1.address),
 					user1BalanceL1.add(amountToDeposit)
@@ -260,7 +260,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 			// Approval
 			// --------------------------
 
-			describe('when a user approves the L1 bridge to transfer its SNX', () => {
+			describe('when a user approves the L1 bridge to transfer its DEM', () => {
 				before('approve', async () => {
 					SynthetixL1 = SynthetixL1.connect(user1L1);
 
@@ -278,7 +278,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 				describe('when a user doesnt have debt in L1', () => {
 					let depositReceipt;
 
-					describe('when a user deposits SNX in the L1 bridge', () => {
+					describe('when a user deposits DEM in the L1 bridge', () => {
 						let user1BalanceL2;
 						let depositFinalizedEvent;
 
@@ -337,7 +337,7 @@ const itCanPerformSynthExchange = ({ ctx }) => {
 								assert.equal(depositFinalizedEvent.args._to, user1L1.address);
 							});
 
-							it('shows that the users L2 SNX balance increased', async () => {
+							it('shows that the users L2 DEM balance increased', async () => {
 								assert.bnEqual(
 									await SynthetixL2.balanceOf(user1L1.address),
 									user1BalanceL2.add(amountToDeposit)

@@ -20,8 +20,8 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
     // ========== STATE VARIABLES ==========
 
     // Available Synths which can be used with the system
-    string public constant TOKEN_NAME = "Synthetix Network Token";
-    string public constant TOKEN_SYMBOL = "SNX";
+    string public constant TOKEN_NAME = "Demaa Network Token";
+    string public constant TOKEN_SYMBOL = "DEM";
     uint8 public constant DECIMALS = 18;
     bytes32 public constant sUSD = "sUSD";
 
@@ -154,8 +154,8 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
         if (initialDebtOwnership > 0) {
             (uint transferable, bool anyRateIsInvalid) =
                 issuer().transferableSynthetixAndAnyRateIsInvalid(account, tokenState.balanceOf(account));
-            require(value <= transferable, "Cannot transfer staked or escrowed SNX");
-            require(!anyRateIsInvalid, "A synth or SNX rate is invalid");
+            require(value <= transferable, "Cannot transfer staked or escrowed DEM");
+            require(!anyRateIsInvalid, "A synth or DEM rate is invalid");
         }
         return true;
     }
