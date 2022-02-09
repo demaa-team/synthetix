@@ -1,9 +1,10 @@
 {
-	"v2.4.0-polygon": {
-		"tag": "v2.4.0-polygon",
-		"fulltag": "v2.4.0-polygon",
+	"v2.5.0-polygon": {
+		"tag": "v2.5.0-polygon",
+		"fulltag": "v2.5.0-polygon",
 		"network": "mumbai",
-		"commit": "4b9b2ee09b38638de6fe1c38dbe4255a11ebed86",
+		"date": "2022-02-08T09:47:56+00:00",
+		"commit": "c23501045502666857662f81ea1cc37c924b4c6f",
 		"block": 24679366,
 		"contracts": {
 			"SafeDecimalMath": {
@@ -365,6 +366,16 @@
 				"address": "0x2E41b4F145659415a35e7503f4A994b30A6503A0",
 				"status": "current",
 				"keccak256": "0xa93ff7610cbe9966e82ddf6aea0d393cddb5b95def87c75d3ccb097e9204463b"
+			},
+			"ShortingRewardssETH": {
+				"address": "0x2d78d9a7CCEa0c9d414Cb8b1E584D60A87284F4c",
+				"status": "current",
+				"keccak256": "0x2d387675e2b5192f47064fe3b8bed09561e3f280fc7aab79332a19d0880970e6"
+			},
+			"ShortingRewardssBTC": {
+				"address": "0xa7608E8a8612Ec9C9F54adB7bcd606e5eA8c7213",
+				"status": "current",
+				"keccak256": "0x2d387675e2b5192f47064fe3b8bed09561e3f280fc7aab79332a19d0880970e6"
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 {
 	"name": "synthetix-demaa",
-	"version": "2.4.0-mumbai",
+	"version": "2.5.0-mumbai",
 	"license": "MIT",
 	"author": "Demaa",
 	"description": "The smart contracts which make up the Demaa system. (demaa.io)",
