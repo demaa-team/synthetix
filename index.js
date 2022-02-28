@@ -216,8 +216,8 @@ const defaults = {
 	OTC_ASSETS: {
 			mumbai: [
 					[toBytes32('USDT'), '0x8ecAD5eD3C3D244d0CB2412005e2107963F4cF65'],
-					[toBytes32('DEM'), '0xe2f45DF412e4dE94FB9faFaAC35DBE88d23d338A'],
-					[toBytes32('sUSD'), '0x29c160e8F9E35Fd529a75e9e57247bAaAA5381C9'],
+					[toBytes32('DEM'), '0xd50a342122EdDE965e1F0F8102e834408Ff30622'],
+					[toBytes32('sUSD'), '0xa8615642827281F525E6Ce635C01F2096a78C122'],
 			],
 	},
 	ETHER_WRAPPER_MAX_ETH: w3utils.toWei('5000'),
